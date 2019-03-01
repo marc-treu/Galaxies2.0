@@ -15,6 +15,10 @@ import os
 
 
 def lecture(fic):
+    """
+    Lit le fichier fic passer en parametres et remplie la base de donnée
+    fic : le resultat de text_align
+    """
     print("Appel lecture fichier sur "+str(fic))
     #FichierEntree = codecs.open(fic, 'r', 'utf-8', errors="ignore")
     connexion = sqlite3.connect(parametres.DirBD+'/galaxie.db')
@@ -31,18 +35,7 @@ def lecture(fic):
         if (nbre_ligne > parametres.NombreLignes and parametres.NombreLignes != 0):
             return
         nbre_ligne += 1
-        #print("Traitement ligne "+str(nbre_ligne)+": "+str(ligne))
         L=json.loads(line.rstrip())
-        # i = 0
-        # for item in Items:
-        #     print('\t- '+ item + ': '+ L[i])
-        #     i=i+1
-        # baseDonnees.ajoutLivre(L[0], L[1], L[2], curseur, nbre_ligne)
-        # baseDonnees.ajoutLivre(L[8], L[9], L[10], curseur, nbre_ligne)
-        # #connexion.commit()
-        # idSource = baseDonnees.idLivre(L[0], L[1], L[2], curseur, nbre_ligne)
-        # idCible = baseDonnees.idLivre(L[8], L[9], L[10], curseur, nbre_ligne)
-        # baseDonnees.ajoutReutilisation(idSource, int(L[6]), int(L[7]) - int(L[6]), L[4], idCible, int(L[14]), int(L[15])-int(L[14]), L[12], curseur, nbre_ligne)
 
         baseDonnees.ajoutLivre(item('source_author', L),
                                item('source_title', L),
@@ -50,7 +43,6 @@ def lecture(fic):
         baseDonnees.ajoutLivre(item('target_author', L),
                                item('target_title', L),
                                itemNum('target_create_date',L), curseur, nbre_ligne)
-        #connexion.commit()
         idSource = baseDonnees.idLivre(item('source_author', L),
                                        item('source_title', L),
                                        itemNum('source_create_date', L), curseur, nbre_ligne)
@@ -68,36 +60,65 @@ def lecture(fic):
                                        L['target_passage'],
                                        metaData(parametres.metaDataCible, L),
                                        curseur, nbre_ligne)
-        #connexion.commit()
-        if divmod(nbre_ligne, parametres.pasTracage)[1]==0:
-            t2 = time.clock()
+        if divmod(nbre_ligne, parametres.pasTracage)[1]==0: # permet de tenir au courant l'utilisateur
+            t2 = time.clock()                               # du temps de construction du graphe
             print(" - " + str(nbre_ligne) + " réutilisations déjà traitées en un temps de "+format(t2-t1,'f')+" secondes")
             t1 = time.clock()
-        #ligne=FichierEntree.readline()
     print(str(nbre_ligne) + " réutilisations dans le fichier")
-    #FichierEntree.close()
     connexion.commit()
     connexion.close()
 
-def item(Clef, L):
-    if Clef in L.keys():
-        return L[Clef]
+
+
+def item(clef, dict):
+    """
+    Retourne la valeur de L[Clef] si elle existe, sinon Inconnu
+    L : un dictionnaire
+    Clef : une clef potentielle de L
+    """
+    return dict[clef] if clef in dict.keys() else "Inconnu"
+
+def itemNum(clef, dict):
+    """
+    Retourne la valeur de L[Clef] si elle existe, sinon 0
+    L : un dictionnaire
+    Clef : une clef potentielle de L
+    """
+    return dict[clef] if clef in dict.keys() else 0
+
+def metaData(clef, dict):
+    """
+    Retourne la valeur de L[Clef] si elle existe, sinon ''
+    L : un dictionnaire
+    Clef : une clef potentielle de L
+    """
+    return dict[clef] if clef in dict.keys() else ''
+
+def fichierNonCache(L):
+    """
+    Fonction qui va retourné le premier fichier d'une liste
+    L : List de dossiers ou de fichiers retourné par os.listdir()
+    """
+    # TODO: Retourner une liste de fichiers potentielle a traités, pas seulement le premier
+    #       peu etre regarder tous ce qui n'est pas un dossiers et qui fini par .tab
+    if L == 0 or not L:
+        print("Il n'y a pas de fichier de ressources!")
+        return
+    elif L[0][0] == '.': # On ne se préocupe pas de ./ et de ../
+        return fichierNonCache(L[1:])
+    elif os.path.isfile(L[0]):
+        return L[0]
     else:
-        return "Inconnu"
+        return fichierNonCache(L[1:])
 
-def itemNum(Clef, L):
-    if Clef in L.keys():
-        return L[Clef]
-    else:
-        return 0
+#### les Fonctions dans la suite n'on pas l'aire utile
 
-
-def clefsFichier(Fic):
+def clefsFichier(Fic): # Fonction jamais utiliser dans le reste du code
     FichierEntree = codecs.open(Fic, 'r', 'utf-8')
     L=json.loads(FichierEntree.readline()[0:-1])
     print(L.keys())
 
-def presenceClef(Clef, Fic)    :
+def presenceClef(Clef, Fic): # Fonction jamais utiliser dans le reste du code
     FichierEntree = codecs.open(Fic, 'r', 'utf-8')
     L = FichierEntree.readline()
     nligne = 0
@@ -114,28 +135,10 @@ def presenceClef(Clef, Fic)    :
     FichierEntree.close()
 
 
-def fichierNonCache(L):
-    if L == 0 or not L:
-        print("Il n'y a pas de fichier de ressources!")
-        return
-    elif L[0][0] == '.':
-        return fichierNonCache(L[1:])
-    elif os.path.isfile(L[0]):
-        return L[0]
-    else:
-        return fichierNonCache(L[1:])
-
-def rechercheDossiersBDsAmasetGraphes(D):
+def rechercheDossiersBDsAmasetGraphes(D): # Fonction qui crée nos dossiers BDs amas et graphe ?
     if not 'BDs' in os.listdir(D):
         os.makedirs(D+"BDs")
     if not 'amas' in os.listdir(D):
         os.makedirs(D+"amas")
     if not 'graphes' in os.listdir(D):
         os.makedirs(D+"graphes")
-
-
-def metaData(clef, dict):
-    if clef in dict.keys():
-        return dict[clef]
-    else:
-        return ''
