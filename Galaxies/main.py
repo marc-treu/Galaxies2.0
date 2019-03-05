@@ -26,24 +26,22 @@ import re
 
 
 def lancement_programme(maxNoeud):
-    init_dossiers()
-    if not 'galaxie.db' in os.listdir(parametres.DirBD):
+    init_dossiers() # creation des dossiers pour stocker les données
+    if not 'galaxie.db' in os.listdir(parametres.DirBD): # Si on a pas de bases de donnée
         t1 = time.clock()
-        baseDonnees.creerBD()
+        baseDonnees.creerBD()                            # On creer la Base de donnée
         t2 = time.clock()
         print("Temps de construction de la base de données: "+format(t2 - t1,'f')+" sec.")
         t1 = time.clock()
-        #cProfile.run('lecture_fic.lecture(Fichier)')
-        lecture_fic.lecture(Fichier)
+        lecture_fic.lecture(Fichier)                     # On remplie notre BD avec notre fichiers .tab
         t2 = time.clock()
         print("Temps de lecture du fichier source: " + format(t2 - t1,'f') + " sec.")
-    if grapheGalaxies.grapheConstruit()!= None:
+    print("premier line de la BD = ",grapheGalaxies.grapheConstruit())
+    if grapheGalaxies.grapheConstruit()!= None: # On teste si le graphe est construit
         print("Graphe déjà construit")
-    else:
-        #cProfile.run('maxNoeud = grapheGalaxies.construction_graphe()')
+    else:                                       # Sinon on le construit
         maxNoeud = grapheGalaxies.construction_graphe()
-        #cProfile.run('grapheGalaxies.sauvegarde_graphe()')
-        grapheGalaxies.sauvegarde_graphe_()
+        grapheGalaxies.sauvegarde_graphe_()     # Et on le sauvegarde
     if extractionGalaxies.composantesExtraites() != None:
         print("Composantes déjà extraites")
     else:
@@ -55,6 +53,9 @@ def lancement_programme(maxNoeud):
         print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
 
 def init_dossiers():
+    """
+    initialise la creation des dossiers pour recuperer les informations
+    """
     LS = os.listdir(parametres.DirGlobal)
     if not 'BDs' in LS:
         os.mkdir(parametres.DirBD)

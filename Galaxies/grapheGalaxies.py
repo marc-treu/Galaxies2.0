@@ -24,18 +24,17 @@ class noeud: #permet d'énumérer les noeuds du graphe
         return self.val
 
 def construction_graphe():
+    """
+    Fonction qui va construire le Graphe
+    """
     t1 = time.clock()
     connexion = sqlite3.connect(parametres.DirBD+'/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     n = noeud()
     curseur.execute('''SELECT rowid FROM livres''')
-    idReference = curseur.fetchone()
-    while idReference != None:
+    idReference = curseur.fetchone() # permet de prendre le premier
+    while idReference != None: # On va parcourir toute notre TABLE livres
         fusion_sources_cibles(idReference, connexion, n)
-        # fusion_sources(idReference, connexion, n)
-        #connexion.commit()
-        # fusion_cibles(idReference, connexion, n)
-        # connexion.commit()
         idReference = curseur.fetchone()
     curseur.execute('''INSERT INTO maxNoeud values (?)''', (n.val,))
     connexion.commit()
@@ -45,23 +44,21 @@ def construction_graphe():
     return (n.val)
 
 def fusion_sources_cibles(idRef, c, n):
-    #print("appel fusion sur référence"+str(idRef))
-    curseurSource=c.cursor()
+    """
+
+    idRef : l'id d'une des lignes du tableau qui est de la forme (n,)
+    c : un pipe qui est connecté a notre BD
+    n : la class Noeud qui permet de compter les noeuds de notre graphe
+    """
+    curseurSource=c.cursor()    # On creer deux curseur
     curseurCible=c.cursor()
-    #print("Fusion sources idRef: "+str(idRef[0]))
     curseurSource.execute('''SELECT ordonneeSource, empanSource, rowid FROM grapheReutilisations WHERE idRefSource = ?''', idRef)
     curseurCible.execute('''SELECT ordonneeCible, empanCible, rowid FROM grapheReutilisations WHERE idRefCible = ?''', idRef)
     listeReutilisationSource = curseurSource.fetchall()
-    #print("liste réutilisation source: "+str(listeReutilisationSource))
     listeReutilisationCible = curseurCible.fetchall()
-    #print("liste réutilisation cible: " + str(listeReutilisationCible))
     listeReutilisationMarquee = marquage(listeReutilisationCible, 'cible')+listeReutilisationSource
     listeReutilisationMarquee.sort()
     R = fusion(listeReutilisationMarquee, idRef, n)
-    # if listeReutilisationSource != [] and listeReutilisationCible != []:
-    #     print("liste réutilisation source: " + str(listeReutilisationSource))
-    #     print("liste réutilisation cible: " + str(listeReutilisationCible))
-    #     print("Résultat fusion:"+str(R))
     if R:
         n.nouvelleValeur()
     for X in R:
@@ -71,7 +68,6 @@ def fusion_sources_cibles(idRef, c, n):
             ajoutCible(X, curseurCible)
         else:
             print("Attention, erreur fusion sur noeud "+str(n.val)+" avec X="+str(X))
-    #print(R)
 
 
 def marquage(L, M):
@@ -237,6 +233,12 @@ def sauvegarde_graphe_():
 
 
 def grapheConstruit():
+    """
+    Se connecte a la base de donnée et retourne la permier ligne de la TABLE grapheGalaxiesSource
+    Permet de tester si la base est bien remplie
+    """
+    # TODO: ca na pas l'air de posser de probleme de d'ouvrir la base sans la refermé
+    #       mais je ne suis pas sur que cela soit une bonne pratique
     connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     curseur.execute('''SELECT * FROM grapheGalaxiesSource''')
