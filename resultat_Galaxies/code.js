@@ -1,8 +1,8 @@
-$.getJSON("../galaxie_0.json", function (data) {
+$.getJSON("jsons/galaxie_44.json", function (data) {
     //console.log(data);
     var cy = cytoscape({
         container: document.getElementById('cy'),
-        elements: data,
+        elements: data['elements'],
         style: [
             {
                 selector: 'node',
