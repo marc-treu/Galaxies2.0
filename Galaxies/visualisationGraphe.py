@@ -14,6 +14,8 @@ import filtres
 import codecs
 import string
 import textwrap
+import json
+
 
 
 
@@ -22,7 +24,9 @@ def sauveGrapheGalaxie(numero):
     ListeNoeuds = dirGalaxies[str(numero)]
     # print("Liste des nœuds: "+str(ListeNoeuds))
     dirGalaxies.close()
+    #return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'json')
     return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'gexf')
+
 
 def sauveGrapheGalaxieGML(numero):
     dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
@@ -96,8 +100,10 @@ def creerGrapheTextes(ListeNoeuds, fichier, ext):
             l_arcs.add((str(Pere),str(Fils)))
 
         Graphe.add_edges_from(l_arcs)
-    # if(ext=='json') :
-    #     nx.readwrite.json_graph.node_link_data(Graphe)
+    if(ext=='json') :
+        data = nx.readwrite.json_graph.node_link_data(Graphe)
+        with open(parametres.DirGraphes+'/'+fichier+'.'+ext, 'w') as f:
+            json.dump(data, f)
     if(ext=='gexf') :
         nx.write_gexf(Graphe, parametres.DirGraphes+'/' + fichier + '.'+ ext,encoding='utf-8',prettyprint=True, version='1.2draft')
     if(ext=='gml') :
