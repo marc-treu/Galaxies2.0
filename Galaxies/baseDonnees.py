@@ -6,6 +6,8 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 
 import sqlite3
+import shelve
+import re
 import os
 import parametres
 import time
@@ -178,4 +180,26 @@ def nombreGalaxies():
     curseur=connexion.execute('''SELECT nbre FROM  nombreGalaxies''')
     res=curseur.fetchone()[0]
     connexion.close()
+    return res
+
+
+def getListeGraphe():
+
+    graphes = os.listdir(parametres.DirGlobal + 'jsons')
+    res = []
+    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
+    for i in graphes:
+        tab = [int(s) for s in re.findall(r'\d+', i)]
+        if len(tab) == 1:
+            texte = "Galaxie numéro " + str(tab[0]) + " contenant " + str(len(dirGalaxies[str(tab[0])])) + " noeuds"
+        elif len(tab) == 2:
+            dirAmas = shelve.open(parametres.DirBD + '/listeAmasGalaxie' + str(tab[0]))
+            texte = "Amas numéro " + str(tab[1]) + " de la galaxie " + str(tab[0]) + " contenant " + str(
+                len(dirAmas[str(tab[1])])) + " noeuds"
+            dirAmas.close()
+        else:
+            texte = 'erreur : ' + i
+        res.append(texte)
+
+    dirGalaxies.close()
     return res
