@@ -1,4 +1,10 @@
 import tkinter as tk
+from tkinter import messagebox
+from tkinter import filedialog
+from tkinter import ttk
+
+
+import baseDonnees
 
 
 class InterfaceGalaxies(tk.Tk):
@@ -21,7 +27,7 @@ class InterfaceGalaxies(tk.Tk):
         super().__init__()
         self.geometry("1200x600")
 
-        self.create_menu()
+        self.create_menu() # Creation du menu
         self.grid_propagate(0)
 
         self.grid_columnconfigure(0, weight=1)
@@ -31,7 +37,7 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left.grid(row=0, column=0,sticky = tk.N+tk.S+tk.W+tk.E)
         self.frame_left.pack_propagate(0)
 
-        self.liste_Graphe = tk.Listbox(self.frame_left,selectmode=tk.MULTIPLE, height = 32,bg="gray88",font=("Helvetica", 12))
+        self.liste_Graphe = tk.Listbox(self.frame_left,selectmode=tk.MULTIPLE, height = 50,bg="gray88",font=("Helvetica", 12))
         self.liste_Graphe.pack(side=tk.LEFT,fill="both", expand = True)
 
         scrollbar = tk.Scrollbar(self.frame_left, orient="vertical")
@@ -50,13 +56,13 @@ class InterfaceGalaxies(tk.Tk):
 
         self.frame_right_button = tk.Label(self.frame_right,text = "ok")
         self.frame_right_button.pack(side=tk.BOTTOM,fill="both", expand = True)#grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
-
+        self.create_button_menu()
         # Initialisation des variables
         self.graph_selected = []
         self.graph_selected_last = None
 
 
-    def create_menu(self) :
+    def create_menu(self):
         menubar = tk.Menu(self)
         menu1 = tk.Menu(menubar,tearoff=0)
         menu1.add_command(label="With a text-align file", command=self.open_text_align_file)
@@ -64,15 +70,21 @@ class InterfaceGalaxies(tk.Tk):
         menu1.add_separator()
         menu1.add_command(label="Quitter", command=self.destroy)
         menubar.add_cascade(label="Start", menu=menu1)
-
         self.config(menu=menubar)
 
+    def create_button_menu(self):
+        processing = tk.Frame(self.frame_right_button)
+        processing.pack(fill="both", expand = True)
+        tk.Label(processing, text="Preprocessing").pack(side=tk.LEFT,fill="both", expand = True)
+        ttk.Separator(processing, orient=tk.VERTICAL).pack(side=tk.LEFT, fill="y",padx=3, pady=1)#, expand = True)
+        tk.Label(processing, text="Postprocessing").pack(side=tk.RIGHT,fill="both", expand = True)
 
-    def open_text_align_file():
+
+    def open_text_align_file(self):
         filepath = filedialog.askopenfilename(title="Open a file",filetypes=[('tab files','.tab')])
         #ajout du code qui lance galaxy à partir du fichier .tab
 
-    def action2():
+    def action2(self):
         messagebox.showinfo("alerte", "Bravo!")
 
     def display_graphe_list(self,listGraphe):
@@ -112,6 +124,7 @@ class InterfaceGalaxies(tk.Tk):
 if __name__ == '__main__':
     interface = InterfaceGalaxies()
 
+    #listGraph = baseDonnees.getListeGraphe()
     listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
     interface.display_graphe_list(listGraph)
     interface.mainloop()
