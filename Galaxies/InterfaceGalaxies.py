@@ -33,7 +33,7 @@ class InterfaceGalaxies(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.frame_left = tk.Frame(self,height=550,width=550)
+        self.frame_left = tk.Frame(self,height=580,width=550)
         self.frame_left.grid(row=0, column=0,sticky = tk.N+tk.S+tk.W+tk.E)
         self.frame_left.pack_propagate(0)
 
@@ -47,15 +47,15 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
         self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
 
-        self.frame_right = tk.Frame(self, height=550,width=550)
+        self.frame_right = tk.Frame(self, height=580,width=550)
         self.frame_right.grid(row=0, column=1,sticky=tk.N+tk.S+tk.W+tk.E)
         self.frame_right.pack_propagate(0)
 
         self.graph_info = tk.Label(self.frame_right, relief=tk.RIDGE)
-        self.graph_info.pack(side=tk.TOP,fill="both", expand = True)#grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
+        self.graph_info.pack(side=tk.TOP,fill="both", expand = True,padx = 2,pady= 2)#grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
 
         self.frame_right_button = tk.Label(self.frame_right,text = "ok")
-        self.frame_right_button.pack(side=tk.BOTTOM,fill="both", expand = True)#grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
+        self.frame_right_button.pack(side=tk.BOTTOM,fill="both", expand = False,padx = 2,pady= 2)#grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
         self.create_button_menu()
         # Initialisation des variables
         self.graph_selected = []
