@@ -73,11 +73,23 @@ class InterfaceGalaxies(tk.Tk):
         self.config(menu=menubar)
 
     def create_button_menu(self):
-        processing = tk.Frame(self.frame_right_button)
-        processing.pack(fill="both", expand = True)
-        tk.Label(processing, text="Preprocessing").pack(side=tk.LEFT,fill="both", expand = True)
-        ttk.Separator(processing, orient=tk.VERTICAL).pack(side=tk.LEFT, fill="y",padx=3, pady=1)#, expand = True)
-        tk.Label(processing, text="Postprocessing").pack(side=tk.RIGHT,fill="both", expand = True)
+        processing = tk.Frame(self.frame_right_button,height=20,width=20)
+        processing.pack(side=tk.TOP,fill="both", expand = True)
+
+        processing.grid_columnconfigure(0, weight=1)
+        processing.grid_columnconfigure(2, weight=1)
+        processing.grid_rowconfigure(0, weight=1)
+        processing.grid_rowconfigure(1, weight=1)
+        tk.Label(processing, text="Preprocessing").grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.LEFT,fill="both", expand = True)
+        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0,rowspan = 4, column=1,sticky=tk.N+tk.S)#.pack(side=tk.LEFT, fill="y",padx=3, pady=1)#, expand = True)
+        tk.Label(processing, text="Postprocessing").grid(row=0, column=2,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.RIGHT,fill="both", expand = True)
+        tk.Button(processing, text="Nouvelle Requete").grid(row=1,rowspan=3, column=0)
+        tk.Button(processing, text="Appliquer un filtre\n sur les noeuds").grid(row=1,rowspan=3, column=2)
+
+        button = tk.Frame(self.frame_right_button)
+        button.pack(side=tk.BOTTOM,fill="both", expand = True)
+        tk.Button(button, text="Afficher la selection dans un navigateur").pack(pady = 15)#, command=fenetre.quit)
+
 
 
     def open_text_align_file(self):
