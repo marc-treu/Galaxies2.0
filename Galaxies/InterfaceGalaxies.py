@@ -1,16 +1,12 @@
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import filedialog
 from tkinter import ttk
-import baseDonnees
 
 import baseDonnees
-
+import Main
 
 class InterfaceGalaxies(tk.Tk):
 
-
-    def __init__(self):
+    def __init__(self,main):
         """
         Fonction qui va initialiser notre fenetre ainsi que toute nos variables:
 
@@ -23,7 +19,7 @@ class InterfaceGalaxies(tk.Tk):
 
 
         """
-
+        self.main = main
         super().__init__()
         self.geometry("1200x600")
 
@@ -61,15 +57,18 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_selected = []
         self.graph_selected_last = None
 
-
     def create_menu(self):
         menubar = tk.Menu(self)
         menu1 = tk.Menu(menubar,tearoff=0)
-        menu1.add_command(label="With a text-align file", command=self.open_text_align_file)
-        menu1.add_command(label="Compare 2 corpus", command=self.action2)
-        menu1.add_separator()
-        menu1.add_command(label="Quitter", command=self.destroy)
+        menu1.add_command(label="New project with a text-align file", command=self.main.start_from_existing_file)
+        menu1.add_command(label="By Compare 2 corpus", command=self.action2)
         menubar.add_cascade(label="Start", menu=menu1)
+
+        menu2 = tk.Menu(menubar,tearoff=0)
+        menu2.add_command(label="Existing project")#, command=self.open_text_align_file)
+        menubar.add_cascade(label="Open", menu=menu2)
+
+        menubar.add_command(label = "Quit",command= self.destroy)
         self.config(menu=menubar)
 
     def create_button_menu(self):
@@ -83,23 +82,20 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(processing, text="Preprocessing").grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.LEFT,fill="both", expand = True)
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0,rowspan = 4, column=1,sticky=tk.N+tk.S)#.pack(side=tk.LEFT, fill="y",padx=3, pady=1)#, expand = True)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.RIGHT,fill="both", expand = True)
-        tk.Button(processing, text="Nouvelle Requete",command = self.new_requete).grid(row=1,rowspan=3, column=0)
+        tk.Button(processing, text="Nouvelle Requete",command = self.get_requete_from_user).grid(row=1,rowspan=3, column=0)
         tk.Button(processing, text="Appliquer un filtre\n sur les noeuds").grid(row=1,rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
         button.pack(side=tk.BOTTOM,fill="both", expand = True)
         tk.Button(button, text="Afficher la selection dans un navigateur").pack(pady = 15)#, command=fenetre.quit)
 
-
-
     def open_text_align_file(self):
-        filepath = filedialog.askopenfilename(title="Open a file",filetypes=[('tab files','.tab')])
-        #ajout du code qui lance galaxy à partir du fichier .tab
+        return tk.filedialog.askopenfilename(title="Open a file",filetypes=[('tab files','.tab')])
 
     def action2(self):
-        messagebox.showinfo("alerte", "Bravo!")
+        tk.messagebox.showinfo("alerte", "Bravo!")
 
-    def new_requete(self):
+    def get_requete_from_user(self):
 
         def recupere():
             if (auteur.get()):
@@ -139,22 +135,18 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.title("Recherche dans les galaxies")
         fenetre.geometry("800x350")
 
-        instructions = tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0,
-                                                                                                                  column=1)
+        instructions = tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0,column=1)
 
-        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(
-            sticky="w", row=1, column=1)
+
+        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(sticky="w", row=1, column=1)
         auteur = tk.Entry(fenetre, width=100)
         auteur.grid(row=1, column=2)
 
-        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(
-            sticky="w", row=2, column=1)
+        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(sticky="w", row=2, column=1)
         notauteur = tk.Entry(fenetre, width=100)
         notauteur.grid(row=2, column=2)
 
-        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",
-                                                                                                          row=3,
-                                                                                                          column=1)
+        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",row=3,column=1)
         date = tk.Entry(fenetre, width=80)
         date.insert(0, '[ AAAA - AAAA ]')
         date.grid(sticky="w", row=3, column=2)
@@ -176,8 +168,7 @@ class InterfaceGalaxies(tk.Tk):
         ltexte_max = tk.Entry(fenetre, width=30)
         ltexte_max.grid(sticky="w", row=7, column=2)
 
-        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",
-                                                                                                       row=8, column=1)
+        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",row=8, column=1)
         nbnoeuds_min = tk.Entry(fenetre, width=30)
         nbnoeuds_min.grid(sticky="w", row=8, column=2)
 
@@ -190,8 +181,9 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.bind("<Escape>", lambda e: fenetre.quit())
 
         fenetre.mainloop()
-        print(requete)
+
         return requete
+
 
     def display_graphe_list(self,listGraphe):
         """
@@ -224,14 +216,15 @@ class InterfaceGalaxies(tk.Tk):
 
 
 
+    def askyesno_txt(self,text,titre = "messagebox"):
+        return tk.messagebox.askyesno(titre,text)
 
 
 
 if __name__ == '__main__':
     interface = InterfaceGalaxies()
 
-    listGraph = baseDonnees.getListeGraphe()
+    #listGraph = baseDonnees.getListeGraphe()
     #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
-    interface.display_graphe_list(listGraph)
+    #interface.display_graphe_list(listGraph)
     interface.mainloop()
-    #interface.destroy()
