@@ -4,11 +4,12 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-import os
-import parametres
-import lecture_fic
 import baseDonnees
 import grapheGalaxies
+import InterfaceGalaxies
+import lecture_fic
+import os
+import parametres
 
 import extractionGalaxies
 import time
@@ -25,7 +26,7 @@ import shutil
 import re
 
 
-def lancement_programme(maxNoeud):
+def lancement_programme(file,maxNoeud=0):
     init_dossiers() # creation des dossiers pour stocker les données
     if not 'galaxie.db' in os.listdir(parametres.DirBD): # Si on a pas de bases de donnée
         t1 = time.clock()
@@ -33,7 +34,7 @@ def lancement_programme(maxNoeud):
         t2 = time.clock()
         print("Temps de construction de la base de données: "+format(t2 - t1,'f')+" sec.")
         t1 = time.clock()
-        lecture_fic.lecture(Fichier)                     # On remplie notre BD avec notre fichiers .tab
+        lecture_fic.lecture(file)                     # On remplie notre BD avec notre fichiers .tab
         t2 = time.clock()
         print("Temps de lecture du fichier source: " + format(t2 - t1,'f') + " sec.")
     print("premier line de la BD = ",grapheGalaxies.grapheConstruit())
@@ -163,16 +164,24 @@ def requetesUser() :
 
 if __name__ == '__main__':
 
+    #interface = InterfaceGalaxies.InterfaceGalaxies()
+
+    #listGraph = baseDonnees.getListeGraphe()
+    #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
+    #interface.display_graphe_list(listGraph)
+    #interface.mainloop()
+
     dossierCourant = os.chdir(parametres.DirFichier)
     Fichier = lecture_fic.fichierNonCache(os.listdir(parametres.DirFichier))
 
     start=time.clock()
 
     maxNoeud = 0
-    lancement_programme(maxNoeud)
+    lancement_programme(Fichier,maxNoeud)
     amas.recupererAmas()
     amas.requetesUser()
     print('fin requête utilisateur')
+    """
     javaVisualisation.preparationVisualisation()
 
     fichiers=Interface.selectionAffichage()
@@ -189,3 +198,4 @@ if __name__ == '__main__':
 
     finish=time.clock()
     print('Le programme s\'est exécuté en '+format((finish - start)/60,'f')+'mn')
+    """
