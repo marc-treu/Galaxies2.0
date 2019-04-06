@@ -4,6 +4,8 @@ from tkinter import ttk
 import baseDonnees
 import javaVisualisation
 import Main
+import webbrowser
+
 
 class InterfaceGalaxies(tk.Tk):
 
@@ -88,7 +90,7 @@ class InterfaceGalaxies(tk.Tk):
 
         button = tk.Frame(self.frame_right_button)
         button.pack(side=tk.BOTTOM,fill="both", expand = True)
-        tk.Button(button, text="Afficher la selection dans un navigateur").pack(pady = 15)#, command=fenetre.quit)
+        tk.Button(button, text="Afficher la selection dans un navigateur", command=self.display_graph_webbrowser).pack(pady = 15)#, command=fenetre.quit)
 
     def open_text_align_file(self):
         return tk.filedialog.askopenfilename(title="Open a file",filetypes=[('tab files','.tab')])
@@ -216,6 +218,10 @@ class InterfaceGalaxies(tk.Tk):
         print('last item selected',self.graph_selected_last)
 
 
+    def display_graph_webbrowser(self):
+        if self.graph_selected_last == None: return
+        webbrowser.open("/home/marc/Desktop/PLDAC/resultat_Galaxies/index1.html")
+        print(self.graph_selected_last)
 
     def askyesno_txt(self,text,titre = "messagebox"):
         return tk.messagebox.askyesno(titre,text)
