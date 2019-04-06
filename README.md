@@ -2,4 +2,6 @@
 A graphic version for Galaxies
 
 How to lunch : 
-  go in the repository, lunch a terminal and type python3 Galaxies/InterfaceGalaxies.py
+  go in the repository, lunch a terminal and type 
+  
+      python3 Galaxies/InterfaceGalaxies.py
