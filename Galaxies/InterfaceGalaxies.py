@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 
 import baseDonnees
+import javaVisualisation
 import Main
 
 class InterfaceGalaxies(tk.Tk):
 
-    def __init__(self,main):
+    def __init__(self):
         """
         Fonction qui va initialiser notre fenetre ainsi que toute nos variables:
 
@@ -19,7 +20,7 @@ class InterfaceGalaxies(tk.Tk):
 
 
         """
-        self.main = main
+        self.main = Main.Main(self)
         super().__init__()
         self.geometry("1200x600")
 
@@ -82,7 +83,7 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(processing, text="Preprocessing").grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.LEFT,fill="both", expand = True)
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0,rowspan = 4, column=1,sticky=tk.N+tk.S)#.pack(side=tk.LEFT, fill="y",padx=3, pady=1)#, expand = True)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2,sticky=tk.N+tk.S+tk.W+tk.E)#.pack(side=tk.RIGHT,fill="both", expand = True)
-        tk.Button(processing, text="Nouvelle Requete",command = self.get_requete_from_user).grid(row=1,rowspan=3, column=0)
+        tk.Button(processing, text="Nouvelle Requete",command = self.main.get_requete_preprocessing).grid(row=1,rowspan=3, column=0)
         tk.Button(processing, text="Appliquer un filtre\n sur les noeuds").grid(row=1,rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
@@ -131,7 +132,7 @@ class InterfaceGalaxies(tk.Tk):
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
             fenetre.destroy()
 
-        fenetre = tk.Tk()
+        fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
         fenetre.geometry("800x350")
 
@@ -180,15 +181,15 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.bind("<Return>", lambda e: recupere())
         fenetre.bind("<Escape>", lambda e: fenetre.quit())
 
-        fenetre.mainloop()
+        self.wait_window(fenetre)
+        return {0:requete}
 
-        return requete
-
-
-    def display_graphe_list(self,listGraphe):
+    def display_graph_list(self):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
+        javaVisualisation.preparationVisualisation()
+        listGraph = baseDonnees.getListeGraphe()
         for graph in listGraph:
             self.liste_Graphe.insert(tk.END, graph)
 
@@ -223,8 +224,8 @@ class InterfaceGalaxies(tk.Tk):
 
 if __name__ == '__main__':
     interface = InterfaceGalaxies()
+    interface.mainloop()
 
     #listGraph = baseDonnees.getListeGraphe()
     #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
-    #interface.display_graphe_list(listGraph)
-    interface.mainloop()
+    #interface.display_graph_list()

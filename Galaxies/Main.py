@@ -28,14 +28,13 @@ import re
 
 class Main:
 
-    def __init__(self):
-        self.interface = InterfaceGalaxies.InterfaceGalaxies(self)
-        self.interface.mainloop()
+    def __init__(self,interface):
+        self.interface = interface#InterfaceGalaxies.InterfaceGalaxies(self)
         #listGraph = baseDonnees.getListeGraphe()
         #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
         #interface.display_graphe_list(listGraph)
 
-    def start_from_existing_file(self):
+    def start_from_existing_file(self,maxNoeud=0):
         file = self.interface.open_text_align_file()
         if file == (): return # Si l'utilisateur a appuié sur cancel
         self.init_dossiers() # creation des dossiers pour stocker les données
@@ -64,6 +63,7 @@ class Main:
             t2 = time.clock()
             print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
         amas.recupererAmas()
+        print("Operation terminée start_from_existing_file")
 
 
     def init_dossiers(self):
@@ -84,11 +84,15 @@ class Main:
                 baseDonnees.detruireBD()
 
     def get_requete_preprocessing(self):
-        print("ok")
+        print("debut de fonction")
         requete = self.interface.get_requete_from_user()
-        print("ok")
+        print("la requete = ",requete)
         amas.myRequetesUser(requete)
-        print("okay !")
+        print("okay ! requete traiter")
+        self.interface.display_graph_list()
+        print("okay ! graphes afficher")
+
 
 if __name__ == '__main__':
-    Main()
+    main = Main()
+    main.interface.mainloop()
