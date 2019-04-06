@@ -8,16 +8,16 @@ import lecture_fic
 
 NombreLignes = 0
 
-DirGlobal = "/home/marc/Desktop/PLDAC/resultat_Galaxies/"
-DirFichier= "/home/marc/Desktop/PLDAC/Tab"
+DirGlobal = "./resultat_Galaxies/"
+DirFichier= "./Tab"
 lecture_fic.rechercheDossiersBDsAmasetGraphes(DirGlobal)
 DirBD = DirGlobal+'BDs'
 DirAmas = DirGlobal+'amas'
 DirGraphes = DirGlobal+'graphes'
 DirJson = DirGlobal+"jsons/"
-DirAffichage = "/home/marc/Downloads/gen-louvain/"
+DirAffichage = "./gen-louvain/"
 DirPgm=DirAffichage
-DirLouvain = "/home/marc/Downloads/gen-louvain"
+DirLouvain = ";/gen-louvain"
 
 pasTracage = 100000
 pasNbreNoeud = 10000
