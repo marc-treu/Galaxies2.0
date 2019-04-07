@@ -17,7 +17,7 @@ DirGraphes = DirGlobal+'graphes'
 DirJson = DirGlobal+"jsons/"
 DirAffichage = "./gen-louvain/"
 DirPgm=DirAffichage
-DirLouvain = ";/gen-louvain"
+DirLouvain = "./gen-louvain"
 
 pasTracage = 100000
 pasNbreNoeud = 10000
