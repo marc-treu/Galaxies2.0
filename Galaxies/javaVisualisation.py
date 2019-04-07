@@ -156,3 +156,14 @@ def affichage(nomFichier):
     webbrowser.open('file:///'+parametres.DirPgm + 'pop-up1.html')
     shutil.copyfile(parametres.DirPgm + 'code2.js', parametres.DirPgm + 'code1.js')
     os.remove(parametres.DirPgm + 'code2.js')
+
+
+def change_html_graph_display(filename):
+
+    with open("./resultat_Galaxies/code.js","r") as f:
+        lines = f.readlines()   # On lit toute les lignes
+
+    lines[0] = '$.getJSON("jsons/galaxie_1.json", function (data) {'
+                                # On remplace la premiere
+    with open("./resultat_Galaxies/code.js","w") as f:
+        f.writelines(lines)     # On re ecrie les lignes dans notre fichier
