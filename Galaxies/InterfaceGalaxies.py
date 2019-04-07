@@ -4,6 +4,7 @@ from tkinter import ttk
 import baseDonnees
 import javaVisualisation
 import Main
+import re
 import webbrowser
 
 
@@ -220,8 +221,18 @@ class InterfaceGalaxies(tk.Tk):
 
     def display_graph_webbrowser(self):
         if self.graph_selected_last == None: return
-        webbrowser.open("/home/marc/Desktop/PLDAC/resultat_Galaxies/index1.html")
+        filename = self.get_name_file()
+        javaVisualisation.change_html_graph_display(filename)
+        webbrowser.open("./resultat_Galaxies/index.html")
         print(self.graph_selected_last)
+
+    def get_name_file(self):
+        number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected_last))]
+        if len(number) == 2 : # Alors il s'agit d'une Galaxie
+            return 'galaxie_'+str(number[0])
+        if len(number) == 3 : # Alors il s'agit d'un Amas
+            return 'galaxie_'+str(number[1])+'_amas_'+str(number[0])
+        else: return
 
     def askyesno_txt(self,text,titre = "messagebox"):
         return tk.messagebox.askyesno(titre,text)
