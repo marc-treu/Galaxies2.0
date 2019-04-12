@@ -16,7 +16,7 @@ import networkx as nx
 import parametres
 import visualisationGraphe
 import baseDonnees
-import Interface
+#import Interface
 import extractionGalaxies
 
 def listeAmas(numGalaxie) :
@@ -95,40 +95,39 @@ def recupererAmas():
         print ('Amas extraits en '+format((tf - td)/3600,'f')+'h')
     noeudsGalaxies.close()
 
-def requetesUser() :
-    print("Appel requête utilisateur")
-    requetes = Interface.recupereRequete()
-    l=len(requetes)
-    if (l==0):
-        return
-    elif (l==1) :
-        print(requetes)
-        gal=extractionGalaxies.galaxiesFiltre(requetes[0])
-    else:
-        print(requetes)
-        gal=extractionGalaxies.galaxiesFiltreListe(requetes)
+# def requetesUser() :
+#     print("Appel requête utilisateur")
+#     ###requetes = Interface.recupereRequete()
+#     requête = {} ## Don't use this fonction, because Interface no longer exist
+#     l=len(requetes)
+#     if (l==0):
+#         return
+#     elif (l==1) :
+#         print(requetes)
+#         gal=extractionGalaxies.galaxiesFiltre(requetes[0])
+#     else:
+#         print(requetes)
+#         gal=extractionGalaxies.galaxiesFiltreListe(requetes)
+#
+#     print(gal)
+#
+#     check = os.listdir(parametres.DirGraphes)
+#     if check :
+#         shutil.rmtree(parametres.DirGraphes)
+#         os.mkdir(parametres.DirGraphes)
+#     if gal[0] :
+#         for num in gal[0] :
+#             visualisationGraphe.sauveGrapheGalaxie(num)
+#
+#     check = os.listdir(parametres.DirAmas)
+#     if check :
+#         shutil.rmtree(parametres.DirAmas)
+#         os.mkdir(parametres.DirAmas)
+#     if gal[1] :
+#         for numero in gal[1] :
+#             visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero])
 
-    print(gal)
-
-    check = os.listdir(parametres.DirGraphes)
-    if check :
-        shutil.rmtree(parametres.DirGraphes)
-        os.mkdir(parametres.DirGraphes)
-    if gal[0] :
-        for num in gal[0] :
-            visualisationGraphe.sauveGrapheGalaxie(num)
-
-    check = os.listdir(parametres.DirAmas)
-    if check :
-        shutil.rmtree(parametres.DirAmas)
-        os.mkdir(parametres.DirAmas)
-    if gal[1] :
-        for numero in gal[1] :
-            visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero])
-
-def myRequetesUser(requetes):
-    print(requetes)
-    print(len(requetes))
+def requetesUser(requetes):
     l=len(requetes)
     if (l==0):
         return

@@ -13,17 +13,17 @@ import parametres
 
 import amas
 import extractionGalaxies
-import shelve
+#import shelve
 import time
-import visualisationGraphe
+#import visualisationGraphe
 
-import igraph as ig
-import networkx as nx
-import community as louvain
-import Interface
-import javaVisualisation
-import shutil
-import re
+#import igraph as ig
+#import networkx as nx
+#import community as louvain
+#import Interface
+#import javaVisualisation
+#import shutil
+#import re
 
 
 class Main:
@@ -87,7 +87,7 @@ class Main:
         print("debut de fonction")
         requete = self.interface.get_requete_from_user()
         print("la requete = ",requete)
-        amas.myRequetesUser(requete)
+        amas.requetesUser(requete)
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
