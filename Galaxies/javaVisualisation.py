@@ -159,7 +159,12 @@ def affichage(nomFichier):
 
 
 def change_html_graph_display(filename):
+    """
+    Change graph to display on browser, by modify the first line of the javascript
+    file.
 
+    filename = the graph file you want to display.
+    """
     with open("./resultat_Galaxies/code.js","r") as f:
         lines = f.readlines()   # On lit toute les lignes
 
