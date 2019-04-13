@@ -17,13 +17,6 @@ DirAffichage = "./gen-louvain/"
 DirPgm=DirAffichage
 DirLouvain = "./gen-louvain"
 
-def set_DirProject(newDirProject):
-    DirProject = newDirProject
-    DirBD = DirProject + 'BDs'
-    DirAmas = DirProject + 'amas'
-    DirGraphes = DirProject + 'graphes'
-    DirJson = DirProject + "jsons/"
-
 
 pasTracage = 100000
 pasNbreNoeud = 10000

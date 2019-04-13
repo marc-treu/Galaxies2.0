@@ -82,8 +82,8 @@ class Main:
     def get_requete_preprocessing(self):
         print("debut de fonction")
         requete = self.interface.get_requete_from_user()
-        print("la requete = ",requete)
-        amas.requetesUser(requete)
+        print("la requete = ", requete)
+        amas.requetesUser(requete, self.DirProject)
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
