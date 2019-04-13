@@ -2,18 +2,64 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="53d1bb33-6bad-4435-bd32-817cceaf3e1f" name="Default Changelist" comment="Modification norme pip8">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/InterfaceGalaxies.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/InterfaceGalaxies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/amas.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/amas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/baseDonnees.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/baseDonnees.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/extractionGalaxies.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/extractionGalaxies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/grapheGalaxies.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/grapheGalaxies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/javaVisualisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/javaVisualisation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/lecture_fic.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/lecture_fic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/parametres.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/parametres.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Galaxies/src/visualisationGraphe.py" beforeDir="false" afterPath="$PROJECT_DIR$/Galaxies/src/visualisationGraphe.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/Makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/convert" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/gpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/hierarchy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/lgpl-3.0.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/louvain" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/matrix" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/balmod.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/balmod.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/balmod.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/condora.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/condora.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/condora.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devind.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devind.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devind.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devuni.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devuni.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/devuni.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/dp.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/dp.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/dp.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/goldberg.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/goldberg.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/goldberg.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph_binary.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph_binary.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/graph_binary.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/louvain.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/louvain.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/louvain.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_convert.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_convert.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_hierarchy.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_hierarchy.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_louvain.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_louvain.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_matrix.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/main_matrix.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/modularity.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/modularity.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/modularity.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/owzad.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/owzad.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/owzad.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/quality.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/quality.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/quality.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/shimalik.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/shimalik.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/shimalik.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/zahn.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/zahn.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gen-louvain/src/zahn.o" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -321,8 +367,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="25" width="1366" height="743" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="25" width="1366" height="743" extended-state="7" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.24571854" />
