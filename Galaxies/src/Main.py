@@ -4,7 +4,6 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-import banane
 import baseDonnees
 import grapheGalaxies
 import lecture_fic
@@ -15,7 +14,6 @@ import amas
 import extractionGalaxies
 import time
 
-print(banane.banana())
 
 class Main:
 
