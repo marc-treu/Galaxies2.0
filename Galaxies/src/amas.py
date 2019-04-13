@@ -19,15 +19,14 @@ import baseDonnees
 #import Interface
 import extractionGalaxies
 
-def listeAmas(numGalaxie) :
-    listeAmas=shelve.open(parametres.DirBD+'/listeAmasGalaxie'+str(numGalaxie))
-    if(len(listeAmas)>0) :
-        E = input("Liste des amas de la galaxie "+str(numGalaxie)+" déjà remplie. Souhaitez-vous recommencer l'opération ? (O, oui, Y, yes) ")
-        if str.lower(E) not in ['oui', 'o', 'y', 'yes']:
-            return
+
+def listeAmas(numGalaxie, project_path):
+
+    listeAmas = shelve.open(project_path+'/BDs/listeAmasGalaxie'+str(numGalaxie))
+
     print('Récupération de la galaxie '+str(numGalaxie))
     td=time.clock()
-    fichierGrapheGalaxie = visualisationGraphe.sauveGrapheGalaxie(numGalaxie)
+    fichierGrapheGalaxie = visualisationGraphe.sauveGrapheGalaxie(numGalaxie, project_path)
     tf=time.clock()
     print('Galaxie récupérée en '+format(tf - td,'f')+'s'+ "- sauvegardée dan "+fichierGrapheGalaxie)
 
@@ -43,9 +42,9 @@ def listeAmas(numGalaxie) :
         if amas[x] in liste_Amas.keys():
             liste_Amas[amas[x]].append(x)
         else:
-            liste_Amas[amas[x]]=[x]
+            liste_Amas[amas[x]] = [x]
     for a in liste_Amas:
-        listeAmas[str(a)]=liste_Amas[a]
+        listeAmas[str(a)] = liste_Amas[a]
     #print("Liste des amas: ",liste_Amas)
     #for a in c
     # res=[[] for i in range(len(amas))]
@@ -70,17 +69,18 @@ def listeAmas(numGalaxie) :
     os.remove(fichierGrapheGalaxie)#parametres.DirGraphes+'/graphe_galaxie_TC_'+str(numGalaxie)+'.gml')
     listeAmas.close()
 
-def recupererAmas():
-    noeudsGalaxies=shelve.open(parametres.DirBD + '/listeGalaxies')
+
+def recupererAmas(project_path, tailleMinGrosseGalaxie = 300):
+    noeudsGalaxies=shelve.open(project_path + '/BDs/listeGalaxies')
     j=0
     td=time.clock()
     # print(len(noeudsGalaxies))
-    while j<baseDonnees.nombreGalaxies()-1:
-        if len(noeudsGalaxies[str(j)])>parametres.tailleMinGrosseGalaxie :
+    while j < baseDonnees.nombreGalaxies(project_path)-1:
+        if len(noeudsGalaxies[str(j)]) > tailleMinGrosseGalaxie:
             print('Galaxie numéro '+str(j)+' de taille '+str(len(noeudsGalaxies[str(j)]))+'\nAppel de Louvain')
             noeudsGalaxies.close()
-            listeAmas(j)
-            noeudsGalaxies=shelve.open(parametres.DirBD + '/listeGalaxies')
+            listeAmas(j, project_path)
+            noeudsGalaxies=shelve.open(project_path + '/BDs/listeGalaxies')
 
             # i=i+1
         # elif len(noeudsGalaxies[str(j)])>4 :

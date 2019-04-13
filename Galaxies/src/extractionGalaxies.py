@@ -18,16 +18,22 @@ import baseDonnees
 # import unicodedata
 # from django.utils import encoding
 
-class galaxie: #permet d'énumérer composantes connexes
-    def __init__(self):
+
+class galaxie:  #permet d'énumérer composantes connexes
+
+    def __init__(self, data_base_path):
         self.val = 0
         self.compositionGalaxie = dict()
         self.tempsIni = time.clock()
+        self.pasGalaxies = 10000
+        self.pasNbreNoeud = 10000
+        self.data_base_path = data_base_path
+
     def nouvelleValeur(self):
         self.val += 1
-        if divmod(self.val, parametres.pasGalaxies)[1] == 0:
+        if divmod(self.val, self.pasGalaxies)[1] == 0:
             self.temps = time.clock()
-            print("Nombre galaxies: "+str(self.val)+"; temps de construction des "+str(parametres.pasNbreNoeud)+" dernières galaxies: "+str(self.temps - self.tempsIni))
+            print("Nombre galaxies: "+str(self.val)+"; temps de construction des "+str(self.pasNbreNoeud)+" dernières galaxies: "+str(self.temps - self.tempsIni))
             self.tempsIni = self.temps
         return self.val
     def valeur(self):
@@ -37,7 +43,7 @@ class galaxie: #permet d'énumérer composantes connexes
         return len(L)
 
     def sauvegarde(self):
-        dict = shelve.open(parametres.DirBD + '/listeGalaxies')
+        dict = shelve.open(self.data_base_path + '/listeGalaxies')
         x = 0 # changement dimanche 14
         while x < self.val:
             dict[str(x)] = self.compositionGalaxie[x]
@@ -49,16 +55,16 @@ class galaxie: #permet d'énumérer composantes connexes
     def rangement(self):
         tr = time.clock()
         print("         Extraction des galaxies terminées; opérations de rangement...")
-        connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+        connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         curseur2 = connexion.cursor()
         curseur2.execute('''INSERT INTO nombreGalaxies values (?)''', (str(self.val),))
-        #connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+        #connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         print("Nombre de galaxies: "+str(self.val))
         #connexion.commit()
         t0 = tr
         i = 0
         while i < self.val:
-            if divmod(i, parametres.pasGalaxies)[1] == 0 and i != 0:
+            if divmod(i, self.pasGalaxies)[1] == 0 and i != 0:
                 t1 = time.clock()
                 print('Nombre galaxies rangées: '+str(i)+' sur '+str(self.val)+" ("+str(int((float(i)/float(self.val))*100))+'%) en '+format(t1 - t0,'f')+'sec.')
                 t0 = t1
@@ -66,7 +72,7 @@ class galaxie: #permet d'énumérer composantes connexes
             n = len(lnoeuds)
             longueur = 0
             longueurMax = 0
-            for texte in texteGalaxie(i, curseur2):
+            for texte in texteGalaxie(i, curseur2, self.data_base_path):
                 longueur += len(texte)
                 longueurMax = max(len(texte), longueurMax)
             curseur2.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(i),))
@@ -198,12 +204,11 @@ class noeudMarques():
             return g
 
 
-
-def extractionComposantesConnexes(maxNoeud):
-    graphe = shelve.open(parametres.DirBD + '/liste_ajacence_graphe')
-    graphe_t = shelve.open(parametres.DirBD + '/liste_ajacence_graphe_transpose')
+def extractionComposantesConnexes(maxNoeud, data_base_path):
+    graphe = shelve.open(data_base_path + '/liste_ajacence_graphe')
+    graphe_t = shelve.open(data_base_path + '/liste_ajacence_graphe_transpose')
     noeuds = noeudMarques(maxNoeud)
-    Galaxie = galaxie()
+    Galaxie = galaxie(data_base_path)
     nouveauNoeud = noeuds.noeudNonVisite(0)
     while nouveauNoeud != None:# < maxNoeud:
         #L = composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds)
@@ -245,24 +250,25 @@ def composanteConnexe(N, g, graphe, graphe_t, noeuds):
 def fils(X, graphe, graphe_t):
     return graphe[str(X)]+graphe_t[str(X)]
 
-def extractionComposantesConnexes_(maxNoeud):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def extractionComposantesConnexes_(maxNoeud, data_base_path, step=10000):
+    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     #curseur.execute('''DROP INDEX idNoeud''')
     #curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
     noeuds = noeudMarques(maxNoeud)
-    Galaxie = galaxie()
+    Galaxie = galaxie(data_base_path)
     tg1 = time.clock()
     nouveauNoeud = noeuds.noeudNonVisite(0)
     nbre_noeuds = 0
     nbre_noeuds_mod = 0
 
-    while nouveauNoeud != None:# < maxNoeud:
+    while nouveauNoeud is not None:# < maxNoeud:
         #L = composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds)
         #print("Nouveau noeud: "+str(nouveauNoeud)+" - galaxie: "+str(Galaxie.val))
         nbre_noeuds = nbre_noeuds + Galaxie.noeudsGalaxie(Galaxie.val, composanteConnexe_(nouveauNoeud, Galaxie, curseur, noeuds))
-        if divmod(nbre_noeuds, parametres.pasNbreNoeudsGalaxie)[0] > nbre_noeuds_mod:
-            nbre_noeuds_mod = divmod(nbre_noeuds, parametres.pasNbreNoeudsGalaxie)[0]
+        if divmod(nbre_noeuds, step)[0] > nbre_noeuds_mod:
+            nbre_noeuds_mod = divmod(nbre_noeuds, step)[0]
             tg2 = time.clock()
             print("Nombre total de nœuds traités: "+str(nbre_noeuds)+" - Nombre de galaxies construites: "+str(Galaxie.val)+" - temps: "+format(tg2 - tg1, 'f')+ " sec.")
             tg1 = tg2
@@ -325,9 +331,9 @@ def source(arc, curseur):
     #print("Ensemble des noeuds origines de l'arc " + arc + ": " + str(s))
     return s
 
-def composantesExtraites():
-    if 'listeGalaxies.db' in os.listdir(parametres.DirBD):
-        dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
+def composantesExtraites(data_base_path):
+    if 'listeGalaxies.db' in os.listdir(data_base_path):
+        dirGalaxies = shelve.open(data_base_path + '/listeGalaxies')
         return dirGalaxies['nbreGalaxies']
     else:
         return None
@@ -356,8 +362,10 @@ def textesGalaxie(numero):
 #         print(curseur.fetchall()) # ERREUR A CORRIGER!!!
 #         #textes.add(curseur.fetchall()[0][0])
 #     return textes
-def texteGalaxie(numero, curseur):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
+
+
+def texteGalaxie(numero, curseur, data_base_path):
+    dirGalaxies = shelve.open(data_base_path + '/listeGalaxies')
     ListeNoeuds = dirGalaxies[str(numero)]
     dirGalaxies.close()
     reutilisations = set()
@@ -382,11 +390,11 @@ def texteGalaxie(numero, curseur):
     return textes
 
 
-def auteursGalaxie(numero):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
+def auteursGalaxie(numero, data_base_path):
+    dirGalaxies = shelve.open(data_base_path + '/listeGalaxies')
     ListeNoeuds = dirGalaxies[str(numero)]
     dirGalaxies.close()
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     auteurs = set()
     for Noeud in ListeNoeuds:

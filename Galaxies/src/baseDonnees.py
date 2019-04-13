@@ -12,37 +12,34 @@ import os
 import parametres
 import time
 
-import igraph as ig
-import community as louvain
 
-def creerBD():
-    if not 'galaxie.db' in os.listdir(parametres.DirBD):
-        print("Création de la base de données 'galaxie.db'")
-        connexion = sqlite3.connect(parametres.DirBD+'/galaxie.db', 1, 0, 'EXCLUSIVE')
-        curseur = connexion.cursor()
-        curseur.execute('''CREATE TABLE livres (idLivre TEXT UNIQUE, auteur TEXT, titre TEXT, date INTEGER)''')
-        curseur.execute('''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, texteCible TEXT, metaDataCible TEXT)''')
-        curseur.execute('''CREATE TABLE grapheGalaxiesSource (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
-        curseur.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
-        curseur.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
-        curseur.execute('''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, ordonnee INTEGER, empan INTEGER)''')
-        curseur.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
-        curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
-        curseur.execute('''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
-        curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
-        curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
-        curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
-        curseur.execute('''CREATE INDEX refCible ON grapheReutilisations (idRefCible)''')
-        curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
-        curseur.execute('''CREATE INDEX idNoeudf ON grapheGalaxies (idNoeudFils)''')
-        curseur.execute('''CREATE INDEX identifiantNoeud ON texteNoeuds (idNoeud)''')
-        # curseur.execute('''CREATE INDEX dateIndex ON livres (date) ASC''')
-        # curseur.execute('''CREATE INDEX idReutSource ON grapheGalaxiesSource (idReutilisation)''')
-        # curseur.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
-        #
-        # curseur.execute('''CREATE INDEX refLivre ON livres (idLivre)''')
+def creerBD(filepath):
+    print("Création de la base de données 'galaxie.db'")
+    connexion = sqlite3.connect(filepath + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+    curseur = connexion.cursor()
+    curseur.execute('''CREATE TABLE livres (idLivre TEXT UNIQUE, auteur TEXT, titre TEXT, date INTEGER)''')
+    curseur.execute('''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, texteCible TEXT, metaDataCible TEXT)''')
+    curseur.execute('''CREATE TABLE grapheGalaxiesSource (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
+    curseur.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
+    curseur.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
+    curseur.execute('''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, ordonnee INTEGER, empan INTEGER)''')
+    curseur.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
+    curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
+    curseur.execute('''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
+    curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
+    curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
+    curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
+    curseur.execute('''CREATE INDEX refCible ON grapheReutilisations (idRefCible)''')
+    curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
+    curseur.execute('''CREATE INDEX idNoeudf ON grapheGalaxies (idNoeudFils)''')
+    curseur.execute('''CREATE INDEX identifiantNoeud ON texteNoeuds (idNoeud)''')
+    # curseur.execute('''CREATE INDEX dateIndex ON livres (date) ASC''')
+    # curseur.execute('''CREATE INDEX idReutSource ON grapheGalaxiesSource (idReutilisation)''')
+    # curseur.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
+    #
+    # curseur.execute('''CREATE INDEX refLivre ON livres (idLivre)''')
 
-        curseur.close()
+    curseur.close()
 
 
 def dateToInt(date):
@@ -110,8 +107,9 @@ def ajoutReutilisation(idSource, coordonneeSource, empanSource, texteSource, met
     #         t2 = time.clock()
     #         print(" temps d'insertion d'un enregistrement "+str(t2-t1)+"secondes")
 
-def maxNoeuds():
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def maxNoeuds(data_base_path):
+    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     curseur.execute('''SELECT * FROM maxNoeud''')
     noeudMax = curseur.fetchone()
@@ -141,8 +139,8 @@ def detruireListeGalaxiesBD():
     if 'listeGalaxies.db' in os.listdir(parametres.DirBD):
         os.remove(parametres.DirBD+'/listeGalaxies.db')
 
-def reutilisations(noeud):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+def reutilisations(noeud, project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (noeud,))
     source = curseur.fetchall()
     curseur = connexion.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (noeud,))
@@ -175,8 +173,9 @@ def valeursMetaDataCible():
     print(E)
     connexion.close()
 
-def nombreGalaxies():
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def nombreGalaxies(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur=connexion.execute('''SELECT nbre FROM  nombreGalaxies''')
     res=curseur.fetchone()[0]
     connexion.close()
@@ -185,7 +184,7 @@ def nombreGalaxies():
 
 def getListeGraphe():
 
-    graphes = os.listdir(parametres.DirGlobal + 'jsons')
+    graphes = os.listdir(parametres.DirJson)
     res = []
     dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
     for i in graphes:

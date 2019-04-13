@@ -15,10 +15,10 @@ import re
 
 def preparationVisualisation():
     #print("Entré préparation visualisation")
-    if 'jsons' in os.listdir(parametres.DirGlobal):
-        shutil.rmtree(parametres.DirGlobal + 'jsons')
+    if 'jsons' in os.listdir(parametres.DirProject):
+        shutil.rmtree(parametres.DirJson)
         #print("Destruction dossier jsons")
-        os.mkdir(parametres.DirGlobal + 'jsons')
+        os.mkdir(parametres.DirJson)
         #print("Reconstruction dossier jsons")
     count = 0
 
@@ -73,9 +73,9 @@ def visualisation(fichier):
 
     tab = [int(s) for s in re.findall(r'\d+', fichier)]
     if (len(tab) == 1):
-        filename = parametres.DirGlobal + 'jsons/galaxie_' + str(tab[0]) + '.json'
+        filename = parametres.DirJson + '/galaxie_' + str(tab[0]) + '.json'
     elif (len(tab) == 2):
-        filename = parametres.DirGlobal + 'jsons/galaxie_' + str(tab[0]) + '_amas_' + str(tab[1]) + '.json'
+        filename = parametres.DirJson + '/galaxie_' + str(tab[0]) + '_amas_' + str(tab[1]) + '.json'
     else:
         print(fichier)
         print(tab)

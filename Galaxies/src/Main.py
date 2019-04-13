@@ -6,82 +6,79 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import baseDonnees
 import grapheGalaxies
-import InterfaceGalaxies
 import lecture_fic
 import os
 import parametres
 
 import amas
 import extractionGalaxies
-#import shelve
 import time
-#import visualisationGraphe
-
-#import igraph as ig
-#import networkx as nx
-#import community as louvain
-#import Interface
-#import javaVisualisation
-#import shutil
-#import re
 
 
 class Main:
 
-    def __init__(self,interface):
-        self.interface = interface#InterfaceGalaxies.InterfaceGalaxies(self)
-        #listGraph = baseDonnees.getListeGraphe()
-        #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
-        #interface.display_graphe_list(listGraph)
+    def __init__(self, interface):
+        self.interface = interface
+        self.DirProject = None
 
-    def start_from_existing_file(self,maxNoeud=0):
-        file = self.interface.open_text_align_file()
-        if file == (): return # Si l'utilisateur a appuié sur cancel
-        self.init_dossiers() # creation des dossiers pour stocker les données
-        if not 'galaxie.db' in os.listdir(parametres.DirBD): # Si on a pas de bases de donnée
-            t1 = time.clock()
-            baseDonnees.creerBD()                            # On creer la Base de donnée
-            t2 = time.clock()
-            print("Temps de construction de la base de données: "+format(t2 - t1,'f')+" sec.")
-            t1 = time.clock()
-            lecture_fic.lecture(file)                     # On remplie notre BD avec notre fichiers .tab
-            t2 = time.clock()
-            print("Temps de lecture du fichier source: " + format(t2 - t1,'f') + " sec.")
-        print("premier line de la BD = ",grapheGalaxies.grapheConstruit())
-        if grapheGalaxies.grapheConstruit()!= None: # On teste si le graphe est construit
-            print("Graphe déjà construit")
-        else:                                       # Sinon on le construit
-            maxNoeud = grapheGalaxies.construction_graphe()
-            grapheGalaxies.sauvegarde_graphe_()     # Et on le sauvegarde
-        if extractionGalaxies.composantesExtraites() != None:
+    def start_from_textAlign_file(self, maxNoeud=0):
+        """
+        Starting a new project with a textAlign file
+
+        :param maxNoeud:
+        """
+
+        file = self.interface.open_text_align_file()  # Ask for textAlign file localisation
+        if file == ():
+            return  # if the user cancel
+
+        newdirproject = self.interface.ask_for_project_name()  # Ask for project name
+
+        if newdirproject == "" or newdirproject is None:
+            # todo : Verifier que l'utilisateur n'a pas entrer un nom de project déjà existant
+            return  # if the user cancel or enter a empty word
+
+        self.DirProject = '../projects/' + newdirproject
+
+        self.init_directory()                        # Creation of the project
+        t1 = time.clock()
+        baseDonnees.creerBD(self.DirProject+'/BDs')  # Creation of the database
+        t2 = time.clock()
+        print("Temps de construction de la base de données: "+format(t2 - t1,'f')+" sec.")
+        t1 = time.clock()
+        lecture_fic.lecture(file, self.DirProject+'/BDs')  # On remplie notre BD avec notre fichiers .tab
+        t2 = time.clock()
+        print("Temps de lecture du fichier source: " + format(t2 - t1,'f') + " sec.")
+        print("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.DirProject+'/BDs'))
+
+        maxNoeud = grapheGalaxies.construction_graphe(self.DirProject+'/BDs')
+        grapheGalaxies.sauvegarde_graphe_(self.DirProject+'/BDs')     # Et on le sauvegarde
+
+        if extractionGalaxies.composantesExtraites(self.DirProject+'/BDs') is not None:
             print("Composantes déjà extraites")
         else:
             if maxNoeud == 0:
-                maxNoeud= baseDonnees.maxNoeuds()
+                maxNoeud= baseDonnees.maxNoeuds(self.DirProject+'/BDs')
             t1 = time.clock()
-            extractionGalaxies.extractionComposantesConnexes_(maxNoeud)
+            extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.DirProject+'/BDs')
             t2 = time.clock()
             print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
-        amas.recupererAmas()
-        print("Operation terminée start_from_existing_file")
+        amas.recupererAmas(self.DirProject)
+        print("Operation terminée start_from_textAlign_file")
+
+    def open_existing_project(self):
+        repositorie = self.interface.ask_open_existing_project()
 
 
-    def init_dossiers(self):
+    def init_directory(self):
         """
         initialise la creation des dossiers pour recuperer les informations
         """
-        LS = os.listdir(parametres.DirGlobal)
-        if not 'BDs' in LS:
-            os.mkdir(parametres.DirBD)
-        if not 'graphes' in LS:
-            os.mkdir(parametres.DirGraphes)
-        if not 'amas' in LS:
-            os.mkdir(parametres.DirAmas)
-        if not 'jsons' in LS:
-            os.mkdir(parametres.DirJson)
-        if 'galaxie.db' in os.listdir(parametres.DirBD):
-            if self.interface.askyesno_txt("Il y a déjà une base de données. Voulez-vous la reconstruire ?"):
-                baseDonnees.detruireBD()
+        os.mkdir(self.DirProject)
+        os.mkdir(self.DirProject + '/BDs')
+        os.mkdir(self.DirProject + '/amas')
+        os.mkdir(self.DirProject + '/graphs')
+        os.mkdir(self.DirProject + '/jsons')
 
     def get_requete_preprocessing(self):
         print("debut de fonction")

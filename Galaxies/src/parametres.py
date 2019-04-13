@@ -8,26 +8,28 @@ import lecture_fic
 
 NombreLignes = 0
 
-DirGlobal = "../resultat_Galaxies/"
-DirFichier= "../Tab"
-lecture_fic.rechercheDossiersBDsAmasetGraphes(DirGlobal)
-DirBD = DirGlobal+'BDs'
-DirAmas = DirGlobal+'amas'
-DirGraphes = DirGlobal+'graphes'
-DirJson = DirGlobal+"jsons/"
+DirProject = ""
+DirBD = DirProject+'BDs'
+DirAmas = DirProject+'amas'
+DirGraphes = DirProject+'graphs'
+DirJson = DirProject+"jsons/"
 DirAffichage = "./gen-louvain/"
 DirPgm=DirAffichage
 DirLouvain = "./gen-louvain"
+
+def set_DirProject(newDirProject):
+    DirProject = newDirProject
+    DirBD = DirProject + 'BDs'
+    DirAmas = DirProject + 'amas'
+    DirGraphes = DirProject + 'graphes'
+    DirJson = DirProject + "jsons/"
+
 
 pasTracage = 100000
 pasNbreNoeud = 10000
 pasGalaxies = 10000
 pasNbreNoeudsGalaxie = 10000
 
-# metaDataSource = 'source_generatedclass'
-# metaDataSourceType = 'TEXT'
-# metaDataCible = 'target_birth'
-# metaDataCibleType = 'NUM'
 metaDataSource = 'source_text_genre'
 metaDataSourceType = 'TEXT'
 metaDataCible = 'target_subject'

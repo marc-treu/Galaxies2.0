@@ -1,6 +1,8 @@
 import tkinter.filedialog
 import tkinter as tk
 from tkinter import ttk
+from tkinter import simpledialog
+
 
 import baseDonnees
 import javaVisualisation
@@ -28,35 +30,38 @@ class InterfaceGalaxies(tk.Tk):
         super().__init__()
         self.geometry("1200x600")
 
-        self.create_menu() # Creation du menu
+        self.create_menu()  # Creation du menu
         self.grid_propagate(0)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.frame_left = tk.Frame(self,height=580,width=550)
-        self.frame_left.grid(row=0, column=0,sticky = tk.N+tk.S+tk.W+tk.E)
+        self.frame_left = tk.Frame(self, height=580, width=550)
+        self.frame_left.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_left.pack_propagate(0)
 
-        self.liste_Graphe = tk.Listbox(self.frame_left,selectmode=tk.MULTIPLE, height = 50,bg="gray88",font=("Helvetica", 12))
-        self.liste_Graphe.pack(side=tk.LEFT,fill="both", expand = True)
+        self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.MULTIPLE, height=50, bg="gray88",
+                                       font=("Helvetica", 12))
+        self.liste_Graphe.pack(side=tk.LEFT, fill="both", expand=True)
 
         scrollbar = tk.Scrollbar(self.frame_left, orient="vertical")
         scrollbar.config(command=self.liste_Graphe.yview)
-        scrollbar.pack(side="right", fill= "y")
+        scrollbar.pack(side="right", fill="y")
 
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
         self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
 
-        self.frame_right = tk.Frame(self, height=580,width=550)
-        self.frame_right.grid(row=0, column=1,sticky=tk.N+tk.S+tk.W+tk.E)
+        self.frame_right = tk.Frame(self, height=580, width=550)
+        self.frame_right.grid(row=0, column=1, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_right.pack_propagate(0)
 
         self.graph_info = tk.Label(self.frame_right, relief=tk.RIDGE)
-        self.graph_info.pack(side=tk.TOP,fill="both", expand = True,padx = 2,pady= 2)#grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
+        self.graph_info.pack(side=tk.TOP, fill="both", expand=True, padx=2,
+                             pady=2)  # grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
 
-        self.frame_right_button = tk.Label(self.frame_right,text = "ok")
-        self.frame_right_button.pack(side=tk.BOTTOM,fill="both", expand = False,padx = 2,pady= 2)#grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
+        self.frame_right_button = tk.Label(self.frame_right, text="ok")
+        self.frame_right_button.pack(side=tk.BOTTOM, fill="both", expand=False, padx=2,
+                                     pady=2)  # grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
         self.create_button_menu()
         # Initialisation des variables
         self.graph_selected = []
@@ -64,16 +69,16 @@ class InterfaceGalaxies(tk.Tk):
 
     def create_menu(self):
         menubar = tk.Menu(self)
-        menu1 = tk.Menu(menubar,tearoff=0)
-        menu1.add_command(label="New project with a text-align file", command=self.main.start_from_existing_file)
-        menu1.add_command(label="By Compare 2 corpus", command=self.action2)
+        menu1 = tk.Menu(menubar, tearoff=0)
+        menu1.add_command(label="New project with a text-align file", command=self.main.start_from_textAlign_file)
+        menu1.add_command(label="By Compare 2 corpus")
         menubar.add_cascade(label="Start", menu=menu1)
 
-        menu2 = tk.Menu(menubar,tearoff=0)
-        menu2.add_command(label="Existing project")#, command=self.open_text_align_file)
+        menu2 = tk.Menu(menubar, tearoff=0)
+        menu2.add_command(label="Existing project", command=self.main.open_existing_project)
         menubar.add_cascade(label="Open", menu=menu2)
 
-        menubar.add_command(label = "Quit",command= self.destroy)
+        menubar.add_command(label="Quit", command=self.destroy)
         self.config(menu=menubar)
 
     def create_button_menu(self):
@@ -84,22 +89,23 @@ class InterfaceGalaxies(tk.Tk):
         processing.grid_columnconfigure(2, weight=1)
         processing.grid_rowconfigure(0, weight=1)
         processing.grid_rowconfigure(1, weight=1)
-        tk.Label(processing, text="Prepossessing").grid(row=0, column=0, sticky=tk.N+tk.S+tk.W+tk.E)
-        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1,sticky=tk.N+tk.S)
-        tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N+tk.S+tk.W+tk.E)
+        tk.Label(processing, text="Prepossessing").grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
+        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
+        tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
         tk.Button(processing, text="New Query", command=self.main.get_requete_preprocessing).grid(row=1, rowspan=3,
                                                                                                   column=0)
         tk.Button(processing, text="Apply filter\n on node").grid(row=1, rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
-        button.pack(side=tk.BOTTOM,fill="both", expand = True)
+        button.pack(side=tk.BOTTOM, fill="both", expand=True)
         tk.Button(button, text="Display Graph in browser", command=self.display_graph_webbrowser).pack(pady=15)
 
     def open_text_align_file(self):
-        return tk.filedialog.askopenfilename(title="Open a file",filetypes=[('tab files','.tab')])
+        return tk.filedialog.askopenfilename(title="Open a file", filetypes=[('tab files', '.tab')])
 
-    def action2(self):
-        tk.messagebox.showinfo("alerte", "Bravo!")
+    def ask_open_existing_project(self):
+        # todo : faire en sorte que l'on demande d'ouvrir un dossier a partir du dossier parent
+        return tk.filedialog.askdirectory(title="Open a existing project")
 
     def get_requete_from_user(self):
 
@@ -141,23 +147,28 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.title("Recherche dans les galaxies")
         fenetre.geometry("800x350")
 
-        instructions = tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0,column=1)
+        instructions = tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(
+            row=0, column=1)
 
-
-        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(sticky="w", row=1, column=1)
+        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(
+            sticky="w", row=1, column=1)
         auteur = tk.Entry(fenetre, width=100)
         auteur.grid(row=1, column=2)
 
-        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(sticky="w", row=2, column=1)
+        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(
+            sticky="w", row=2, column=1)
         notauteur = tk.Entry(fenetre, width=100)
         notauteur.grid(row=2, column=2)
 
-        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",row=3,column=1)
+        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",
+                                                                                                             row=3,
+                                                                                                             column=1)
         date = tk.Entry(fenetre, width=80)
         date.insert(0, '[ AAAA - AAAA ]')
         date.grid(sticky="w", row=3, column=2)
 
-        lab4 = tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4, column=1)
+        lab4 = tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4,
+                                                                                             column=1)
         mcles = tk.Entry(fenetre, width=100)
         mcles.grid(row=4, column=2)
 
@@ -174,7 +185,9 @@ class InterfaceGalaxies(tk.Tk):
         ltexte_max = tk.Entry(fenetre, width=30)
         ltexte_max.grid(sticky="w", row=7, column=2)
 
-        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",row=8, column=1)
+        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",
+                                                                                                          row=8,
+                                                                                                          column=1)
         nbnoeuds_min = tk.Entry(fenetre, width=30)
         nbnoeuds_min.grid(sticky="w", row=8, column=2)
 
@@ -187,7 +200,7 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.bind("<Escape>", lambda e: fenetre.quit())
 
         self.wait_window(fenetre)
-        return {0:requete}
+        return {0: requete}
 
     def display_graph_list(self):
         """
@@ -204,8 +217,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         self.graph_info['text'] = self.graph_selected_last
 
-
-    def select_graph(self,evt):
+    def select_graph(self, evt):
         """
         Fonction qui devra afficher les information necessaire dans la box de droite,
         et qui met a jour la liste des graphes selectionner
@@ -213,13 +225,13 @@ class InterfaceGalaxies(tk.Tk):
         w = evt.widget
         index = [graph for graph in w.curselection()]
 
-        self.graph_selected_last = set(self.graph_selected) # On garde la liste de selection precedente
-        self.graph_selected = [w.get(ind) for ind in index] # On recuperer la liste de selection courante
-        self.graph_selected_last = set(self.graph_selected) - self.graph_selected_last # la difference des deux nous donne le dernier selectionne
-        if self.graph_selected_last != set(): # Si on a bien un nouveau graphe selectionne
-            self.display_graph_info()         # Alors on l'affiche dans notre fenetre a gauche
-        print('last item selected',self.graph_selected_last)
-
+        self.graph_selected_last = set(self.graph_selected)  # On garde la liste de selection precedente
+        self.graph_selected = [w.get(ind) for ind in index]  # On recuperer la liste de selection courante
+        self.graph_selected_last = set(
+            self.graph_selected) - self.graph_selected_last  # la difference des deux nous donne le dernier selectionne
+        if self.graph_selected_last != set():  # Si on a bien un nouveau graphe selectionne
+            self.display_graph_info()  # Alors on l'affiche dans notre fenetre a gauche
+        print('last item selected', self.graph_selected_last)
 
     def display_graph_webbrowser(self):
         if self.graph_selected_last == None: return
@@ -230,21 +242,24 @@ class InterfaceGalaxies(tk.Tk):
 
     def get_name_file(self):
         number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected_last))]
-        if len(number) == 2 : # Alors il s'agit d'une Galaxie
-            return 'galaxie_'+str(number[0])
-        if len(number) == 3 : # Alors il s'agit d'un Amas
-            return 'galaxie_'+str(number[1])+'_amas_'+str(number[0])
-        else: return
+        if len(number) == 2:  # Alors il s'agit d'une Galaxie
+            return 'galaxie_' + str(number[0])
+        if len(number) == 3:  # Alors il s'agit d'un Amas
+            return 'galaxie_' + str(number[1]) + '_amas_' + str(number[0])
+        else:
+            return
 
-    def askyesno_txt(self,text,titre = "messagebox"):
-        return tk.messagebox.askyesno(titre,text)
+    def askyesno_txt(self, text, titre="messagebox"):
+        return tk.messagebox.askyesno(titre, text)
 
+    def ask_for_project_name(self):
+        return simpledialog.askstring("Project Name", "What name for your Project ?")
 
 
 if __name__ == '__main__':
     interface = InterfaceGalaxies()
     interface.mainloop()
 
-    #listGraph = baseDonnees.getListeGraphe()
-    #listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
-    #interface.display_graph_list()
+    # listGraph = baseDonnees.getListeGraphe()
+    # listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
+    # interface.display_graph_list()

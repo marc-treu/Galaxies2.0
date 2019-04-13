@@ -6,7 +6,6 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import codecs
 import parametres
-import re
 import baseDonnees
 import sqlite3
 import time
@@ -14,14 +13,18 @@ import json
 import os
 
 
-def lecture(fic):
+def lecture(tab_file, data_base_path, number_of_line=0):
     """
-    Lit le fichier fic passer en parametres et remplie la base de donnée
-    fic : le resultat de text_align
+    Lit le fichier tab_file passer en parametres et remplie la base de donnée
+
+    :param tab_file:
+    :param data_base_path:
+    :param number_of_line:
+    :return:
     """
-    print("Appel lecture fichier sur "+str(fic))
+    print("Appel lecture fichier sur "+str(tab_file))
     #FichierEntree = codecs.open(fic, 'r', 'utf-8', errors="ignore")
-    connexion = sqlite3.connect(parametres.DirBD+'/galaxie.db')
+    connexion = sqlite3.connect(data_base_path + '/galaxie.db')
     curseur = connexion.cursor()
     #Entete = FichierEntree.readline()
     #print("Entete: "+str(Entete))
@@ -31,8 +34,8 @@ def lecture(fic):
     #print("Ligne n°"+str(nbre_ligne+1)+": "+str(ligne))
 
     t1 = time.clock()
-    for line in codecs.open(fic, 'r', 'utf-8', errors="ignore"):
-        if (nbre_ligne > parametres.NombreLignes and parametres.NombreLignes != 0):
+    for line in codecs.open(tab_file, 'r', 'utf-8', errors="ignore"):
+        if nbre_ligne > number_of_line != 0:
             return
         nbre_ligne += 1
         L=json.loads(line.rstrip())

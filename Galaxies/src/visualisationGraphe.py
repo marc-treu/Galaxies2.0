@@ -12,20 +12,14 @@ import sqlite3
 import baseDonnees
 import filtres
 import codecs
-import string
-import textwrap
 import json
 
 
-
-
-def sauveGrapheGalaxie(numero):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
+def sauveGrapheGalaxie(numero, project_path):
+    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
     ListeNoeuds = dirGalaxies[str(numero)]
-    # print("Liste des nœuds: "+str(ListeNoeuds))
     dirGalaxies.close()
-    #return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'json')
-    return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'gexf')
+    return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'gexf', project_path)
 
 
 def sauveGrapheGalaxieGML(numero):
@@ -34,6 +28,7 @@ def sauveGrapheGalaxieGML(numero):
     # print("Liste des nœuds: "+str(ListeNoeuds))
     dirGalaxies.close()
     return creerGrapheTextes(ListeNoeuds, 'graphe_galaxie_TC_'+str(numero), 'gml')
+
 
 def sauveGrapheGalaxieAffichage(requete, numero):
     dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
@@ -61,9 +56,10 @@ def sauveGrapheAmas_(numGalaxie, dictAmas) :
 # def sauveGrapheAmasAffichage(requete, listeNoeuds, galaxie_numero, amas_numero):
 #     creerGrapheTextesFiltre(requete, listeNoeuds, 'graphe_galaxie_' + galaxie_numero + '_amas_' + amas_numero + '.gexf')
 
-def creerGrapheTextes(ListeNoeuds, fichier, ext):
+
+def creerGrapheTextes(ListeNoeuds, fichier, ext, project_path):
     # print('Création du graphe...')
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     # reutilisations = set()
     arcs={}
@@ -89,29 +85,29 @@ def creerGrapheTextes(ListeNoeuds, fichier, ext):
             RefPere = curseur.fetchall()[0]
             T = caracterisquesReference(RefPere[1], curseur)
 
-            Graphe.add_node(str(Pere), texte=RefPere[0], longueurTexte=len(RefPere[0]), auteur=T[0], titre=T[1], date=T[2], reutilisation=str(baseDonnees.reutilisations(Pere)))
+            Graphe.add_node(str(Pere), texte=RefPere[0], longueurTexte=len(RefPere[0]), auteur=T[0], titre=T[1], date=T[2], reutilisation=str(baseDonnees.reutilisations(Pere, project_path)))
         l_arcs=set()
         for Fils in arcs[Pere]:
             if not Fils in Graphe:
                 curseur.execute('''SELECT texte, idRowLivre FROM texteNoeuds WHERE idNoeud = (?)''', (str(Fils),))
                 Ref = curseur.fetchall()[0]
                 T = caracterisquesReference(str(Ref[1]), curseur)
-                Graphe.add_node(str(Fils), texte=Ref[0], longueurTexte=len(Ref[0]), auteur=T[0],titre=T[1], date=T[2], reutilisation=str(baseDonnees.reutilisations(Fils)))
+                Graphe.add_node(str(Fils), texte=Ref[0], longueurTexte=len(Ref[0]), auteur=T[0],titre=T[1], date=T[2], reutilisation=str(baseDonnees.reutilisations(Fils, project_path)))
             l_arcs.add((str(Pere),str(Fils)))
 
         Graphe.add_edges_from(l_arcs)
     if(ext=='json') :
         data = nx.readwrite.json_graph.node_link_data(Graphe)
-        with open(parametres.DirGraphes+'/'+fichier+'.'+ext, 'w') as f:
+        with open(project_path+'/graphs/'+fichier+'.'+ext, 'w') as f:
             json.dump(data, f)
     if(ext=='gexf') :
-        nx.write_gexf(Graphe, parametres.DirGraphes+'/' + fichier + '.'+ ext,encoding='utf-8',prettyprint=True, version='1.2draft')
+        nx.write_gexf(Graphe, project_path+'/graphs/' + fichier + '.'+ ext,encoding='utf-8',prettyprint=True, version='1.2draft')
     if(ext=='gml') :
-        nx.write_gml(Graphe, parametres.DirGraphes+'/'+fichier+'.'+ext)
+        nx.write_gml(Graphe, project_path+'/graphs/'+fichier+'.'+ext)
         # print(str(nx.generate_gml(Graphe)))
     # sauvJson(Graphe, parametres.DirBD + '/' + fichier)
     connexion.close()
-    return parametres.DirGraphes+'/'+fichier+'.'+ext
+    return project_path+'/graphs/'+fichier+'.'+ext
 
 def creerAmasTextes(ListeNoeuds, fichier, ext) :
     # print('Création du graphe...')
