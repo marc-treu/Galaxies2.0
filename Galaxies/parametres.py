@@ -8,8 +8,8 @@ import lecture_fic
 
 NombreLignes = 0
 
-DirGlobal = "./resultat_Galaxies/"
-DirFichier= "./Tab"
+DirGlobal = "../resultat_Galaxies/"
+DirFichier= "../Tab"
 lecture_fic.rechercheDossiersBDsAmasetGraphes(DirGlobal)
 DirBD = DirGlobal+'BDs'
 DirAmas = DirGlobal+'amas'
