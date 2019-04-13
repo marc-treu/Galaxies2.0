@@ -72,10 +72,10 @@ def requetesUser(requetes, project_path):
         return
     elif l == 1:
         print(requetes)
-        gal = extractionGalaxies.galaxiesFiltre(requetes[0])
+        gal = extractionGalaxies.galaxiesFiltre(requetes[0], project_path)
     else:
         print(requetes)
-        gal = extractionGalaxies.galaxiesFiltreListe(requetes)
+        gal = extractionGalaxies.galaxiesFiltreListe(requetes, project_path)
 
     print(gal)
 
@@ -85,7 +85,7 @@ def requetesUser(requetes, project_path):
         os.mkdir(project_path + "/graphs")
     if gal[0]:
         for num in gal[0]:
-            visualisationGraphe.sauveGrapheGalaxie(num)
+            visualisationGraphe.sauveGrapheGalaxie(num, project_path)
 
     check = os.listdir(project_path + "/amas")
     if check:
@@ -93,4 +93,4 @@ def requetesUser(requetes, project_path):
         os.mkdir(project_path + "/amas")
     if gal[1]:
         for numero in gal[1]:
-            visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero])
+            visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero], project_path)

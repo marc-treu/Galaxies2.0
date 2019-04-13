@@ -13,24 +13,19 @@ import re
 
 # import pylab as P
 
-def preparationVisualisation():
-    #print("Entré préparation visualisation")
-    if 'jsons' in os.listdir(parametres.DirProject):
-        shutil.rmtree(parametres.DirJson)
-        #print("Destruction dossier jsons")
-        os.mkdir(parametres.DirJson)
-        #print("Reconstruction dossier jsons")
+def preparationVisualisation(project_path):
+    if 'jsons' in os.listdir(project_path):
+        shutil.rmtree(project_path + "/jsons")
+        os.mkdir(project_path + "/jsons")
     count = 0
 
-    galaxies = os.listdir(parametres.DirGraphes)
+    galaxies = os.listdir(project_path + "/graphs")
     for i in galaxies:
-        visualisation(parametres.DirGraphes + '/' + i)
-        #print("visualisation ",parametres.DirGraphes + '/' + i)
+        visualisation(project_path + "/graphs/" + i, project_path)
         count += 1
-    amas = os.listdir(parametres.DirAmas)
+    amas = os.listdir(project_path + "/amas")
     for i in amas:
-        visualisation(parametres.DirAmas + '/' + i)
-        #print("visualisation ", parametres.DirGraphes + '/' + i)
+        visualisation(project_path + '/amas/' + i, project_path)
         count += 1
 
 
@@ -38,7 +33,8 @@ def visualisaton_galaxie(num_galaxie):
     Nom = visualisationGraphe.sauveGrapheGalaxie(num_galaxie)
     visualisation(parametres.DirGraphes + Nom)
 
-def visualisation(fichier):
+
+def visualisation(fichier, project_path):
     G = nx.read_gexf(fichier)
 
     data1 = json_graph.node_link_data(G)
@@ -73,9 +69,9 @@ def visualisation(fichier):
 
     tab = [int(s) for s in re.findall(r'\d+', fichier)]
     if (len(tab) == 1):
-        filename = parametres.DirJson + '/galaxie_' + str(tab[0]) + '.json'
+        filename = project_path + '/jsons/galaxie_' + str(tab[0]) + '.json'
     elif (len(tab) == 2):
-        filename = parametres.DirJson + '/galaxie_' + str(tab[0]) + '_amas_' + str(tab[1]) + '.json'
+        filename = project_path + '/jsons/galaxie_' + str(tab[0]) + '_amas_' + str(tab[1]) + '.json'
     else:
         print(fichier)
         print(tab)

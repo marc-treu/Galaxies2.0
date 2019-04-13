@@ -4,12 +4,10 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-
 import sqlite3
 import shelve
 import re
 import os
-import parametres
 import time
 
 
@@ -18,14 +16,17 @@ def creerBD(filepath):
     connexion = sqlite3.connect(filepath + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     curseur.execute('''CREATE TABLE livres (idLivre TEXT UNIQUE, auteur TEXT, titre TEXT, date INTEGER)''')
-    curseur.execute('''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, texteCible TEXT, metaDataCible TEXT)''')
+    curseur.execute(
+        '''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, texteCible TEXT, metaDataCible TEXT)''')
     curseur.execute('''CREATE TABLE grapheGalaxiesSource (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
     curseur.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
     curseur.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
-    curseur.execute('''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, ordonnee INTEGER, empan INTEGER)''')
+    curseur.execute(
+        '''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, ordonnee INTEGER, empan INTEGER)''')
     curseur.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
     curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
-    curseur.execute('''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
+    curseur.execute(
+        '''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
     curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
     curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
@@ -48,18 +49,19 @@ def dateToInt(date):
     #     return ''
     if type(date) == type(0):
         return normalisation_date(date)
-    d=date.encode('ascii', 'ignore')
-    #print(d)
-    tmp=''
-    for x in filter(str.isdigit,str(d)):
-        tmp = tmp+x
-    #print(type(tmp))
+    d = date.encode('ascii', 'ignore')
+    # print(d)
+    tmp = ''
+    for x in filter(str.isdigit, str(d)):
+        tmp = tmp + x
+    # print(type(tmp))
     if not tmp:
-        return 0 # correction '' remplacé par 0
-    if len(tmp)>4 :
-        tmp=tmp[:4]
-    date=int(tmp)
+        return 0  # correction '' remplacé par 0
+    if len(tmp) > 4:
+        tmp = tmp[:4]
+    date = int(tmp)
     return normalisation_date(date)
+
 
 def normalisation_date(date):
     d = str(date)
@@ -67,18 +69,15 @@ def normalisation_date(date):
         return date * 100
     return date
 
+
 def ajoutLivre(auteur, titre, date, curseur, nbre_lignes):
     t1 = time.clock()
     id = idRef(auteur, titre, date, curseur, nbre_lignes)
     curseur.execute('''SELECT * FROM livres WHERE idLivre = ?''', (id,))
     L = curseur.fetchone()
     if not L:
-        date=dateToInt(date)
-        curseur.execute('''INSERT INTO livres values (?,?,?,?)''', (id,auteur, titre, date))
-    # if divmod(nbre_lignes, parametres.pasTracage)[1]==0:
-    #         t2 = time.clock()
-    #         print(" temps d'insertion d'un livre "+str(t2-t1)+"secondes")
-
+        date = dateToInt(date)
+        curseur.execute('''INSERT INTO livres values (?,?,?,?)''', (id, auteur, titre, date))
 
 
 def idRef(auteur, titre, date, curseur, nbre_lignes):
@@ -89,23 +88,21 @@ def idRef(auteur, titre, date, curseur, nbre_lignes):
     #     print("Erreur type titre: "+str(titre))
     # if auteur and int(auteur):
     #     print("Erreur type auteur: "+str(auteur))
-    return auteur+titre+str(date)
+    return auteur + titre + str(date)
+
 
 def idLivre(auteur, titre, date, curseur, nbre_lignes):
-    t1=time.clock()
-    curseur.execute('''SELECT rowid FROM livres WHERE idLivre = (?)''', (idRef(auteur, titre, date, curseur, nbre_lignes),))
-    L = curseur.fetchone()
-    # if divmod(nbre_lignes, parametres.pasTracage)[1]==0:
-    #         t2 = time.clock()
-    #         print(" temps de repérage de l'identifiant d'un livre "+str(t2-t1)+"secondes")
-    return L[0]
+    curseur.execute('''SELECT rowid FROM livres WHERE idLivre = (?)''',
+                    (idRef(auteur, titre, date, curseur, nbre_lignes),))
+    first_line = curseur.fetchone()
+    return first_line[0]
 
-def ajoutReutilisation(idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible, empanCible, texteCible, metaDataCible, curseur, nbre_lignes):
-    t1 = time.clock()
-    curseur.execute('''INSERT INTO grapheReutilisations values (?,?,?, ?, ?, ?, ?, ?,?,?)''', (idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible, empanCible, texteCible, metaDataCible))
-    # if divmod(nbre_lignes, parametres.pasTracage)[1]==0:
-    #         t2 = time.clock()
-    #         print(" temps d'insertion d'un enregistrement "+str(t2-t1)+"secondes")
+
+def ajoutReutilisation(idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible,
+                       empanCible, texteCible, metaDataCible, curseur, nbre_lignes):
+    curseur.execute('''INSERT INTO grapheReutilisations values (?,?,?, ?, ?, ?, ?, ?,?,?)''', (
+    idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible, empanCible,
+    texteCible, metaDataCible))
 
 
 def maxNoeuds(data_base_path):
@@ -115,20 +112,22 @@ def maxNoeuds(data_base_path):
     noeudMax = curseur.fetchone()
     return noeudMax[0]
 
-def detruireBD():
-    if 'galaxie.db' in os.listdir(parametres.DirBD):
-        os.remove(parametres.DirBD+'/galaxie.db')
-    if 'listeGalaxies.db' in os.listdir(parametres.DirBD):
-        os.remove(parametres.DirBD+'/listeGalaxies.db')
-    if 'liste_ajacence_graphe.db' in os.listdir(parametres.DirBD):
-        os.remove(parametres.DirBD + '/liste_ajacence_graphe.db')
-    if 'liste_ajacence_graphe_transpose.db' in os.listdir(parametres.DirBD):
-        os.remove(parametres.DirBD + '/liste_ajacence_graphe_transpose.db')
+
+def detruireBD(project_path):
+    if 'galaxie.db' in os.listdir(project_path + '/BDs'):
+        os.remove(project_path + '/BDs/galaxie.db')
+    if 'listeGalaxies.db' in os.listdir(project_path + '/BDs'):
+        os.remove(project_path + '/BDs/listeGalaxies.db')
+    if 'liste_ajacence_graphe.db' in os.listdir(project_path + '/BDs'):
+        os.remove(project_path + '/BDs/liste_ajacence_graphe.db')
+    if 'liste_ajacence_graphe_transpose.db' in os.listdir(project_path + '/BDs'):
+        os.remove(project_path + '/BDs/liste_ajacence_graphe_transpose.db')
     detruireListeGalaxiesBD()
 
-def detruireListeGalaxiesBD():
-    if 'galaxie.db' in os.listdir(parametres.DirBD):
-        connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def detruireListeGalaxiesBD(project_path):
+    if 'galaxie.db' in os.listdir(project_path + '/BDs'):
+        connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
         curseur = connexion.cursor()
         curseur.execute('''DROP TABLE nombreGalaxies''')
         curseur.execute('''DROP TABLE degreGalaxies''')
@@ -136,8 +135,9 @@ def detruireListeGalaxiesBD():
         curseur.execute('''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER)''')
 
         connexion.close()
-    if 'listeGalaxies.db' in os.listdir(parametres.DirBD):
-        os.remove(parametres.DirBD+'/listeGalaxies.db')
+    if 'listeGalaxies.db' in os.listdir(project_path + '/BDs'):
+        os.remove(project_path + '/BDs/listeGalaxies.db')
+
 
 def reutilisations(noeud, project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
@@ -147,14 +147,15 @@ def reutilisations(noeud, project_path):
     cible = curseur.fetchall()
     connexion.close()
     result = []
-    for X in source+cible:
+    for X in source + cible:
         result.append(X[0])
     return result
 
-def valeursMetaDataSource():
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def valeursMetaDataSource(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.execute('''SELECT metaDataSource FROM grapheReutilisations''')
-    E =  set()
+    E = set()
     X = curseur.fetchone()
     while X:
         E.add(X)
@@ -162,10 +163,11 @@ def valeursMetaDataSource():
     print(E)
     connexion.close()
 
-def valeursMetaDataCible():
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+
+def valeursMetaDataCible(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.execute('''SELECT metaDataCible FROM grapheReutilisations''')
-    E =  set()
+    E = set()
     X = curseur.fetchone()
     while X:
         E.add(X)
@@ -176,23 +178,22 @@ def valeursMetaDataCible():
 
 def nombreGalaxies(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur=connexion.execute('''SELECT nbre FROM  nombreGalaxies''')
-    res=curseur.fetchone()[0]
+    curseur = connexion.execute('''SELECT nbre FROM  nombreGalaxies''')
+    res = curseur.fetchone()[0]
     connexion.close()
     return res
 
 
-def getListeGraphe():
-
-    graphes = os.listdir(parametres.DirJson)
+def get_list_graph(project_path):
+    graphs = os.listdir(project_path + "/jsons")
     res = []
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
-    for i in graphes:
+    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
+    for i in graphs:
         tab = [int(s) for s in re.findall(r'\d+', i)]
         if len(tab) == 1:
             texte = "Galaxie numéro " + str(tab[0]) + " contenant " + str(len(dirGalaxies[str(tab[0])])) + " noeuds"
         elif len(tab) == 2:
-            dirAmas = shelve.open(parametres.DirBD + '/listeAmasGalaxie' + str(tab[0]))
+            dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(tab[0]))
             texte = "Amas numéro " + str(tab[1]) + " de la galaxie " + str(tab[0]) + " contenant " + str(
                 len(dirAmas[str(tab[1])])) + " noeuds"
             dirAmas.close()

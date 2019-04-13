@@ -204,13 +204,13 @@ class InterfaceGalaxies(tk.Tk):
         self.wait_window(fenetre)
         return {0: requete}
 
-    def display_graph_list(self):
+    def display_graph_list(self, project_path):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
-        javaVisualisation.preparationVisualisation()
-        listGraph = baseDonnees.getListeGraphe()
-        for graph in listGraph:
+        javaVisualisation.preparationVisualisation(project_path)
+        list_graph = baseDonnees.get_list_graph(project_path)
+        for graph in list_graph:
             self.liste_Graphe.insert(tk.END, graph)
 
     def display_graph_info(self):
@@ -262,7 +262,3 @@ class InterfaceGalaxies(tk.Tk):
 if __name__ == '__main__':
     interface = InterfaceGalaxies()
     interface.mainloop()
-
-    # listGraph = baseDonnees.getListeGraphe()
-    # listGraph = ["Graphe "+str(i)+" de 4 noeuds" for i in range(100)]
-    # interface.display_graph_list()

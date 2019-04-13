@@ -85,7 +85,7 @@ class Main:
         print("la requete = ", requete)
         amas.requetesUser(requete, self.DirProject)
         print("okay ! requete traiter")
-        self.interface.display_graph_list()
+        self.interface.display_graph_list(self.DirProject)
         print("okay ! graphes afficher")
 
 
