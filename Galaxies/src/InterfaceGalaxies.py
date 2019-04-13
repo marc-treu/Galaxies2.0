@@ -40,6 +40,8 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_left.pack_propagate(0)
 
+        # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
+        #        cela implique aussi de modifier graph_selected et graph_selected_last, ainsi que select_graph
         self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.MULTIPLE, height=50, bg="gray88",
                                        font=("Helvetica", 12))
         self.liste_Graphe.pack(side=tk.LEFT, fill="both", expand=True)
@@ -218,6 +220,7 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_info['text'] = self.graph_selected_last
 
     def select_graph(self, evt):
+        # todo : lorsque la Listbox liste_Graphe ne sera plus multiple, simplifier cette fonction
         """
         Fonction qui devra afficher les information necessaire dans la box de droite,
         et qui met a jour la liste des graphes selectionner
