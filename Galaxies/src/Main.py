@@ -4,6 +4,7 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
+import banane
 import baseDonnees
 import grapheGalaxies
 import lecture_fic
@@ -14,6 +15,7 @@ import amas
 import extractionGalaxies
 import time
 
+print(banane.banana())
 
 class Main:
 
@@ -54,21 +56,20 @@ class Main:
         maxNoeud = grapheGalaxies.construction_graphe(self.DirProject+'/BDs')
         grapheGalaxies.sauvegarde_graphe_(self.DirProject+'/BDs')     # Et on le sauvegarde
 
-        if extractionGalaxies.composantesExtraites(self.DirProject+'/BDs') is not None:
-            print("Composantes déjà extraites")
-        else:
-            if maxNoeud == 0:
-                maxNoeud= baseDonnees.maxNoeuds(self.DirProject+'/BDs')
-            t1 = time.clock()
-            extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.DirProject+'/BDs')
-            t2 = time.clock()
-            print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
+        if maxNoeud == 0:
+            maxNoeud = baseDonnees.maxNoeuds(self.DirProject+'/BDs')
+        t1 = time.clock()
+        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.DirProject+'/BDs')
+        t2 = time.clock()
+        print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
         amas.recupererAmas(self.DirProject)
         print("Operation terminée start_from_textAlign_file")
 
     def open_existing_project(self):
-        repositorie = self.interface.ask_open_existing_project()
 
+        directory = self.interface.ask_open_existing_project()
+        # todo : verifier que directory est bien un projet
+        self.DirProject = directory
 
     def init_directory(self):
         """
