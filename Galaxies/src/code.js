@@ -1,4 +1,4 @@
-$.getJSON("jsons/galaxie_9_amas_25.json", function (data) {
+$.getJSON("jsons/exemple.json", function (data) {
     var cy = cytoscape({
         container: document.getElementById('cy'),
         elements: data['elements'],

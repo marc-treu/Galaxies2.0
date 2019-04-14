@@ -37,6 +37,7 @@ class InterfaceGalaxies(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
+        # Left Panel
         self.frame_left = tk.Frame(self, height=580, width=550)
         self.frame_left.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_left.pack_propagate(0)
@@ -54,21 +55,30 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
         self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
 
+        # Right Panel
         self.frame_right = tk.Frame(self, height=580, width=550)
         self.frame_right.grid(row=0, column=1, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_right.pack_propagate(0)
 
         self.graph_info = tk.Label(self.frame_right, relief=tk.RIDGE)
         self.graph_info.pack(side=tk.TOP, fill="both", expand=True, padx=2,
-                             pady=2)  # grid(row=0, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
+                             pady=2)
 
         self.frame_right_button = tk.Label(self.frame_right, text="ok")
         self.frame_right_button.pack(side=tk.BOTTOM, fill="both", expand=False, padx=2,
-                                     pady=2)  # grid(row=1, column=0,sticky=tk.N+tk.S+tk.W+tk.E)
-        self.create_button_menu()
+                                     pady=2)
+
         # Initialisation des variables
         self.graph_selected = []
         self.graph_selected_last = None
+        self.button_new_query = None
+        self.button_apply_filter = None
+        self.button_display_graph = None
+
+        # Creation of the button on right bottom
+        self.create_button_menu()
+
+        # Progress bar
 
     def create_menu(self):
         menubar = tk.Menu(self)
@@ -95,13 +105,17 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(processing, text="Prepossessing").grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
-        tk.Button(processing, text="New Query", command=self.main.get_requete_preprocessing).grid(row=1, rowspan=3,
-                                                                                                  column=0)
-        tk.Button(processing, text="Apply filter\n on node").grid(row=1, rowspan=3, column=2)
+
+        self.button_new_query = tk.Button(processing, text="New Query", command=self.main.get_requete_preprocessing)
+        self.button_new_query.grid(row=1, rowspan=3, column=0)
+
+        self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
+        self.button_apply_filter.grid(row=1, rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
         button.pack(side=tk.BOTTOM, fill="both", expand=True)
-        tk.Button(button, text="Display Graph in browser", command=self.display_graph_webbrowser).pack(pady=15)
+        self.button_display_graph = tk.Button(button, text="Display Graph in browser", command=self.display_graph_webbrowser)
+        self.button_display_graph.pack(pady=15)
 
     def open_text_align_file(self):
         return tk.filedialog.askopenfilename(title="Open a file", filetypes=[('tab files', '.tab')])
@@ -237,11 +251,24 @@ class InterfaceGalaxies(tk.Tk):
             self.display_graph_info()  # Alors on l'affiche dans notre fenetre a gauche
         print('last item selected', self.graph_selected_last)
 
+    def disabled_window(self):
+        self.liste_Graphe.configure(state='disable')
+        self.button_apply_filter.configure(state='disable')
+        self.button_display_graph.configure(state='disable')
+        self.button_new_query.configure(state='disable')
+
+    def enabled_window(self):
+        self.liste_Graphe.configure(state='normal')
+        self.button_apply_filter.configure(state='normal')
+        self.button_display_graph.configure(state='normal')
+        self.button_new_query.configure(state='normal')
+
     def display_graph_webbrowser(self):
         if self.graph_selected_last == None: return
         filename = self.get_name_file()
-        javaVisualisation.change_html_graph_display(filename)
-        webbrowser.open("./resultat_Galaxies/index.html")
+        project_path = self.main.get_project_path()
+        javaVisualisation.change_html_graph_display(filename, project_path)
+        webbrowser.open(project_path + '/index.html')
         print(self.graph_selected_last)
 
     def get_name_file(self):

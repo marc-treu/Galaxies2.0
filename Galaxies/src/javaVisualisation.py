@@ -154,17 +154,17 @@ def affichage(nomFichier):
     os.remove(parametres.DirPgm + 'code2.js')
 
 
-def change_html_graph_display(filename):
+def change_html_graph_display(filename, project_path):
     """
     Change graph to display on browser, by modify the first line of the javascript
     file.
 
     filename = the graph file you want to display.
     """
-    with open("./resultat_Galaxies/code.js","r") as f:
+    with open(project_path+'/code.js', 'r') as f:
         lines = f.readlines()   # On lit toute les lignes
 
     lines[0] = '$.getJSON("jsons/'+filename+'.json", function (data) {\n'
                                 # On remplace la premiere
-    with open("./resultat_Galaxies/code.js","w") as f:
+    with open(project_path+'/code.js', 'w') as f:
         f.writelines(lines)     # On re ecrie les lignes dans notre fichier

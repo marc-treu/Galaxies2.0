@@ -8,7 +8,7 @@ import baseDonnees
 import grapheGalaxies
 import lecture_fic
 import os
-import parametres
+import shutil
 
 import amas
 import extractionGalaxies
@@ -27,15 +27,17 @@ class Main:
 
         :param maxNoeud:
         """
-
+        self.interface.disabled_window()
         file = self.interface.open_text_align_file()  # Ask for textAlign file localisation
         if file == ():
+            self.interface.enabled_window()
             return  # if the user cancel
 
         newdirproject = self.interface.ask_for_project_name()  # Ask for project name
 
         if newdirproject == "" or newdirproject is None:
             # todo : Verifier que l'utilisateur n'a pas entrer un nom de project déjà existant
+            self.interface.enabled_window()
             return  # if the user cancel or enter a empty word
 
         self.interface.change_name(newdirproject.split('/')[-1])
@@ -61,9 +63,10 @@ class Main:
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.DirProject+'/BDs')
         t2 = time.clock()
-        print("Temps total d'extraction des composantes connexes: " + format(t2 - t1,'f') + " sec.")
+        print("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         amas.recupererAmas(self.DirProject)
         print("Operation terminée start_from_textAlign_file")
+        self.interface.enabled_window()
 
     def open_existing_project(self):
 
@@ -81,6 +84,8 @@ class Main:
         os.mkdir(self.DirProject + '/amas')
         os.mkdir(self.DirProject + '/graphs')
         os.mkdir(self.DirProject + '/jsons')
+        shutil.copy('./code.js', self.DirProject + '/')
+        shutil.copy('./index.html', self.DirProject + '/')
 
     def get_requete_preprocessing(self):
         print("debut de fonction")
@@ -91,6 +96,8 @@ class Main:
         self.interface.display_graph_list(self.DirProject)
         print("okay ! graphes afficher")
 
+    def get_project_path(self):
+        return self.DirProject
 
 if __name__ == '__main__':
     main = Main()
