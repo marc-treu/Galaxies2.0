@@ -29,6 +29,7 @@ class InterfaceGalaxies(tk.Tk):
         self.main = Main.Main(self)
         super().__init__()
         self.geometry("1200x600")
+        self.title("Galaxies")
 
         self.create_menu()  # Creation du menu
         self.grid_propagate(0)
@@ -251,6 +252,9 @@ class InterfaceGalaxies(tk.Tk):
             return 'galaxie_' + str(number[1]) + '_amas_' + str(number[0])
         else:
             return
+
+    def change_name(self, project_name):
+        self.title('Galaxies - ' + project_name)
 
     def askyesno_txt(self, text, titre="messagebox"):
         return tk.messagebox.askyesno(titre, text)

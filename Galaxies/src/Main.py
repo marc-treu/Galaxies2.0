@@ -38,6 +38,8 @@ class Main:
             # todo : Verifier que l'utilisateur n'a pas entrer un nom de project déjà existant
             return  # if the user cancel or enter a empty word
 
+        self.interface.change_name(newdirproject.split('/')[-1])
+
         self.DirProject = '../projects/' + newdirproject
 
         self.init_directory()                        # Creation of the project
@@ -67,6 +69,7 @@ class Main:
 
         directory = self.interface.ask_open_existing_project()
         # todo : verifier que directory est bien un projet
+        self.interface.change_name(directory.split('/')[-1])
         self.DirProject = directory
 
     def init_directory(self):
