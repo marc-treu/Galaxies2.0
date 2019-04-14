@@ -1,4 +1,4 @@
-Galaxies/projects/
+Galaxies/projects/*
 .idea/
 .DS_Store
 __pycache__/
