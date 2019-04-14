@@ -1,5 +1,5 @@
 Galaxies/projects/*
-!Galaxies/projects//.gitkeep 
+!Galaxies/projects/.gitkeep 
 .idea/
 .DS_Store
 __pycache__/
