@@ -475,7 +475,6 @@ def metaDonnees(LNoeuds):
 
 
 def galaxiesFiltre(requete, project_path, tailleMinGrosseGalaxie=300):
-    print(project_path)
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     curseur.execute('''SELECT nbre FROM nombreGalaxies''')

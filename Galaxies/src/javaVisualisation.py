@@ -11,8 +11,6 @@ import shutil
 import re
 
 
-# import pylab as P
-
 def preparationVisualisation(project_path):
     if 'jsons' in os.listdir(project_path):
         shutil.rmtree(project_path + "/jsons")

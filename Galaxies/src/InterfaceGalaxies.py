@@ -177,10 +177,9 @@ class InterfaceGalaxies(tk.Tk):
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
             fenetre.destroy()
 
-        def ferme():
+        def close_window():
             is_close[0] = True
             fenetre.destroy()
-            return None
 
         fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
@@ -235,27 +234,57 @@ class InterfaceGalaxies(tk.Tk):
 
         space = tk.Label(fenetre, text="\n").grid(row=10)
         bouton = tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
-        close = tk.Button(fenetre, text="Fermer", command=ferme).grid(sticky="w", row=11, column=1)
-        fenetre.bind("<Return>", lambda e: ferme())
-        fenetre.bind("<Escape>", lambda e: ferme())
+        close = tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
+        fenetre.bind("<Return>", lambda e: close_window())
+        fenetre.bind("<Escape>", lambda e: close_window())
 
         self.wait_window(fenetre)
         return {0: requete} if is_close[0] is False else None
 
     def get_query_graphs_structure_from_user(self):
+        """
+
+        :return: query graphs_structure a dict with specific information:
+                    - minimal_node_number   # minimal number of node for a graph
+                    - maximal_node_number   # maximal number of node for a graph
+        """
+
+        def valid():
+            if node_min.get():
+                query['minimal_node_number'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
+            if node_max.get():
+                query['maximal_node_number'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
+            window.destroy()
+
+        def close_window():
+            is_close[0] = True
+            window.destroy()
+
         window = tk.Toplevel()
-        window.title("Recherche dans les galaxies")
-        window.geometry("800x350")
+        window.title("Graph Feature")
+        # window.geometry("800x350")
 
-        tk.Label(window, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(
-            row=0, column=1)
+        is_close = [False]
+        query = dict()
 
-        bouton = tk.Button(window, text="Valider", command=window.quit).grid(row=3, column=2)
-        close = tk.Button(window, text="Fermer", command=window.quit).grid(sticky="w", row=3, column=1)
-        window.bind("<Return>", lambda e: window.quit())
-        window.bind("<Escape>", lambda e: window.quit())
+        tk.Label(window, text="\nPlease enter what graph characteristic you want\n", font="FreeSerif 14 bold").grid(
+            row=0, column=0)
+
+        tk.Label(window, text="Minimal number of nodes:", font="Arial 11").grid(sticky="w", row=1, column=0)
+        node_min = tk.Entry(window, width=30)
+        node_min.grid(sticky="w", row=1, column=1)
+
+        tk.Label(window, text="Maximal number of nodes:", font="Arial 11").grid(sticky="w", row=2, column=0)
+        node_max = tk.Entry(window, width=30)
+        node_max.grid(sticky="w", row=2, column=1)
+
+        tk.Button(window, text="Valid", command=valid).grid(row=3, column=2, padx=5, pady=10)
+        tk.Button(window, text="Cancel", command=close_window).grid(sticky="w", row=3, column=0, padx=5, pady=10)
+
+        window.bind("<Return>", lambda e: close_window())
+        window.bind("<Escape>", lambda e: close_window())
         self.wait_window(window)
-        return
+        return query if is_close[0] is False else None
 
     def display_graph_list(self):
         """
@@ -271,7 +300,6 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.delete(0, tk.END)
 
         self.sort_method = self.combo_box.get()
-        print(self.sort_method)
         # todo : trier les graphes en fonction de la methode selectionner
         if self.sort_method == 'number of node':
             list_graph = sorted(list_graph, key=lambda x: int(re.findall(r'\d+', str(x))[-1]))[::-1]

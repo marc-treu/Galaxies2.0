@@ -11,6 +11,9 @@ import grapheGalaxies
 import javaVisualisation
 import lecture_fic
 
+# todo : placer les fonctions de tmp_query_graph_structure dans un autre fichier
+import tmp_query_graph_structure
+
 import os
 import shutil
 import time
@@ -23,7 +26,7 @@ class Galaxie:
         self.project_path = None
         # todo : faire en sorte que la requete soit enregistrer pour pouvoir etre exploiter plus tard
         self.query = None
-        self.query_graphs_structure = False
+        self.query_graphs_structure = None
 
     def start_from_textAlign_file(self, maxNoeud=0):
         """
@@ -94,7 +97,7 @@ class Galaxie:
         shutil.copy('./code.js', self.project_path + '/')
         shutil.copy('./index.html', self.project_path + '/')
 
-    def _ask_for_query(self):
+    def _execute_query(self):
         amas.requetesUser(self.query, self.project_path)
         javaVisualisation.preparationVisualisation(self.project_path)
 
@@ -112,7 +115,7 @@ class Galaxie:
         if self.query is None:
             return  # if no query were ask on project
 
-        self._ask_for_query()
+        self._execute_query()
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
@@ -124,10 +127,17 @@ class Galaxie:
             pass
             #return  # if no query were ask on project
 
-        if self.query_graphs_structure:
+        if self.query_graphs_structure is not None:
             # todo : tache possiblement longue, necessite la progress bar
-            self._ask_for_query()  # if we have already change the list of graphs answer, we rebuild it
-        query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
+            self._execute_query()  # if we have already change the list of graphs answer, we rebuild it
+
+        self.query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
+        if self.query_graphs_structure is None:
+            return
+
+        tmp_query_graph_structure.handle_query_graph_struture(self.query_graphs_structure, self.project_path)
+
+        self.interface.display_graph_list()
 
     def get_project_path(self):
         return self.project_path
