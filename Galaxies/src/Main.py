@@ -20,7 +20,10 @@ class Main:
 
     def __init__(self, interface):
         self.interface = interface
-        self.DirProject = None
+        self.project_path = None
+        # todo : faire en sorte que la requete soit enregistrer pour pouvoir etre exploiter plus tard
+        self.query = None
+        self.query_graphs_structure = False
 
     def start_from_textAlign_file(self, maxNoeud=0):
         """
@@ -43,29 +46,29 @@ class Main:
 
         self.interface.change_name(newdirproject.split('/')[-1])
 
-        self.DirProject = '../projects/' + newdirproject
+        self.project_path = '../projects/' + newdirproject
 
-        self.init_directory()                        # Creation of the project
+        self.init_directory()  # Creation of the project
         t1 = time.clock()
-        baseDonnees.creerBD(self.DirProject+'/BDs')  # Creation of the database
+        baseDonnees.creerBD(self.project_path + '/BDs')  # Creation of the database
         t2 = time.clock()
-        print("Temps de construction de la base de données: "+format(t2 - t1,'f')+" sec.")
+        print("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
         t1 = time.clock()
-        lecture_fic.lecture(file, self.DirProject+'/BDs')  # On remplie notre BD avec notre fichiers .tab
+        lecture_fic.lecture(file, self.project_path + '/BDs')  # On remplie notre BD avec notre fichiers .tab
         t2 = time.clock()
-        print("Temps de lecture du fichier source: " + format(t2 - t1,'f') + " sec.")
-        print("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.DirProject+'/BDs'))
+        print("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
+        print("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.project_path + '/BDs'))
 
-        maxNoeud = grapheGalaxies.construction_graphe(self.DirProject+'/BDs')
-        grapheGalaxies.sauvegarde_graphe_(self.DirProject+'/BDs')     # Et on le sauvegarde
+        maxNoeud = grapheGalaxies.construction_graphe(self.project_path + '/BDs')
+        grapheGalaxies.sauvegarde_graphe_(self.project_path + '/BDs')  # Et on le sauvegarde
 
         if maxNoeud == 0:
-            maxNoeud = baseDonnees.maxNoeuds(self.DirProject+'/BDs')
+            maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
-        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.DirProject+'/BDs')
+        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path + '/BDs')
         t2 = time.clock()
         print("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
-        amas.recupererAmas(self.DirProject)
+        amas.recupererAmas(self.project_path)
         print("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
 
@@ -75,36 +78,48 @@ class Main:
         directory = self.interface.ask_open_existing_project()
         # todo : verifier que directory est bien un projet
         self.interface.change_name(directory.split('/')[-1])
-        self.DirProject = directory
+        self.project_path = directory
         self.interface.display_graph_list()
         self.interface.enabled_window()
-
 
     def init_directory(self):
         """
         initialise la creation des dossiers pour recuperer les informations
         """
-        os.mkdir(self.DirProject)
-        os.mkdir(self.DirProject + '/BDs')
-        os.mkdir(self.DirProject + '/amas')
-        os.mkdir(self.DirProject + '/graphs')
-        os.mkdir(self.DirProject + '/jsons')
-        shutil.copy('./code.js', self.DirProject + '/')
-        shutil.copy('./index.html', self.DirProject + '/')
+        os.mkdir(self.project_path)
+        os.mkdir(self.project_path + '/BDs')
+        os.mkdir(self.project_path + '/amas')
+        os.mkdir(self.project_path + '/graphs')
+        os.mkdir(self.project_path + '/jsons')
+        shutil.copy('./code.js', self.project_path + '/')
+        shutil.copy('./index.html', self.project_path + '/')
+
+    def _ask_for_query(self):
+        amas.requetesUser(self.query, self.project_path)
+        javaVisualisation.preparationVisualisation(self.project_path)
 
     def get_requete_preprocessing(self):
-        print("debut de fonction")
-        requete = self.interface.get_requete_from_user()
-        print("la requete = ", requete)
-        amas.requetesUser(requete, self.DirProject)
-        javaVisualisation.preparationVisualisation(self.DirProject)
+        # todo : tache possiblement longue, necessite la progress bar
+        print("debut de fonction get_requete_preprocessing")
+        query = self.interface.get_requete_from_user()
+        self.query = query
+        print("la requete = ", self.query)
+        self._ask_for_query()
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
 
-    def get_project_path(self):
-        return self.DirProject
+    def get_query_graphs_structure(self):
 
-if __name__ == '__main__':
-    main = Main()
-    main.interface.mainloop()
+        if self.query is None:
+            # todo : enleve le pass et remmetre le return, ici uniquement pour le bien des teste
+            pass
+            #return  # if no query were ask on project
+
+        if self.query_graphs_structure:
+            # todo : tache possiblement longue, necessite la progress bar
+            self._ask_for_query()  # if we have already change the list of graphs answer, we rebuild it
+        query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
+
+    def get_project_path(self):
+        return self.project_path

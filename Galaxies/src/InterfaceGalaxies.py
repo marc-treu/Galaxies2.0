@@ -53,7 +53,7 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
         self.sort_method = self.combo_box.get()
 
-        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.main.get_requete_preprocessing)
+        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.main.get_query_graphs_structure)
         self.button_query_graphs.pack(side=tk.LEFT, padx='5')
         # Left Listbox
         # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
@@ -235,6 +235,21 @@ class InterfaceGalaxies(tk.Tk):
 
         self.wait_window(fenetre)
         return {0: requete}
+
+    def get_query_graphs_structure_from_user(self):
+        window = tk.Toplevel()
+        window.title("Recherche dans les galaxies")
+        window.geometry("800x350")
+
+        tk.Label(window, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(
+            row=0, column=1)
+
+        bouton = tk.Button(window, text="Valider", command=window.quit).grid(row=3, column=2)
+        close = tk.Button(window, text="Fermer", command=window.quit).grid(sticky="w", row=3, column=1)
+        window.bind("<Return>", lambda e: window.quit())
+        window.bind("<Escape>", lambda e: window.quit())
+        self.wait_window(window)
+        return
 
     def display_graph_list(self):
         """
