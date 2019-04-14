@@ -19,7 +19,6 @@ class Galaxie:
     def __init__(self, interface):
         self.interface = interface
         self.project_path = None
-        # todo : faire en sorte que la requete soit enregistrer pour pouvoir etre exploiter plus tard
         self.query = None
         self.query_graphs_structure = None
 
