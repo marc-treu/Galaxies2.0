@@ -42,6 +42,7 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_left.pack_propagate(0)
 
+        # Left Top Panel
         self.frame_left_top = tk.Frame(self.frame_left)
         self.frame_left_top.pack(side=tk.TOP, fill="both", expand=True, padx='2', pady='2')
 
@@ -52,8 +53,12 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
         self.sort_method = self.combo_box.get()
 
+        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.main.get_requete_preprocessing)
+        self.button_query_graphs.pack(side=tk.LEFT, padx='5')
+        # Left Listbox
         # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
-        #        cela implique aussi de modifier graph_selected et graph_selected_last, ainsi que select_graph
+        #        cela implique aussi de modifier les variable graph_selected et graph_selected_last, ainsi que
+        #        la fonction select_graph
         self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.MULTIPLE, height=50, bg="gray88",
                                        font=("Helvetica", 12))
         self.liste_Graphe.pack(side=tk.LEFT, fill="both", expand=True)
@@ -236,8 +241,6 @@ class InterfaceGalaxies(tk.Tk):
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
         project_path = self.main.get_project_path()
-        self.sort_method = self.combo_box.get()
-        print(self.sort_method)
 
         if project_path is None:
             return  # if no project are selected or stared
@@ -246,7 +249,16 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.configure(state='normal')
         self.liste_Graphe.delete(0, tk.END)
 
+        self.sort_method = self.combo_box.get()
+        print(self.sort_method)
         # todo : trier les graphes en fonction de la methode selectionner
+        if self.sort_method == 'number of node':
+            list_graph = sorted(list_graph, key=lambda x: int(re.findall(r'\d+', str(x))[-1]))[::-1]
+        if self.sort_method == 'longest text':
+            pass
+        if self.sort_method == 'shortest text':
+            pass
+
         for graph in list_graph:
             self.liste_Graphe.insert(tk.END, graph)
         self.update()
@@ -279,12 +291,16 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
         self.button_new_query.configure(state='disable')
+        self.button_query_graphs.configure(state='disable')
+        self.combo_box.configure(state='disable')
 
     def enabled_window(self):
         self.liste_Graphe.configure(state='normal')
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
+        self.button_query_graphs.configure(state='normal')
+        self.combo_box.configure(state='normal')
         self.update()
 
     def display_graph_webbrowser(self):
