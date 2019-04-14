@@ -11,8 +11,6 @@ import grapheGalaxies
 import javaVisualisation
 import lecture_fic
 
-# todo : placer les fonctions de tmp_query_graph_structure dans un autre fichier
-import tmp_query_graph_structure
 
 import os
 import shutil
@@ -97,8 +95,8 @@ class Galaxie:
         shutil.copy('./code.js', self.project_path + '/')
         shutil.copy('./index.html', self.project_path + '/')
 
-    def _execute_query(self):
-        amas.requetesUser(self.query, self.project_path)
+    def _execute_query(self, query):
+        amas.requetesUser(query, self.project_path)
         javaVisualisation.preparationVisualisation(self.project_path)
 
     def get_requete_preprocessing(self):
@@ -115,7 +113,7 @@ class Galaxie:
         if self.query is None:
             return  # if no query were ask on project
 
-        self._execute_query()
+        self._execute_query(self.query)
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
@@ -129,14 +127,13 @@ class Galaxie:
 
         if self.query_graphs_structure is not None:
             # todo : tache possiblement longue, necessite la progress bar
-            self._execute_query()  # if we have already change the list of graphs answer, we rebuild it
+            self._execute_query(self.query)  # if we have already change the list of graphs answer, we rebuild it
 
         self.query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
         if self.query_graphs_structure is None:
             return
 
-        tmp_query_graph_structure.handle_query_graph_struture(self.query_graphs_structure, self.project_path)
-
+        self._execute_query({0: dict(self.query_graphs_structure[0], **self.query[0])})
         self.interface.display_graph_list()
 
     def get_project_path(self):

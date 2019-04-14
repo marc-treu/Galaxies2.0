@@ -607,6 +607,8 @@ def metaDonneesFiltre(EnsNoeuds, requete):
 def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
     if 'nbre_minimal_noeuds' in requete.keys() and requete['nbre_minimal_noeuds'] > len(EnsNoeuds):
         return False
+    if 'nbre_maximal_noeuds' in requete.keys() and requete['nbre_maximal_noeuds'] < len(EnsNoeuds):
+        return False
     for Noeud in EnsNoeuds:
         curseur.execute(
             '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',

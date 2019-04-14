@@ -235,7 +235,7 @@ class InterfaceGalaxies(tk.Tk):
         space = tk.Label(fenetre, text="\n").grid(row=10)
         bouton = tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
         close = tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
-        fenetre.bind("<Return>", lambda e: close_window())
+        fenetre.bind("<Return>", lambda e: recupere())
         fenetre.bind("<Escape>", lambda e: close_window())
 
         self.wait_window(fenetre)
@@ -245,15 +245,15 @@ class InterfaceGalaxies(tk.Tk):
         """
 
         :return: query graphs_structure a dict with specific information:
-                    - minimal_node_number   # minimal number of node for a graph
-                    - maximal_node_number   # maximal number of node for a graph
+                    - nbre_minimal_noeuds   # minimal number of node for a graph
+                    - nbre_maximal_noeuds   # maximal number of node for a graph
         """
 
         def valid():
             if node_min.get():
-                query['minimal_node_number'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
+                query['nbre_minimal_noeuds'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
             if node_max.get():
-                query['maximal_node_number'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
+                query['nbre_maximal_noeuds'] = [int(s) for s in node_max.get().split() if s.isdigit()].pop(0)
             window.destroy()
 
         def close_window():
@@ -281,10 +281,10 @@ class InterfaceGalaxies(tk.Tk):
         tk.Button(window, text="Valid", command=valid).grid(row=3, column=2, padx=5, pady=10)
         tk.Button(window, text="Cancel", command=close_window).grid(sticky="w", row=3, column=0, padx=5, pady=10)
 
-        window.bind("<Return>", lambda e: close_window())
+        window.bind("<Return>", lambda e: valid())
         window.bind("<Escape>", lambda e: close_window())
         self.wait_window(window)
-        return query if is_close[0] is False else None
+        return {0: query} if is_close[0] is False else None
 
     def display_graph_list(self):
         """
