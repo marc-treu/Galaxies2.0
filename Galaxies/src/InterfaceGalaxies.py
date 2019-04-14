@@ -177,6 +177,11 @@ class InterfaceGalaxies(tk.Tk):
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
             fenetre.destroy()
 
+        def ferme():
+            is_close[0] = True
+            fenetre.destroy()
+            return None
+
         fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
         fenetre.geometry("800x350")
@@ -226,15 +231,16 @@ class InterfaceGalaxies(tk.Tk):
         nbnoeuds_min.grid(sticky="w", row=8, column=2)
 
         requete = dict()
+        is_close = [False]
 
         space = tk.Label(fenetre, text="\n").grid(row=10)
         bouton = tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
-        close = tk.Button(fenetre, text="Fermer", command=fenetre.quit).grid(sticky="w", row=11, column=1)
-        fenetre.bind("<Return>", lambda e: recupere())
-        fenetre.bind("<Escape>", lambda e: fenetre.quit())
+        close = tk.Button(fenetre, text="Fermer", command=ferme).grid(sticky="w", row=11, column=1)
+        fenetre.bind("<Return>", lambda e: ferme())
+        fenetre.bind("<Escape>", lambda e: ferme())
 
         self.wait_window(fenetre)
-        return {0: requete}
+        return {0: requete} if is_close[0] is False else None
 
     def get_query_graphs_structure_from_user(self):
         window = tk.Toplevel()

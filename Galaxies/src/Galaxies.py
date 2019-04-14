@@ -106,8 +106,12 @@ class Galaxie:
 
         print("debut de fonction get_requete_preprocessing")
         query = self.interface.get_requete_from_user()
+
         self.query = query
         print("la requete = ", self.query)
+        if self.query is None:
+            return  # if no query were ask on project
+
         self._ask_for_query()
         print("okay ! requete traiter")
         self.interface.display_graph_list()
