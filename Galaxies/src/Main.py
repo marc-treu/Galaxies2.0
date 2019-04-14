@@ -76,7 +76,7 @@ class Main:
         # todo : verifier que directory est bien un projet
         self.interface.change_name(directory.split('/')[-1])
         self.DirProject = directory
-        self.interface.display_graph_list(self.DirProject)
+        self.interface.display_graph_list()
         self.interface.enabled_window()
 
 
@@ -99,7 +99,7 @@ class Main:
         amas.requetesUser(requete, self.DirProject)
         javaVisualisation.preparationVisualisation(self.DirProject)
         print("okay ! requete traiter")
-        self.interface.display_graph_list(self.DirProject)
+        self.interface.display_graph_list()
         print("okay ! graphes afficher")
 
     def get_project_path(self):

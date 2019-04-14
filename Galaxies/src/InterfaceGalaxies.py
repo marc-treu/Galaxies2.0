@@ -42,6 +42,16 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.frame_left.pack_propagate(0)
 
+        self.frame_left_top = tk.Frame(self.frame_left)
+        self.frame_left_top.pack(side=tk.TOP, fill="both", expand=True, padx='2', pady='2')
+
+        self.combo_box = ttk.Combobox(self.frame_left_top, values=['number of node', 'longest text', 'shortest text'])
+        self.combo_box.pack(side=tk.RIGHT, pady='2')
+        self.combo_box.bind('<<ComboboxSelected>>', lambda event: self.display_graph_list())
+        self.combo_box.current(0)
+        tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
+        self.sort_method = self.combo_box.get()
+
         # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
         #        cela implique aussi de modifier graph_selected et graph_selected_last, ainsi que select_graph
         self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.MULTIPLE, height=50, bg="gray88",
@@ -64,7 +74,7 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_info.pack(side=tk.TOP, fill="both", expand=True, padx=2,
                              pady=2)
 
-        self.frame_right_button = tk.Label(self.frame_right, text="ok")
+        self.frame_right_button = tk.Frame(self.frame_right)
         self.frame_right_button.pack(side=tk.BOTTOM, fill="both", expand=False, padx=2,
                                      pady=2)
 
@@ -79,6 +89,8 @@ class InterfaceGalaxies(tk.Tk):
         self.create_button_menu()
 
         # Progress bar
+        # todo : Faire une progress bar tout en bas de la fenetre pour voire ou en ai la generation du graphe ou toute
+        #        autre tache qui requiere du temps
 
     def create_menu(self):
         menubar = tk.Menu(self)
@@ -219,13 +231,22 @@ class InterfaceGalaxies(tk.Tk):
         self.wait_window(fenetre)
         return {0: requete}
 
-    def display_graph_list(self, project_path):
+    def display_graph_list(self):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
+        project_path = self.main.get_project_path()
+        self.sort_method = self.combo_box.get()
+        print(self.sort_method)
+
+        if project_path is None:
+            return  # if no project are selected or stared
+
         list_graph = baseDonnees.get_list_graph(project_path)
         self.liste_Graphe.configure(state='normal')
         self.liste_Graphe.delete(0, tk.END)
+
+        # todo : trier les graphes en fonction de la methode selectionner
         for graph in list_graph:
             self.liste_Graphe.insert(tk.END, graph)
         self.update()
