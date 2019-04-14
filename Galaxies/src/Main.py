@@ -4,14 +4,15 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
+import amas
 import baseDonnees
+import extractionGalaxies
 import grapheGalaxies
+import javaVisualisation
 import lecture_fic
+
 import os
 import shutil
-
-import amas
-import extractionGalaxies
 import time
 
 
@@ -70,10 +71,14 @@ class Main:
 
     def open_existing_project(self):
 
+        self.interface.disabled_window()
         directory = self.interface.ask_open_existing_project()
         # todo : verifier que directory est bien un projet
         self.interface.change_name(directory.split('/')[-1])
         self.DirProject = directory
+        self.interface.display_graph_list(self.DirProject)
+        self.interface.enabled_window()
+
 
     def init_directory(self):
         """
@@ -92,6 +97,7 @@ class Main:
         requete = self.interface.get_requete_from_user()
         print("la requete = ", requete)
         amas.requetesUser(requete, self.DirProject)
+        javaVisualisation.preparationVisualisation(self.DirProject)
         print("okay ! requete traiter")
         self.interface.display_graph_list(self.DirProject)
         print("okay ! graphes afficher")

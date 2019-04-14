@@ -223,10 +223,12 @@ class InterfaceGalaxies(tk.Tk):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
-        javaVisualisation.preparationVisualisation(project_path)
         list_graph = baseDonnees.get_list_graph(project_path)
+        self.liste_Graphe.configure(state='normal')
+        self.liste_Graphe.delete(0, tk.END)
         for graph in list_graph:
             self.liste_Graphe.insert(tk.END, graph)
+        self.update()
 
     def display_graph_info(self):
         """
@@ -262,6 +264,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
+        self.update()
 
     def display_graph_webbrowser(self):
         if self.graph_selected_last == None: return
