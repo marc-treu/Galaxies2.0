@@ -11,9 +11,6 @@ import grapheGalaxies
 import javaVisualisation
 import lecture_fic
 
-
-import os
-import shutil
 import time
 
 
@@ -49,7 +46,7 @@ class Galaxie:
 
         self.project_path = '../projects/' + newdirproject
 
-        self.init_directory()  # Creation of the project
+        lecture_fic.init_directory(self.project_path)  # Creation of the project
         t1 = time.clock()
         baseDonnees.creerBD(self.project_path + '/BDs')  # Creation of the database
         t2 = time.clock()
@@ -81,19 +78,8 @@ class Galaxie:
         self.interface.change_name(directory.split('/')[-1])
         self.project_path = directory
         self.interface.display_graph_list()
+        self.query = lecture_fic.load_query(self.project_path)
         self.interface.enabled_window()
-
-    def init_directory(self):
-        """
-        initialise la creation des dossiers pour recuperer les informations
-        """
-        os.mkdir(self.project_path)
-        os.mkdir(self.project_path + '/BDs')
-        os.mkdir(self.project_path + '/amas')
-        os.mkdir(self.project_path + '/graphs')
-        os.mkdir(self.project_path + '/jsons')
-        shutil.copy('./code.js', self.project_path + '/')
-        shutil.copy('./index.html', self.project_path + '/')
 
     def _execute_query(self, query):
         amas.requetesUser(query, self.project_path)
@@ -101,8 +87,9 @@ class Galaxie:
 
     def get_requete_preprocessing(self):
         # todo : tache possiblement longue, necessite la progress bar
-
+        self.interface.disabled_window()
         if self.project_path is None:
+            self.interface.enabled_window()
             return  # if no project are selected or stared
 
         print("debut de fonction get_requete_preprocessing")
@@ -111,19 +98,20 @@ class Galaxie:
         self.query = query
         print("la requete = ", self.query)
         if self.query is None:
+            self.interface.enabled_window()
             return  # if no query were ask on project
 
         self._execute_query(self.query)
+        lecture_fic.save_query(self.query, self.project_path)
         print("okay ! requete traiter")
         self.interface.display_graph_list()
         print("okay ! graphes afficher")
+        self.interface.enabled_window()
 
     def get_query_graphs_structure(self):
 
         if self.query is None:
-            # todo : enleve le pass et remmetre le return, ici uniquement pour le bien des teste
-            pass
-            #return  # if no query were ask on project
+            return  # if no query were ask on project
 
         if self.query_graphs_structure is not None:
             # todo : tache possiblement longue, necessite la progress bar

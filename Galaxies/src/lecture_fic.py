@@ -4,13 +4,15 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-import codecs
-import parametres
 import baseDonnees
-import sqlite3
-import time
+import codecs
 import json
 import os
+import parametres
+import pickle
+import shutil
+import sqlite3
+import time
 
 
 def lecture(tab_file, data_base_path, number_of_line=0):
@@ -113,6 +115,30 @@ def fichierNonCache(L):
         return L[0]
     else:
         return fichierNonCache(L[1:])
+
+
+def init_directory(project_path):
+    """
+    initialise la creation des dossiers pour recuperer les informations
+    """
+    os.mkdir(project_path)
+    os.mkdir(project_path + '/BDs')
+    os.mkdir(project_path + '/amas')
+    os.mkdir(project_path + '/graphs')
+    os.mkdir(project_path + '/jsons')
+    shutil.copy('./code.js', project_path + '/')
+    shutil.copy('./index.html', project_path + '/')
+
+
+def save_query(query, project_path):
+    pickle.dump(query, open(project_path + '/query', 'wb'))
+
+
+def load_query(project_path):
+    try:
+        return pickle.load(open(project_path + '/query', 'rb'))
+    except:
+        return None
 
 #### les Fonctions dans la suite n'on pas l'aire utile
 
