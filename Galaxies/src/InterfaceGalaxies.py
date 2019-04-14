@@ -135,7 +135,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_display_graph.pack(pady=15)
 
     def open_text_align_file(self):
-        return tk.filedialog.askopenfilename(title="Open a file", filetypes=[('tab files', '.tab')])
+        return tk.filedialog.askopenfilename(title="Open a tab file", filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self):
         # todo : faire en sorte que l'on demande d'ouvrir un dossier a partir du dossier parent

@@ -36,7 +36,7 @@ class Galaxie:
         """
         self.interface.disabled_window()
         file = self.interface.open_text_align_file()  # Ask for textAlign file localisation
-        if file == ():
+        if file == () or file == '':
             self.interface.enabled_window()
             return  # if the user cancel
 
