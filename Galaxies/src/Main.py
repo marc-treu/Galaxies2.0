@@ -100,6 +100,10 @@ class Main:
 
     def get_requete_preprocessing(self):
         # todo : tache possiblement longue, necessite la progress bar
+
+        if self.project_path is None:
+            return  # if no project are selected or stared
+
         print("debut de fonction get_requete_preprocessing")
         query = self.interface.get_requete_from_user()
         self.query = query

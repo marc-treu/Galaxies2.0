@@ -319,9 +319,14 @@ class InterfaceGalaxies(tk.Tk):
         self.update()
 
     def display_graph_webbrowser(self):
-        if self.graph_selected_last == None: return
+        if self.graph_selected_last is None: return
         filename = self.get_name_file()
+
         project_path = self.main.get_project_path()
+
+        if project_path is None:
+            return  # if no project are selected or stared
+
         javaVisualisation.change_html_graph_display(filename, project_path)
         webbrowser.open(project_path + '/index.html')
         print(self.graph_selected_last)
