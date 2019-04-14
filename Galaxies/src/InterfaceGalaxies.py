@@ -6,7 +6,7 @@ from tkinter import simpledialog
 
 import baseDonnees
 import javaVisualisation
-import Main
+import Galaxies
 import re
 import webbrowser
 
@@ -26,7 +26,7 @@ class InterfaceGalaxies(tk.Tk):
 
 
         """
-        self.main = Main.Main(self)
+        self.galaxie = Galaxies.Galaxie(self)
         super().__init__()
         self.geometry("1200x600")
         self.title("Galaxies")
@@ -53,7 +53,7 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
         self.sort_method = self.combo_box.get()
 
-        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.main.get_query_graphs_structure)
+        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.galaxie.get_query_graphs_structure)
         self.button_query_graphs.pack(side=tk.LEFT, padx='5')
         # Left Listbox
         # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
@@ -100,12 +100,12 @@ class InterfaceGalaxies(tk.Tk):
     def create_menu(self):
         menubar = tk.Menu(self)
         menu1 = tk.Menu(menubar, tearoff=0)
-        menu1.add_command(label="New project with a text-align file", command=self.main.start_from_textAlign_file)
+        menu1.add_command(label="New project with a text-align file", command=self.galaxie.start_from_textAlign_file)
         menu1.add_command(label="By Compare 2 corpus")
         menubar.add_cascade(label="Start", menu=menu1)
 
         menu2 = tk.Menu(menubar, tearoff=0)
-        menu2.add_command(label="Existing project", command=self.main.open_existing_project)
+        menu2.add_command(label="Existing project", command=self.galaxie.open_existing_project)
         menubar.add_cascade(label="Open", menu=menu2)
 
         menubar.add_command(label="Quit", command=self.destroy)
@@ -123,7 +123,7 @@ class InterfaceGalaxies(tk.Tk):
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query", command=self.main.get_requete_preprocessing)
+        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.get_requete_preprocessing)
         self.button_new_query.grid(row=1, rowspan=3, column=0)
 
         self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
@@ -255,7 +255,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
         """
-        project_path = self.main.get_project_path()
+        project_path = self.galaxie.get_project_path()
 
         if project_path is None:
             return  # if no project are selected or stared
@@ -322,7 +322,7 @@ class InterfaceGalaxies(tk.Tk):
         if self.graph_selected_last is None: return
         filename = self.get_name_file()
 
-        project_path = self.main.get_project_path()
+        project_path = self.galaxie.get_project_path()
 
         if project_path is None:
             return  # if no project are selected or stared

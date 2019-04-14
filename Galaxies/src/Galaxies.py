@@ -16,7 +16,7 @@ import shutil
 import time
 
 
-class Main:
+class Galaxie:
 
     def __init__(self, interface):
         self.interface = interface
