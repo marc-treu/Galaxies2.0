@@ -100,7 +100,7 @@ class InterfaceGalaxies(tk.Tk):
     def create_menu(self):
         menubar = tk.Menu(self)
         menu1 = tk.Menu(menubar, tearoff=0)
-        menu1.add_command(label="New project with a text-align file", command=self.galaxie.start_from_textAlign_file)
+        menu1.add_command(label="New project with a text-align file", command=self.galaxie.start_from_textalign_file)
         menu1.add_command(label="By Compare 2 corpus")
         menubar.add_cascade(label="Start", menu=menu1)
 

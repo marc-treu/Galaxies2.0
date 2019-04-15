@@ -22,7 +22,7 @@ class Galaxie:
         self.query = None
         self.query_graphs_structure = None
 
-    def start_from_textAlign_file(self, maxNoeud=0):
+    def start_from_textalign_file(self, maxNoeud=0):
         """
         Starting a new project with a textAlign file
 
