@@ -342,6 +342,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='disable')
         self.button_query_graphs.configure(state='disable')
         self.combo_box.configure(state='disable')
+        self.update()
 
     def enabled_window(self):
         self.liste_Graphe.configure(state='normal')
