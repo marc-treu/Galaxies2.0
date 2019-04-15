@@ -108,20 +108,26 @@ class Galaxie:
         self.interface.enabled_window()
 
     def get_query_graphs_structure(self):
+        print("get_query_graphs_structure")
+        self.interface.disabled_window()
 
         if self.query is None:
+            self.interface.enabled_window()
             return  # if no query were ask on project
 
         if self.query_graphs_structure is not None:
+            print("self.query_graphs_structure is not None")
             # todo : tache possiblement longue, necessite la progress bar
             self._execute_query(self.query)  # if we have already change the list of graphs answer, we rebuild it
 
         self.query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
         if self.query_graphs_structure is None:
+            self.interface.enabled_window()
             return
 
         self._execute_query({0: dict(self.query_graphs_structure[0], **self.query[0])})
         self.interface.display_graph_list()
+        self.interface.enabled_window()
 
     def get_project_path(self):
         return self.project_path
