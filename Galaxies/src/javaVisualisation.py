@@ -65,7 +65,7 @@ def visualisation(fichier, project_path):
     data1["elements"]["nodes"] = nv_nodes
     data1["elements"]["edges"] = nv_edges
 
-    tab = [int(s) for s in re.findall(r'\d+', fichier)]
+    tab = [int(s) for s in re.findall(r'\d+', fichier.split("/")[-1])]
     if (len(tab) == 1):
         filename = project_path + '/jsons/galaxie_' + str(tab[0]) + '.json'
     elif (len(tab) == 2):
@@ -76,8 +76,9 @@ def visualisation(fichier, project_path):
 
     # print(data1)
     # création d'un fichier json à la répertoire indiquée
-    with open(filename, 'w') as f:
-        json.dump(data1, f)
+    if filename is not None:
+        with open(filename, 'w') as f:
+            json.dump(data1, f)
 
 # chemin vers le fichier gexf contenant le graphe
 # def visualisation(fichier):
