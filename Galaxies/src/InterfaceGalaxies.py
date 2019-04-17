@@ -10,6 +10,7 @@ import Galaxies
 import re
 import webbrowser
 
+import extractionGalaxies
 
 class InterfaceGalaxies(tk.Tk):
 
@@ -326,6 +327,20 @@ class InterfaceGalaxies(tk.Tk):
         Fonction qui affiche les information du dernier graphe selectionner
         """
         self.graph_info['text'] = self.graph_selected
+        # print(extractionGalaxies.metaDonnees([6608], self.galaxie.get_project_path()))
+
+    def display_project_info(self, project_name, query=None):
+        """
+            Function that display on the right frame some information about the project, is use for inform the user of
+        success of project loading
+
+        :param project_name: the name of the current project
+        :param query: if has one, the last time use query
+        """
+        text = "The "+project_name+" Project has been loaded successfully"
+        if query != None:
+            text += "\n\nYour last query was:\n"+str(query)
+        self.graph_info['text'] = text
 
     def select_graph(self, evt):
         """

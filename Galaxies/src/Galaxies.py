@@ -85,6 +85,7 @@ class Galaxie:
         self.project_path = directory
         self.interface.display_graph_list()
         self.query = lecture_fic.load_query(self.project_path)
+        self.interface.display_project_info(self.project_path.split('/')[-1], self.query)
         self.interface.enabled_window()
 
     def _execute_query(self, query):

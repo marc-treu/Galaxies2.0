@@ -447,8 +447,8 @@ def metaDonneesLivres(LNoeuds):
     return metaDonnees
 
 
-def metaDonnees(LNoeuds):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+def metaDonnees(LNoeuds, project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     metaDonnees = set()
     for Noeud in LNoeuds:
