@@ -55,11 +55,9 @@ class InterfaceGalaxies(tk.Tk):
 
         self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.galaxie.get_query_graphs_structure)
         self.button_query_graphs.pack(side=tk.LEFT, padx='5')
+
         # Left Listbox
-        # todo : Faire en sorte que la Listbox liste_Graphe ne soit plus multiple (selectmode=tk.MULTIPLE),
-        #        cela implique aussi de modifier les variable graph_selected et graph_selected_last, ainsi que
-        #        la fonction select_graph
-        self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.MULTIPLE, height=50, bg="gray88",
+        self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.SINGLE, height=50, bg="gray88",
                                        font=("Helvetica", 12))
         self.liste_Graphe.pack(side=tk.LEFT, fill="both", expand=True)
 
@@ -84,8 +82,7 @@ class InterfaceGalaxies(tk.Tk):
                                      pady=2)
 
         # Initialisation des variables
-        self.graph_selected = []
-        self.graph_selected_last = None
+        self.graph_selected = None
         self.button_new_query = None
         self.button_apply_filter = None
         self.button_display_graph = None
@@ -328,24 +325,22 @@ class InterfaceGalaxies(tk.Tk):
         """
         Fonction qui affiche les information du dernier graphe selectionner
         """
-        self.graph_info['text'] = self.graph_selected_last
+        self.graph_info['text'] = self.graph_selected
 
     def select_graph(self, evt):
-        # todo : lorsque la Listbox liste_Graphe ne sera plus multiple, simplifier cette fonction
         """
-        Fonction qui devra afficher les information necessaire dans la box de droite,
-        et qui met a jour la liste des graphes selectionner
-        """
-        w = evt.widget
-        index = [graph for graph in w.curselection()]
+            Function that handle the selection of graph in our ListBox, by get the information of which graph have been
+        selected, and by call display_graph_info for give that information to the user on the right Frame.
+            It is call by the event of a selection in the ListBox
 
-        self.graph_selected_last = set(self.graph_selected)  # On garde la liste de selection precedente
-        self.graph_selected = [w.get(ind) for ind in index]  # On recuperer la liste de selection courante
-        self.graph_selected_last = set(
-            self.graph_selected) - self.graph_selected_last  # la difference des deux nous donne le dernier selectionne
-        if self.graph_selected_last != set():  # Si on a bien un nouveau graphe selectionne
-            self.display_graph_info()  # Alors on l'affiche dans notre fenetre a gauche
-        print('last item selected', self.graph_selected_last)
+        :param evt: the event of mouse click in the ListBox
+        """
+        w = evt.widget  # We get the widget event
+        index = w.curselection()  # we get the active selection
+        if index != ():  # if the selection is not empty
+            self.graph_selected = w.get(index[0])  # we get the graph that correspond at the index of the selection
+        self.display_graph_info()  # Display the graph information
+
 
     def disabled_window(self):
         self.liste_Graphe.configure(state='disable')
@@ -366,7 +361,7 @@ class InterfaceGalaxies(tk.Tk):
         self.update()
 
     def display_graph_webbrowser(self):
-        if self.graph_selected_last is None: return
+        if self.graph_selected is None: return
         filename = self.get_name_file()
 
         project_path = self.galaxie.get_project_path()
@@ -376,10 +371,10 @@ class InterfaceGalaxies(tk.Tk):
 
         javaVisualisation.change_html_graph_display(filename, project_path)
         webbrowser.open(project_path + '/index.html')
-        print(self.graph_selected_last)
+        print(self.graph_selected)
 
     def get_name_file(self):
-        number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected_last))]
+        number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected))]
         if len(number) == 2:  # Alors il s'agit d'une Galaxie
             return 'galaxie_' + str(number[0])
         if len(number) == 3:  # Alors il s'agit d'un Amas
