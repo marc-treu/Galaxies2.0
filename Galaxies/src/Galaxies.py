@@ -16,12 +16,6 @@ import time
 
 class Galaxie:
 
-    def __init__(self, interface):
-        self.interface = interface
-        self.project_path = None
-        self.query = None
-        self.query_graphs_structure = None
-
     def start_from_textalign_file(self, maxNoeud=0):
         """
         Starting a new project with a textAlign file
@@ -46,28 +40,41 @@ class Galaxie:
         self.project_path = '../projects/' + newdirproject
 
         lecture_fic.init_directory(self.project_path)  # Creation of the project
+        self.interface.set_progress_bar_values(5, 100)
         t1 = time.clock()
         baseDonnees.creerBD(self.project_path + '/BDs')  # Creation of the database
+        self.interface.set_progress_bar_values(10, 100)
         t2 = time.clock()
         print("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
         t1 = time.clock()
         lecture_fic.lecture(file, self.project_path + '/BDs')  # On remplie notre BD avec notre fichiers .tab
+        self.interface.set_progress_bar_values(50, 100)
         t2 = time.clock()
         print("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
         print("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.project_path + '/BDs'))
 
         maxNoeud = grapheGalaxies.construction_graphe(self.project_path + '/BDs')
+        self.interface.set_progress_bar_values(60, 100)
         grapheGalaxies.sauvegarde_graphe_(self.project_path + '/BDs')  # Et on le sauvegarde
-
+        self.interface.set_progress_bar_values(70, 100)
         if maxNoeud == 0:
             maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path + '/BDs')
+        self.interface.set_progress_bar_values(80, 100)
         t2 = time.clock()
         print("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
+        self.interface.set_progress_bar_values(90, 100)
         amas.recupererAmas(self.project_path)
         print("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
+        self.interface.reset_progress_bar()
+
+    def __init__(self, interface):
+        self.interface = interface
+        self.project_path = None
+        self.query = None
+        self.query_graphs_structure = None
 
     def open_existing_project(self):
 

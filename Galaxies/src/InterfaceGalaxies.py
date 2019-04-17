@@ -28,7 +28,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         self.galaxie = Galaxies.Galaxie(self)
         super().__init__()
-        self.geometry("1200x600")
+        self.geometry("1200x610")
         self.title("Galaxies")
 
         self.create_menu()  # Creation du menu
@@ -94,8 +94,20 @@ class InterfaceGalaxies(tk.Tk):
         self.create_button_menu()
 
         # Progress bar
+        self.frame_progressbar = tk.Frame(self)
+        self.frame_progressbar.grid(row=1, column=0, columnspan=2, sticky=tk.N + tk.S + tk.W + tk.E, padx=3, pady=4)
         # todo : Faire une progress bar tout en bas de la fenetre pour voire ou en ai la generation du graphe ou toute
         #        autre tache qui requiere du temps
+        style = ttk.Style()
+        style.configure("gray.Horizontal.TProgressbar", foreground="grey", background="grey")
+        self.progressbar = ttk.Progressbar(self.frame_progressbar, style="gray.Horizontal.TProgressbar", mode="determinate")
+        self.progressbar.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
+        self.progressbar.pack_propagate(0)
+
+        self.operation_progressbar = tk.Label(self.frame_progressbar, text="operation name")
+        self.operation_progressbar.grid(row=0, column=1, sticky=tk.W + tk.E)
+        self.frame_progressbar.grid_columnconfigure(0, weight=6)
+        self.frame_progressbar.grid_columnconfigure(1, weight=1)
 
     def create_menu(self):
         menubar = tk.Menu(self)
@@ -374,6 +386,14 @@ class InterfaceGalaxies(tk.Tk):
             return 'galaxie_' + str(number[1]) + '_amas_' + str(number[0])
         else:
             return
+
+    def set_progress_bar_values(self, values, max_values):
+        self.progressbar['value'] = values/max_values*100
+        self.update()
+
+    def reset_progress_bar(self):
+        self.progressbar['value'] = 0
+        self.update()
 
     def change_name(self, project_name):
         self.title('Galaxies - ' + project_name)
