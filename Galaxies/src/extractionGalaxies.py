@@ -608,7 +608,6 @@ def sort_list_galaxie(project_path, table_index=0):
     select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne', 4: 'longueurTexteMax'}
     result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie, cursor, select_item[table_index]))
     connexion.close()
-    print(result[:10])
     return result
 
 
