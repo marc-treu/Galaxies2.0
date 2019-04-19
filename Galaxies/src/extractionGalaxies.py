@@ -342,10 +342,12 @@ def get_meta_data_from_idGalaxie(project_path, idGalaxie):
     """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')  # Connection to the DB
     cursor = connexion.cursor()  # Creation of cursor
-    cursor.execute('''SELECT * FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))  # Query execution that collecte meta-data on idGalaxie
+    cursor.execute('''SELECT * FROM degreGalaxies WHERE idGalaxie = (?)''',
+                   (idGalaxie,))  # Query execution that collecte meta-data on idGalaxie
     result = cursor.fetchone()  # We take the first result, there must be only one result
     connexion.close()
     return result
+
 
 def fils_(X, curseur):
     curseur.execute('''SELECT idNoeudFils FROM grapheGalaxies WHERE idNoeudPere = (?)''', (X,))
