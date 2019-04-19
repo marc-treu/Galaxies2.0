@@ -82,7 +82,7 @@ class galaxie:  # permet d'énumérer composantes connexes
                 longueur += len(texte)
                 longueurMax = max(len(texte), longueurMax)
             curseur2.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(i),))
-            curseur2.execute('''INSERT INTO degreGalaxies values (?,?, ?, ?,?)''',
+            curseur2.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
                              (str(i), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
             # connexion.commit()
             # print("degré galaxie n°"+str(i)+": "+str(n))
@@ -496,6 +496,11 @@ def metaDonnees(LNoeuds, project_path):
     return metaDonnees
 
 
+def update_query_table(cursor, galaxies_list):
+    for galaxie in galaxies_list:
+        cursor.execute('''INSERT INTO Query values (?)''', (galaxie,))
+
+
 def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
@@ -523,9 +528,14 @@ def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
             listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
                                                                             query['longueur_texte_maximal'], curseur,
                                                                             dirGalaxies)
+
+    baseDonnees.reload_query_table(project_path)
+    update_query_table(curseur, listeGalaxiesTriee)
+    update_query_table(curseur, listeGrossesGalaxies)
+
     dirGalaxies.close()
     connexion.close()
-    return (listeGalaxiesTriee, listeGrossesGalaxies)
+    return listeGalaxiesTriee, listeGrossesGalaxies
 
 
 def amasFiltre(numGalaxie, requete, curseur, project_path):

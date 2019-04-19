@@ -27,7 +27,7 @@ def creerBD(filepath):
     curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
     curseur.execute(
         '''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
-    curseur.execute('''CREATE TABLE Query (idNoeud INTEGER)''')
+    curseur.execute('''CREATE TABLE Query (idGalaxie INTEGER)''')
     curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
     curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
@@ -40,8 +40,17 @@ def creerBD(filepath):
     # curseur.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
     #
     # curseur.execute('''CREATE INDEX refLivre ON livres (idLivre)''')
+    connexion.commit()
+    connexion.close()
 
-    curseur.close()
+
+def reload_query_table(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''DROP TABLE Query''')
+    cursor.execute('''CREATE TABLE Query (idGalaxie INTEGER)''')
+    connexion.commit()
+    connexion.close()
 
 
 def dateToInt(date):
