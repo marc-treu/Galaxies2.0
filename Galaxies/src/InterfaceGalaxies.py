@@ -146,7 +146,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_display_graph.pack(pady=15)
 
     def open_text_align_file(self):
-        return tk.filedialog.askopenfilename(title="Open a tab file", filetypes=[('tab files', '.tab')])
+        project_directory = '/'.join(os.getcwd().split('/')[:-2])
+        return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file", filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self):
         project_directory = '/'.join(os.getcwd().split('/')[:-1]) + '/projects'
