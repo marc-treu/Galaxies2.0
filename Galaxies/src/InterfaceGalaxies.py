@@ -329,25 +329,16 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_info['text'] = self.galaxie.get_meta_data_on_galaxie(self.get_idGalaxie())
         self.update()
 
-    def display_project_info(self, project_name, query=None):
+    def display_info(self, text, query=None):
         """
-            Function that display on the right frame some information about the project, is use for inform the user of
-        success of project loading
+            Function that display on the right frame some information on, it is use for inform the user of successful
+        loading for example
 
-        :param project_name: the name of the current project
+        :param text: the text we want to display
         :param query: if has one, the last time use query
         """
-        text = "The "+project_name+" Project has been loaded successfully"
-        if query != None:
+        if query is not None:
             text += "\n\nYour last query was:\n"+str(query)
-        self.graph_info['text'] = text
-        self.update()
-
-    def display_info(self, text):
-        """
-
-        :param text:
-        """
         self.graph_info['text'] = text
         self.update()
 

@@ -104,7 +104,8 @@ class Galaxie:
         self.interface.change_name(directory.split('/')[-1])
         self.interface.display_graph_list()
         self.query = lecture_fic.load_query(self.project_path)
-        self.interface.display_project_info(self.project_path.split('/')[-1], self.query)
+        text = "The "+self.project_path.split('/')[-1]+" Project has been loaded successfully"
+        self.interface.display_info(text, self.query)
         self.interface.enabled_window()
 
     def _execute_query(self, query):
