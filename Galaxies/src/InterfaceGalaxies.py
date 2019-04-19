@@ -5,8 +5,9 @@ from tkinter import simpledialog
 
 
 import baseDonnees
-import javaVisualisation
 import Galaxies
+import javaVisualisation
+import os
 import re
 import webbrowser
 
@@ -148,8 +149,8 @@ class InterfaceGalaxies(tk.Tk):
         return tk.filedialog.askopenfilename(title="Open a tab file", filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self):
-        # todo : faire en sorte que l'on demande d'ouvrir un dossier a partir du dossier parent
-        return tk.filedialog.askdirectory(title="Open a existing project")
+        project_directory = '/'.join(os.getcwd().split('/')[:-1]) + '/projects'
+        return tk.filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
 
     def get_requete_from_user(self):
 
