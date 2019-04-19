@@ -98,18 +98,18 @@ class Galaxie:
     def get_requete_preprocessing(self):
         # todo : tache possiblement longue, necessite la progress bar
         self.interface.disabled_window()
-        if self.project_path is None:
+        if self.project_path is None:  # if no project are selected or stared
             self.interface.enabled_window()
-            return  # if no project are selected or stared
+            return
 
         print("debut de fonction get_requete_preprocessing")
         query = self.interface.get_requete_from_user()
 
         self.query = query
         print("la requete = ", self.query)
-        if self.query is None:
+        if self.query is None:  # if no query were ask on project
             self.interface.enabled_window()
-            return  # if no query were ask on project
+            return
 
         self._execute_query(self.query)
         lecture_fic.save_query(self.query, self.project_path)

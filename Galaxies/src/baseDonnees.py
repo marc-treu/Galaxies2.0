@@ -27,6 +27,7 @@ def creerBD(filepath):
     curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
     curseur.execute(
         '''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
+    curseur.execute('''CREATE TABLE Query (idNoeud INTEGER)''')
     curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
     curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')

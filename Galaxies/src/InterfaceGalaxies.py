@@ -406,8 +406,6 @@ class InterfaceGalaxies(tk.Tk):
         # todo : faire en sorte que cela fonctionne aussi avec les amas
         return re.findall(r'\d+', str(self.graph_selected))[0]
 
-
-
     def set_progress_bar_values(self, values, max_values):
         self.progressbar['value'] = values/max_values*100
         self.update()

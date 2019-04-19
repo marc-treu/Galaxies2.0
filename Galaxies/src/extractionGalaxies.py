@@ -320,9 +320,16 @@ def composanteConnexe_(N, g, curseur, noeuds):
     return noeudsVisites
 
 
-def degreGalaxie(G, curseur):
-    curseur.execute('''SELECT degreGalaxie FROM degreGalaxies WHERE idGalaxie = (?)''', (G,))
-    return curseur.fetchone()[0]
+def degreGalaxie(idGalaxie, cursor):
+    """
+        Function that execute a query on cursor, for knowing the degre, number of node, of Galaxie idGalaxie
+
+    :param idGalaxie:
+    :param cursor: The id of the Galaxie we want meta-data
+    :return: The degre of idGalaxie
+    """
+    cursor.execute('''SELECT degreGalaxie FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))
+    return cursor.fetchone()[0]
 
 
 def get_meta_data_from_idGalaxie(project_path, idGalaxie):
@@ -331,12 +338,12 @@ def get_meta_data_from_idGalaxie(project_path, idGalaxie):
 
     :param project_path: The path of the project
     :param idGalaxie: The id of the Galaxie we want meta-data
-    :return: the line in table degreGalaxies that corresponding to the Galaxie Id
+    :return: The line in table degreGalaxies that corresponding to the Galaxie Id
     """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')  # Connection to the DB
-    curseur = connexion.cursor()  # Creation of cursor
-    curseur.execute('''SELECT * FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))  # Query execution that collecte meta-data on idGalaxie
-    result = curseur.fetchone()  # We take the first result, there must be only one result
+    cursor = connexion.cursor()  # Creation of cursor
+    cursor.execute('''SELECT * FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))  # Query execution that collecte meta-data on idGalaxie
+    result = cursor.fetchone()  # We take the first result, there must be only one result
     connexion.close()
     return result
 
@@ -489,7 +496,7 @@ def metaDonnees(LNoeuds, project_path):
     return metaDonnees
 
 
-def galaxiesFiltre(requete, project_path, tailleMinGrosseGalaxie=300):
+def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     curseur.execute('''SELECT nbre FROM nombreGalaxies''')
@@ -500,21 +507,21 @@ def galaxiesFiltre(requete, project_path, tailleMinGrosseGalaxie=300):
     listeGrossesGalaxies = dict()
     while numero < nombreTotalGalaxies:
         EnsNoeuds = dirGalaxies[str(numero)]
-        if metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
+        if metaDonneesFiltreAux(EnsNoeuds, query, curseur):
             if len(EnsNoeuds) < tailleMinGrosseGalaxie:
                 listeGalaxies.append(numero)
             else:
-                tmp = amasFiltre(numero, requete, curseur, project_path)
+                tmp = amasFiltre(numero, query, curseur, project_path)
                 if tmp:
                     listeGrossesGalaxies[str(numero)] = tmp
         numero += 1
-    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda Galaxie: -degreGalaxie(Galaxie, curseur))
-    if 'longueur_texte_maximal' in requete.keys():
-        listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, requete['longueur_texte_maximal'],
+    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, curseur))
+    if 'longueur_texte_maximal' in query.keys():
+        listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, query['longueur_texte_maximal'],
                                                             curseur, dirGalaxies)
         for gal in listeGrossesGalaxies:
             listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
-                                                                            requete['longueur_texte_maximal'], curseur,
+                                                                            query['longueur_texte_maximal'], curseur,
                                                                             dirGalaxies)
     dirGalaxies.close()
     connexion.close()
