@@ -44,13 +44,15 @@ def creerBD(filepath):
     connexion.close()
 
 
-def reload_query_table(project_path):
-    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    cursor = connexion.cursor()
+def reload_query_table(cursor):
+    """
+        Function that erase the Query table for create a new empty one.
+    This fonction is call after a new query had been made by the user
+
+    :param cursor: cursor on the DB
+    """
     cursor.execute('''DROP TABLE Query''')
     cursor.execute('''CREATE TABLE Query (idGalaxie INTEGER)''')
-    connexion.commit()
-    connexion.close()
 
 
 def dateToInt(date):

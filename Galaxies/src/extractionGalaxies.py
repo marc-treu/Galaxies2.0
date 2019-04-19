@@ -503,37 +503,38 @@ def update_query_table(cursor, galaxies_list):
 
 def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    curseur.execute('''SELECT nbre FROM nombreGalaxies''')
-    nombreTotalGalaxies = curseur.fetchall()[0][0]
+    cursor = connexion.cursor()
+    cursor.execute('''SELECT nbre FROM nombreGalaxies''')
+    nombreTotalGalaxies = cursor.fetchall()[0][0]
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
     numero = 0
     listeGalaxies = []
     listeGrossesGalaxies = dict()
     while numero < nombreTotalGalaxies:
         EnsNoeuds = dirGalaxies[str(numero)]
-        if metaDonneesFiltreAux(EnsNoeuds, query, curseur):
+        if metaDonneesFiltreAux(EnsNoeuds, query, cursor):
             if len(EnsNoeuds) < tailleMinGrosseGalaxie:
                 listeGalaxies.append(numero)
             else:
-                tmp = amasFiltre(numero, query, curseur, project_path)
+                tmp = amasFiltre(numero, query, cursor, project_path)
                 if tmp:
                     listeGrossesGalaxies[str(numero)] = tmp
         numero += 1
-    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, curseur))
+    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
     if 'longueur_texte_maximal' in query.keys():
         listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, query['longueur_texte_maximal'],
-                                                            curseur, dirGalaxies)
+                                                            cursor, dirGalaxies)
         for gal in listeGrossesGalaxies:
             listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
-                                                                            query['longueur_texte_maximal'], curseur,
+                                                                            query['longueur_texte_maximal'], cursor,
                                                                             dirGalaxies)
 
-    baseDonnees.reload_query_table(project_path)
-    update_query_table(curseur, listeGalaxiesTriee)
-    update_query_table(curseur, listeGrossesGalaxies)
+    baseDonnees.reload_query_table(cursor)
+    update_query_table(cursor, listeGalaxiesTriee)
+    update_query_table(cursor, listeGrossesGalaxies)
 
     dirGalaxies.close()
+    connexion.commit()
     connexion.close()
     return listeGalaxiesTriee, listeGrossesGalaxies
 
