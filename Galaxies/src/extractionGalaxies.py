@@ -325,6 +325,21 @@ def degreGalaxie(G, curseur):
     return curseur.fetchone()[0]
 
 
+def get_meta_data_from_idGalaxie(project_path, idGalaxie):
+    """
+        Function that connects to the data base, and extracts and returns meta information about a specific Galaxie
+
+    :param project_path: The path of the project
+    :param idGalaxie: The id of the Galaxie we want meta-data
+    :return: the line in table degreGalaxies that corresponding to the Galaxie Id
+    """
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')  # Connection to the DB
+    curseur = connexion.cursor()  # Creation of cursor
+    curseur.execute('''SELECT * FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))  # Query execution that collecte meta-data on idGalaxie
+    result = curseur.fetchone()  # We take the first result, there must be only one result
+    connexion.close()
+    return result
+
 def fils_(X, curseur):
     curseur.execute('''SELECT idNoeudFils FROM grapheGalaxies WHERE idNoeudPere = (?)''', (X,))
     L = []

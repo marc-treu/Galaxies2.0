@@ -324,10 +324,10 @@ class InterfaceGalaxies(tk.Tk):
 
     def display_graph_info(self):
         """
-        Fonction qui affiche les information du dernier graphe selectionner
+            Function that display meta information about the current user selected Galaxie
         """
-        self.graph_info['text'] = self.graph_selected
-        # print(extractionGalaxies.metaDonnees([6608], self.galaxie.get_project_path()))
+        # todo: faire en sorte que get_meta_data_on_galaxie fonctionne aussi avec les amas
+        self.graph_info['text'] = self.galaxie.get_meta_data_on_galaxie(self.get_idGalaxie())
 
     def display_project_info(self, project_name, query=None):
         """
@@ -354,7 +354,7 @@ class InterfaceGalaxies(tk.Tk):
         index = w.curselection()  # we get the active selection
         if index != ():  # if the selection is not empty
             self.graph_selected = w.get(index[0])  # we get the graph that correspond at the index of the selection
-        self.display_graph_info()  # Display the graph information
+            self.display_graph_info()  # Display the graph information
 
 
     def disabled_window(self):
@@ -396,6 +396,17 @@ class InterfaceGalaxies(tk.Tk):
             return 'galaxie_' + str(number[1]) + '_amas_' + str(number[0])
         else:
             return
+
+    def get_idGalaxie(self):
+        """
+            Function that return the id of the galaxie that have been selected
+
+        :return: an Int which is the ID of the current that have been selected by the user
+        """
+        # todo : faire en sorte que cela fonctionne aussi avec les amas
+        return re.findall(r'\d+', str(self.graph_selected))[0]
+
+
 
     def set_progress_bar_values(self, values, max_values):
         self.progressbar['value'] = values/max_values*100

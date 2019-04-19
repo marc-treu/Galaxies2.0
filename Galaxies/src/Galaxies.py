@@ -16,6 +16,15 @@ import time
 
 class Galaxie:
 
+    def __init__(self, interface):
+        self.interface = interface
+        self.project_path = None
+        self.query = None
+        self.query_graphs_structure = None
+
+    def get_project_path(self):
+        return self.project_path
+
     def start_from_textalign_file(self, maxNoeud=0):
         """
         Starting a new project with a textAlign file
@@ -69,12 +78,6 @@ class Galaxie:
         print("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
         self.interface.reset_progress_bar()
-
-    def __init__(self, interface):
-        self.interface = interface
-        self.project_path = None
-        self.query = None
-        self.query_graphs_structure = None
 
     def open_existing_project(self):
 
@@ -137,5 +140,14 @@ class Galaxie:
         self.interface.display_graph_list()
         self.interface.enabled_window()
 
-    def get_project_path(self):
-        return self.project_path
+    def get_meta_data_on_galaxie(self, idGalaxie):
+        """
+            Function that extract multiple meta information about a specific Galaxie, and return a formatted String that
+        will be display in our interface
+
+        :param idGalaxie: The id of the Galaxie we want meta-data
+        :return: A well formatted String that have meta information on idGalaxie
+        """
+        meta_data = extractionGalaxies.get_meta_data_from_idGalaxie(self.project_path, idGalaxie)
+        return 'Galaxie selected : {}\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
+               'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
