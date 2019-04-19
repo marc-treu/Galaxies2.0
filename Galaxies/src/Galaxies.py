@@ -12,6 +12,7 @@ import javaVisualisation
 import lecture_fic
 
 import time
+import os
 
 
 class Galaxie:
@@ -32,7 +33,8 @@ class Galaxie:
         :param maxNoeud:
         """
         self.interface.disabled_window()
-        file = self.interface.open_text_align_file()  # Ask for textAlign file localisation
+        project_directory = '/'.join(os.getcwd().split('/')[:-2])
+        file = self.interface.open_text_align_file(project_directory)  # Ask for textAlign file localisation
         if file == () or file == '':
             self.interface.enabled_window()
             return  # if the user cancel
@@ -82,10 +84,24 @@ class Galaxie:
     def open_existing_project(self):
 
         self.interface.disabled_window()
-        directory = self.interface.ask_open_existing_project()
-        # todo : verifier que directory est bien un projet
-        self.interface.change_name(directory.split('/')[-1])
+        project_directory = '/'.join(os.getcwd().split('/')[:-1]) + '/projects'
+        project_list = os.listdir(project_directory)
+        if '.gitkeep' in project_list:  # if .gitkeep still in projects folder
+            project_list.remove('.gitkeep')  # we delete it
+        if not project_list:  # If there is no project
+            self.interface.display_info("There are currently zero projects\n on your computer")
+            self.interface.enabled_window()
+            return
+
+        directory = self.interface.ask_open_existing_project(project_directory)
+
+        if directory not in project_list:  # if the selected folder is not a Galaxie project
+            self.interface.display_info("This is not a Galaxie project folder, please select a valid project")
+            self.interface.enabled_window()
+            return
+
         self.project_path = directory
+        self.interface.change_name(directory.split('/')[-1])
         self.interface.display_graph_list()
         self.query = lecture_fic.load_query(self.project_path)
         self.interface.display_project_info(self.project_path.split('/')[-1], self.query)

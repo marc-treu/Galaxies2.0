@@ -7,7 +7,6 @@ from tkinter import simpledialog
 import baseDonnees
 import Galaxies
 import javaVisualisation
-import os
 import re
 import webbrowser
 
@@ -145,12 +144,10 @@ class InterfaceGalaxies(tk.Tk):
         self.button_display_graph = tk.Button(button, text="Display Graph in browser", command=self.display_graph_webbrowser)
         self.button_display_graph.pack(pady=15)
 
-    def open_text_align_file(self):
-        project_directory = '/'.join(os.getcwd().split('/')[:-2])
+    def open_text_align_file(self, project_directory):
         return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file", filetypes=[('tab files', '.tab')])
 
-    def ask_open_existing_project(self):
-        project_directory = '/'.join(os.getcwd().split('/')[:-1]) + '/projects'
+    def ask_open_existing_project(self, project_directory):
         return tk.filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
 
     def get_requete_from_user(self):
@@ -330,6 +327,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         # todo: faire en sorte que get_meta_data_on_galaxie fonctionne aussi avec les amas
         self.graph_info['text'] = self.galaxie.get_meta_data_on_galaxie(self.get_idGalaxie())
+        self.update()
 
     def display_project_info(self, project_name, query=None):
         """
@@ -343,6 +341,15 @@ class InterfaceGalaxies(tk.Tk):
         if query != None:
             text += "\n\nYour last query was:\n"+str(query)
         self.graph_info['text'] = text
+        self.update()
+
+    def display_info(self, text):
+        """
+
+        :param text:
+        """
+        self.graph_info['text'] = text
+        self.update()
 
     def select_graph(self, evt):
         """
