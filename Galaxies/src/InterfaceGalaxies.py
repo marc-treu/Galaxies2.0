@@ -47,7 +47,7 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left_top = tk.Frame(self.frame_left)
         self.frame_left_top.pack(side=tk.TOP, fill="both", expand=True, padx='2', pady='2')
 
-        self.combo_box = ttk.Combobox(self.frame_left_top, values=['number of node', 'longest text', 'shortest text'])
+        self.combo_box = ttk.Combobox(self.frame_left_top, values=['', 'name','number of node', 'longest text', 'shortest text', 'longest mean text'])
         self.combo_box.pack(side=tk.RIGHT, pady='2')
         self.combo_box.bind('<<ComboboxSelected>>', lambda event: self.display_graph_list())
         self.combo_box.current(0)
@@ -304,18 +304,27 @@ class InterfaceGalaxies(tk.Tk):
         if project_path is None:
             return  # if no project are selected or stared
 
-        list_graph = baseDonnees.get_list_graph(project_path)
+        # list_graph = baseDonnees.get_list_graph(project_path)
+        #list_graph = extractionGalaxies.get_list_galaxie(project_path)
         self.liste_Graphe.configure(state='normal')
         self.liste_Graphe.delete(0, tk.END)
 
         self.sort_method = self.combo_box.get()
-        # todo : trier les graphes en fonction de la methode selectionner
+        project_path = self.galaxie.get_project_path()
         if self.sort_method == 'number of node':
-            list_graph = sorted(list_graph, key=lambda x: int(re.findall(r'\d+', str(x))[-1]))[::-1]
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
+            # list_graph = sorted(list_graph, key=lambda x: int(re.findall(r'\d+', str(x))[-1]))[::-1]
         if self.sort_method == 'longest text':
-            pass
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
         if self.sort_method == 'shortest text':
-            pass
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path)
+        if self.sort_method == 'name':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path)
+        if self.sort_method == 'longest mean text':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)
+        if self.sort_method == '':
+            list_graph = extractionGalaxies.get_list_galaxie(project_path)
+
 
         for graph in list_graph:
             self.liste_Graphe.insert(tk.END, graph)
@@ -355,7 +364,6 @@ class InterfaceGalaxies(tk.Tk):
         if index != ():  # if the selection is not empty
             self.graph_selected = w.get(index[0])  # we get the graph that correspond at the index of the selection
             self.display_graph_info()  # Display the graph information
-
 
     def disabled_window(self):
         self.liste_Graphe.configure(state='disable')

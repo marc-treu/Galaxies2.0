@@ -320,15 +320,17 @@ def composanteConnexe_(N, g, curseur, noeuds):
     return noeudsVisites
 
 
-def degreGalaxie(idGalaxie, cursor):
+def degreGalaxie(idGalaxie, cursor, select_item="degreGalaxie"):
     """
         Function that execute a query on cursor, for knowing the degre, number of node, of Galaxie idGalaxie
 
     :param idGalaxie:
     :param cursor: The id of the Galaxie we want meta-data
+    :param select_item:
     :return: The degre of idGalaxie
     """
-    cursor.execute('''SELECT degreGalaxie FROM degreGalaxies WHERE idGalaxie = (?)''', (idGalaxie,))
+    query = "SELECT {} FROM degreGalaxies WHERE idGalaxie = {}".format(select_item, idGalaxie)
+    cursor.execute(query)
     return cursor.fetchone()[0]
 
 
@@ -577,6 +579,39 @@ def galaxiesFiltreListe(Lrequete, project_path, tailleMinGrosseGalaxie=300):
     return (listeGalaxiesTriee, listeGrossesGalaxies)
 
 
+def get_list_galaxie(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''SELECT idGalaxie FROM Query''')
+    result = [id_galaxie[0] for id_galaxie in cursor.fetchall()]
+    connexion.close()
+    return result
+
+
+def sort_list_galaxie(project_path, table_index=0):
+    """
+        Function that sorts galaxie list of the last query, on a criteria according to the table_index :
+            0 idGalaxie
+            1 degreGalaxie
+            2 longueurTexteTotale
+            3 longueurTexteMoyenne
+            4 longueurTexteMax
+        that is base on the degreGalaxies table
+
+    :param project_path:
+    :param table_index:
+    :return:
+    """
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    galaxies_list = get_list_galaxie(project_path)
+    select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne', 4: 'longueurTexteMax'}
+    result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie, cursor, select_item[table_index]))
+    connexion.close()
+    print(result[:10])
+    return result
+
+
 def galaxiesFiltreListeAffiche(Lrequete):
     listeGalaxies = galaxiesFiltreListe(Lrequete)
     print("Il y a " + str(len(listeGalaxies)) + " satisfaisant à votre requête. Souhaitez-vous les afficher?")
@@ -807,8 +842,8 @@ def ordonner(LGalaxies):
     connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     L = sorted(LGalaxies, key=lambda Galaxie: -degreGalaxie(Galaxie, curseur))
-    return L
     connexion.close()
+    return L
 
 
 # def galaxiesAuteurOrdonnees(Auteur):
