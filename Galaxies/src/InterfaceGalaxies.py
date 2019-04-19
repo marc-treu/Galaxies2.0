@@ -325,9 +325,9 @@ class InterfaceGalaxies(tk.Tk):
         if self.sort_method == '':
             list_graph = extractionGalaxies.get_list_galaxie(project_path)
 
-
         for graph in list_graph:
-            self.liste_Graphe.insert(tk.END, graph)
+            space = " "*(14 - 2*len(str(graph[0])))+" with "
+            self.liste_Graphe.insert(tk.END, 'Galaxie number : '+str(graph[0])+space+str(graph[1])+" nodes")
         self.update()
 
     def display_graph_info(self):

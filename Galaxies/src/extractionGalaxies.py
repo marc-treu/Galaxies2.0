@@ -582,8 +582,8 @@ def galaxiesFiltreListe(Lrequete, project_path, tailleMinGrosseGalaxie=300):
 def get_list_galaxie(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute('''SELECT idGalaxie FROM Query''')
-    result = [id_galaxie[0] for id_galaxie in cursor.fetchall()]
+    cursor.execute('''SELECT Query.idGalaxie, degreGalaxie FROM Query LEFT OUTER JOIN degreGalaxies ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
+    result = [id_galaxie for id_galaxie in cursor.fetchall()]
     connexion.close()
     return result
 
@@ -606,7 +606,7 @@ def sort_list_galaxie(project_path, table_index=0):
     cursor = connexion.cursor()
     galaxies_list = get_list_galaxie(project_path)
     select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne', 4: 'longueurTexteMax'}
-    result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie, cursor, select_item[table_index]))
+    result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie[0], cursor, select_item[table_index]))
     connexion.close()
     return result
 
