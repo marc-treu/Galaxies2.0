@@ -505,11 +505,31 @@ def update_query_table(cursor, galaxies_list):
         cursor.execute('''INSERT INTO Query values (?)''', (galaxie,))
 
 
+def get_number_galaxies(cursor=None, project_path=None):
+
+    if cursor is None and project_path is None:
+        raise ValueError("exactly one argument must be given")
+
+    open_bd = True if cursor is None else False
+    connexion = None
+
+    if open_bd:
+        connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+        cursor = connexion.cursor()
+
+    cursor.execute('''SELECT nbre FROM nombreGalaxies''')
+    result = cursor.fetchall()[0][0]
+
+    if open_bd:
+        connexion.close()
+
+    return result
+
+
 def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute('''SELECT nbre FROM nombreGalaxies''')
-    nombreTotalGalaxies = cursor.fetchall()[0][0]
+    nombreTotalGalaxies = get_number_galaxies(cursor)
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
     numero = 0
     listeGalaxies = []
@@ -602,9 +622,9 @@ def sort_list_galaxie(project_path, table_index=0):
     :param table_index:
     :return:
     """
+    galaxies_list = get_list_galaxie(project_path)
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    galaxies_list = get_list_galaxie(project_path)
     select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne', 4: 'longueurTexteMax'}
     result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie[0], cursor, select_item[table_index]))
     connexion.close()
