@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
 
-
 import baseDonnees
 import Galaxies
 import javaVisualisation
@@ -11,6 +10,7 @@ import re
 import webbrowser
 
 import extractionGalaxies
+
 
 class InterfaceGalaxies(tk.Tk):
 
@@ -47,14 +47,18 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left_top = tk.Frame(self.frame_left)
         self.frame_left_top.pack(side=tk.TOP, fill="both", expand=True, padx='2', pady='2')
 
-        self.combo_box = ttk.Combobox(self.frame_left_top, values=['', 'name','number of node', 'longest text', 'shortest text', 'longest mean text'])
+        self.combo_box = ttk.Combobox(self.frame_left_top, values=['', 'name', 'number of node ascending',
+                                                                   'number of node descending', 'longest text',
+                                                                   'shortest text', 'text average length ascending',
+                                                                   'text average length descending'])
         self.combo_box.pack(side=tk.RIGHT, pady='2')
         self.combo_box.bind('<<ComboboxSelected>>', lambda event: self.display_graph_list())
         self.combo_box.current(0)
         tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
         self.sort_method = self.combo_box.get()
 
-        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure", command=self.galaxie.get_query_graphs_structure)
+        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure",
+                                             command=self.galaxie.get_query_graphs_structure)
         self.button_query_graphs.pack(side=tk.LEFT, padx='5')
 
         # Left Listbox
@@ -98,7 +102,8 @@ class InterfaceGalaxies(tk.Tk):
         #        autre tache qui requiere du temps
         style = ttk.Style()
         style.configure("gray.Horizontal.TProgressbar", foreground="grey", background="grey")
-        self.progressbar = ttk.Progressbar(self.frame_progressbar, style="gray.Horizontal.TProgressbar", mode="determinate")
+        self.progressbar = ttk.Progressbar(self.frame_progressbar, style="gray.Horizontal.TProgressbar",
+                                           mode="determinate")
         self.progressbar.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.progressbar.pack_propagate(0)
 
@@ -141,11 +146,13 @@ class InterfaceGalaxies(tk.Tk):
 
         button = tk.Frame(self.frame_right_button)
         button.pack(side=tk.BOTTOM, fill="both", expand=True)
-        self.button_display_graph = tk.Button(button, text="Display Graph in browser", command=self.display_graph_webbrowser)
+        self.button_display_graph = tk.Button(button, text="Display Graph in browser",
+                                              command=self.display_graph_webbrowser)
         self.button_display_graph.pack(pady=15)
 
     def open_text_align_file(self, project_directory):
-        return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file", filetypes=[('tab files', '.tab')])
+        return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file",
+                                             filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self, project_directory):
         return tk.filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
@@ -305,29 +312,32 @@ class InterfaceGalaxies(tk.Tk):
             return  # if no project are selected or stared
 
         # list_graph = baseDonnees.get_list_graph(project_path)
-        #list_graph = extractionGalaxies.get_list_galaxie(project_path)
+        # list_graph = extractionGalaxies.get_list_galaxie(project_path)
         self.liste_Graphe.configure(state='normal')
         self.liste_Graphe.delete(0, tk.END)
 
         self.sort_method = self.combo_box.get()
         project_path = self.galaxie.get_project_path()
-        if self.sort_method == 'number of node':
+        if self.sort_method == 'number of node ascending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
+        if self.sort_method == 'number of node descending':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
-            # list_graph = sorted(list_graph, key=lambda x: int(re.findall(r'\d+', str(x))[-1]))[::-1]
         if self.sort_method == 'longest text':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
         if self.sort_method == 'shortest text':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path)
         if self.sort_method == 'name':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path)
-        if self.sort_method == 'longest mean text':
+        if self.sort_method == 'text average length ascending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
+        if self.sort_method == 'text average length descending':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)
         if self.sort_method == '':
             list_graph = extractionGalaxies.get_list_galaxie(project_path)
 
         for graph in list_graph:
-            space = " "*(14 - 2*len(str(graph[0])))+" with "
-            self.liste_Graphe.insert(tk.END, 'Galaxie number : '+str(graph[0])+space+str(graph[1])+" nodes")
+            space = " " * (14 - 2 * len(str(graph[0]))) + " with "
+            self.liste_Graphe.insert(tk.END, 'Galaxie number : ' + str(graph[0]) + space + str(graph[1]) + " nodes")
         self.update()
 
     def display_graph_info(self):
@@ -347,7 +357,7 @@ class InterfaceGalaxies(tk.Tk):
         :param query: if has one, the last time use query
         """
         if query is not None:
-            text += "\n\nYour last query was:\n"+str(query)
+            text += "\n\nYour last query was:\n" + str(query)
         self.graph_info['text'] = text
         self.update()
 
@@ -415,7 +425,7 @@ class InterfaceGalaxies(tk.Tk):
         return re.findall(r'\d+', str(self.graph_selected))[0]
 
     def set_progress_bar_values(self, values, max_values):
-        self.progressbar['value'] = values/max_values*100
+        self.progressbar['value'] = values / max_values * 100
         self.update()
 
     def reset_progress_bar(self):
