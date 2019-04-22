@@ -110,7 +110,7 @@ class Galaxie:
 
     def _execute_query(self, query):
         amas.requetesUser(query, self.project_path)
-        javaVisualisation.preparationVisualisation(self.project_path)
+        #javaVisualisation.preparationVisualisation(self.project_path)
 
     def get_requete_preprocessing(self):
         # todo : tache possiblement longue, necessite la progress bar
@@ -166,5 +166,5 @@ class Galaxie:
         :return: A well formatted String that have meta information on idGalaxie
         """
         meta_data = extractionGalaxies.get_meta_data_from_idGalaxie(self.project_path, idGalaxie)
-        return 'Galaxie selected : {}\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
+        return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
                'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])

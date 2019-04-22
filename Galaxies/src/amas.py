@@ -77,20 +77,20 @@ def requetesUser(requetes, project_path):
         print(requetes)
         gal = extractionGalaxies.galaxiesFiltreListe(requetes, project_path)
 
-    print(gal)
-
-    check = os.listdir(project_path + "/graphs")
-    if check:
-        shutil.rmtree(project_path + "/graphs")
-        os.mkdir(project_path + "/graphs")
-    if gal[0]:
-        for num in gal[0]:
-            visualisationGraphe.sauveGrapheGalaxie(num, project_path)
-
-    check = os.listdir(project_path + "/amas")
-    if check:
-        shutil.rmtree(project_path + "/amas")
-        os.mkdir(project_path + "/amas")
-    if gal[1]:
-        for numero in gal[1]:
-            visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero], project_path)
+    # print('gal = ', gal)
+    #
+    # check = os.listdir(project_path + "/graphs")
+    # if check:
+    #     shutil.rmtree(project_path + "/graphs")
+    #     os.mkdir(project_path + "/graphs")
+    # if gal[0]:
+    #     for num in gal[0]:
+    #         visualisationGraphe.sauveGrapheGalaxie(num, project_path)
+    #
+    # check = os.listdir(project_path + "/amas")
+    # if check:
+    #     shutil.rmtree(project_path + "/amas")
+    #     os.mkdir(project_path + "/amas")
+    # if gal[1]:
+    #     for numero in gal[1]:
+    #         visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero], project_path)
