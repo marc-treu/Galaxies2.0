@@ -311,8 +311,6 @@ class InterfaceGalaxies(tk.Tk):
         if project_path is None:
             return  # if no project are selected or stared
 
-        # list_graph = baseDonnees.get_list_graph(project_path)
-        # list_graph = extractionGalaxies.get_list_galaxie(project_path)
         self.liste_Graphe.configure(state='normal')
         self.liste_Graphe.delete(0, tk.END)
 

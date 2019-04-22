@@ -47,7 +47,7 @@ def sauveGrapheGalaxieAffichage(requete, numero):
 def sauveGrapheAmas_(numGalaxie, dictAmas, project_path):
     dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(numGalaxie))
     for i in dictAmas:
-        creerAmasTextes(dirAmas[str(i)], 'graphe_galaxie_' + str(numGalaxie) + '_amas_' + str(i), 'gexf', project_path )
+        creerAmasTextes(dirAmas[str(i)], 'graphe_galaxie_' + str(numGalaxie) + '_amas_' + str(i), 'gexf', project_path)
     dirAmas.close()
 
 
