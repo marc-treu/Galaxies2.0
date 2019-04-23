@@ -11,35 +11,37 @@ import os
 import time
 
 
-def creerBD(filepath):
+def create_bd(project_path):
     print("Création de la base de données 'galaxie.db'")
-    connexion = sqlite3.connect(filepath + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    curseur.execute('''CREATE TABLE livres (idLivre TEXT UNIQUE, auteur TEXT, titre TEXT, date INTEGER)''')
-    curseur.execute(
-        '''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, texteCible TEXT, metaDataCible TEXT)''')
-    curseur.execute('''CREATE TABLE grapheGalaxiesSource (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
-    curseur.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
-    curseur.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
-    curseur.execute(
-        '''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, ordonnee INTEGER, empan INTEGER)''')
-    curseur.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
-    curseur.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
-    curseur.execute(
-        '''CREATE TABLE degreGalaxies (idGalaxie INTEGER UNIQUE, degreGalaxie INTEGER, longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
-    curseur.execute('''CREATE TABLE Query (idGalaxie INTEGER)''')
-    curseur.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
-    curseur.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
-    curseur.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
-    curseur.execute('''CREATE INDEX refCible ON grapheReutilisations (idRefCible)''')
-    curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
-    curseur.execute('''CREATE INDEX idNoeudf ON grapheGalaxies (idNoeudFils)''')
-    curseur.execute('''CREATE INDEX identifiantNoeud ON texteNoeuds (idNoeud)''')
-    # curseur.execute('''CREATE INDEX dateIndex ON livres (date) ASC''')
-    # curseur.execute('''CREATE INDEX idReutSource ON grapheGalaxiesSource (idReutilisation)''')
-    # curseur.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''CREATE TABLE livres (idLivre TEXT UNIQUE, auteur TEXT, titre TEXT, date INTEGER)''')
+    cursor.execute('''CREATE TABLE grapheReutilisations (idRefSource TEXT, ordonneeSource INTEGER, empanSource INTEGER, 
+        texteSource TEXT, metaDataSource TEXT, idRefCible TEXT, ordonneeCible INTEGER, empanCible INTEGER, 
+        texteCible TEXT, metaDataCible TEXT)''')
+    cursor.execute('''CREATE TABLE grapheGalaxiesSource (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
+    cursor.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
+    cursor.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
+    cursor.execute('''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, 
+        ordonnee INTEGER, empan INTEGER)''')
+    cursor.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
+    cursor.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
+    cursor.execute('''CREATE TABLE degreGalaxies (idGalaxie TEXT UNIQUE, degreGalaxie INTEGER, 
+        longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
+    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT)''')
+
+    cursor.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
+    cursor.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
+    cursor.execute('''CREATE INDEX refSource ON grapheReutilisations (idRefSource)''')
+    cursor.execute('''CREATE INDEX refCible ON grapheReutilisations (idRefCible)''')
+    cursor.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
+    cursor.execute('''CREATE INDEX idNoeudf ON grapheGalaxies (idNoeudFils)''')
+    cursor.execute('''CREATE INDEX identifiantNoeud ON texteNoeuds (idNoeud)''')
+    # cursor.execute('''CREATE INDEX dateIndex ON livres (date) ASC''')
+    # cursor.execute('''CREATE INDEX idReutSource ON grapheGalaxiesSource (idReutilisation)''')
+    # cursor.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
     #
-    # curseur.execute('''CREATE INDEX refLivre ON livres (idLivre)''')
+    # cursor.execute('''CREATE INDEX refLivre ON livres (idLivre)''')
     connexion.commit()
     connexion.close()
 
@@ -52,7 +54,7 @@ def reload_query_table(cursor):
     :param cursor: cursor on the DB
     """
     cursor.execute('''DROP TABLE Query''')
-    cursor.execute('''CREATE TABLE Query (idGalaxie INTEGER)''')
+    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT)''')
 
 
 def dateToInt(date):
@@ -196,22 +198,22 @@ def nombreGalaxies(project_path):
     return res
 
 
-def get_list_graph(project_path):
-    graphs = os.listdir(project_path + "/jsons")
-    res = []
-    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    for i in graphs:
-        tab = [int(s) for s in re.findall(r'\d+', i)]
-        if len(tab) == 1:
-            texte = "Galaxie numéro " + str(tab[0]) + " contenant " + str(len(dirGalaxies[str(tab[0])])) + " noeuds"
-        elif len(tab) == 2:
-            dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(tab[0]))
-            texte = "Amas numéro " + str(tab[1]) + " de la galaxie " + str(tab[0]) + " contenant " + str(
-                len(dirAmas[str(tab[1])])) + " noeuds"
-            dirAmas.close()
-        else:
-            texte = 'erreur : ' + i
-        res.append(texte)
-
-    dirGalaxies.close()
-    return res
+# def get_list_graph(project_path):
+#     graphs = os.listdir(project_path + "/jsons")
+#     res = []
+#     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
+#     for i in graphs:
+#         tab = [int(s) for s in re.findall(r'\d+', i)]
+#         if len(tab) == 1:
+#             texte = "Galaxie numéro " + str(tab[0]) + " contenant " + str(len(dirGalaxies[str(tab[0])])) + " noeuds"
+#         elif len(tab) == 2:
+#             dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(tab[0]))
+#             texte = "Amas numéro " + str(tab[1]) + " de la galaxie " + str(tab[0]) + " contenant " + str(
+#                 len(dirAmas[str(tab[1])])) + " noeuds"
+#             dirAmas.close()
+#         else:
+#             texte = 'erreur : ' + i
+#         res.append(texte)
+#
+#     dirGalaxies.close()
+#     return res

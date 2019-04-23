@@ -17,8 +17,9 @@ import os
 
 class Galaxie:
 
-    def __init__(self, interface):
+    def __init__(self, interface, verbose):
         self.interface = interface
+        self.verbose = verbose
         self.project_path = None
         self.query = None
         self.query_graphs_structure = None
@@ -50,34 +51,34 @@ class Galaxie:
 
         self.project_path = '../projects/' + newdirproject
 
-        lecture_fic.init_directory(self.project_path)  # Creation of the project
+        lecture_fic.init_directory(self.project_path)  # Creation of the project folder
         self.interface.set_progress_bar_values(5, 100)
         t1 = time.clock()
-        baseDonnees.creerBD(self.project_path + '/BDs')  # Creation of the database
+        baseDonnees.create_bd(self.project_path)  # Creation of the database
         self.interface.set_progress_bar_values(10, 100)
         t2 = time.clock()
-        print("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
+        self.print_verbose("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
         t1 = time.clock()
         lecture_fic.lecture(file, self.project_path + '/BDs')  # On remplie notre BD avec notre fichiers .tab
         self.interface.set_progress_bar_values(50, 100)
         t2 = time.clock()
-        print("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
-        print("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.project_path + '/BDs'))
+        self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
+        self.print_verbose("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.project_path))
 
-        maxNoeud = grapheGalaxies.construction_graphe(self.project_path + '/BDs')
+        maxNoeud = grapheGalaxies.construction_graphe(self.project_path)
         self.interface.set_progress_bar_values(60, 100)
-        grapheGalaxies.sauvegarde_graphe_(self.project_path + '/BDs')  # Et on le sauvegarde
+        grapheGalaxies.sauvegarde_graphe_(self.project_path)  # Et on le sauvegarde
         self.interface.set_progress_bar_values(70, 100)
         if maxNoeud == 0:
             maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
-        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path + '/BDs')
+        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path)
         self.interface.set_progress_bar_values(80, 100)
         t2 = time.clock()
-        print("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
+        self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         self.interface.set_progress_bar_values(90, 100)
         amas.recupererAmas(self.project_path)
-        print("Operation terminée start_from_textAlign_file")
+        self.print_verbose("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
         self.interface.reset_progress_bar()
 
@@ -119,24 +120,24 @@ class Galaxie:
             self.interface.enabled_window()
             return
 
-        print("debut de fonction get_requete_preprocessing")
+        self.print_verbose("debut de fonction get_requete_preprocessing")
         query = self.interface.get_requete_from_user()
 
         self.query = query
-        print("la requete = ", self.query)
+        self.print_verbose("la requete = ", self.query)
         if self.query is None:  # if no query were ask on project
             self.interface.enabled_window()
             return
 
         self._execute_query(self.query)
         lecture_fic.save_query(self.query, self.project_path)
-        print("okay ! requete traiter")
+        self.print_verbose("okay ! requete traiter")
         self.interface.display_graph_list()
-        print("okay ! graphes afficher")
+        self.print_verbose("okay ! graphes afficher")
         self.interface.enabled_window()
 
     def get_query_graphs_structure(self):
-        print("get_query_graphs_structure")
+        self.print_verbose("get_query_graphs_structure")
         self.interface.disabled_window()
 
         if self.query is None:
@@ -144,7 +145,7 @@ class Galaxie:
             return  # if no query were ask on project
 
         if self.query_graphs_structure is not None:
-            print("self.query_graphs_structure is not None")
+            self.print_verbose("self.query_graphs_structure is not None")
             # todo : tache possiblement longue, necessite la progress bar
             self._execute_query(self.query)  # if we have already change the list of graphs answer, we rebuild it
 
@@ -168,3 +169,7 @@ class Galaxie:
         meta_data = extractionGalaxies.get_meta_data_from_idGalaxie(self.project_path, idGalaxie)
         return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
                'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
+
+    def print_verbose(self, *args, sep=' ', end='\n', file=None):
+        if self.verbose:
+            print(args, sep, end, file)

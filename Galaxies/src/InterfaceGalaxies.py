@@ -27,7 +27,7 @@ class InterfaceGalaxies(tk.Tk):
 
 
         """
-        self.galaxie = Galaxies.Galaxie(self)
+        self.galaxie = Galaxies.Galaxie(self, verbose=True)
         super().__init__()
         self.geometry("1200x610")
         self.title("Galaxies")
@@ -151,6 +151,12 @@ class InterfaceGalaxies(tk.Tk):
         self.button_display_graph.pack(pady=15)
 
     def open_text_align_file(self, project_directory):
+        """
+            Ask the user to open a Tab file, that correspond to a result file of text-pair
+
+        :param project_directory: The path above the project
+        :return: The path of the .tab file
+        """
         return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file",
                                              filetypes=[('tab files', '.tab')])
 
@@ -374,6 +380,9 @@ class InterfaceGalaxies(tk.Tk):
             self.display_graph_info()  # Display the graph information
 
     def disabled_window(self):
+        """
+            Disable the window, by disable all buttons on the page
+        """
         self.liste_Graphe.configure(state='disable')
         self.button_apply_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
@@ -383,6 +392,9 @@ class InterfaceGalaxies(tk.Tk):
         self.update()
 
     def enabled_window(self):
+        """
+            enable the window, by enable all buttons on the page
+        """
         self.liste_Graphe.configure(state='normal')
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
@@ -431,12 +443,22 @@ class InterfaceGalaxies(tk.Tk):
         self.update()
 
     def change_name(self, project_name):
+        """
+            Change the name of the window, for inform the user on which project is working on
+
+        :param project_name: The name of the project, that will be display
+        """
         self.title('Galaxies - ' + project_name)
 
     def askyesno_txt(self, text, titre="messagebox"):
         return tk.messagebox.askyesno(titre, text)
 
     def ask_for_project_name(self):
+        """
+            Open a simple window and asking the user to enter the project name
+
+        :return: A String that correspond to the project name
+        """
         return simpledialog.askstring("Project Name", "What name for your Project ?")
 
 

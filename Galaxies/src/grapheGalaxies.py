@@ -28,20 +28,20 @@ class noeud:  # permet d'énumérer les noeuds du graphe
         return self.val
 
 
-def construction_graphe(data_base_path):
+def construction_graphe(project_path):
     """
     Fonction qui va construire le Graphe
     """
     t1 = time.clock()
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
     n = noeud()
-    curseur.execute('''SELECT rowid FROM livres''')
-    idReference = curseur.fetchone()  # permet de prendre le premier
+    cursor.execute('''SELECT rowid FROM livres''')
+    idReference = cursor.fetchone()  # permet de prendre le premier
     while idReference != None:  # On va parcourir toute notre TABLE livres
         fusion_sources_cibles(idReference, connexion, n)
-        idReference = curseur.fetchone()
-    curseur.execute('''INSERT INTO maxNoeud values (?)''', (n.val,))
+        idReference = cursor.fetchone()
+    cursor.execute('''INSERT INTO maxNoeud values (?)''', (n.val,))
     connexion.commit()
     connexion.close()
     t2 = time.clock()
@@ -50,6 +50,7 @@ def construction_graphe(data_base_path):
 
 
 def fusion_sources_cibles(idRef, c, n):
+    # todo: l'erreur du texte qui se repéte doit etre ici selon Ganascia
     """
 
     idRef : l'id d'une des lignes du tableau qui est de la forme (n,)
@@ -191,14 +192,14 @@ def sauvegarde_graphe(data_base_path):
     print("graphe transposé sauvé")
 
 
-def sauvegarde_graphe_(data_base_path):
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+def sauvegarde_graphe_(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur_arc = connexion.cursor()
     curseur_noeud = connexion.cursor()
     curseur_graphe = connexion.cursor()
     curseur_arc.execute('''SELECT * FROM maxNoeud''')
     maxNoeud = curseur_arc.fetchone()[0]
-    # graphe = shelve.open(data_base_path + '/liste_ajacence_graphe')
+    # graphe = shelve.open(project_path + '/BDs/liste_ajacence_graphe')
     n = noeud()
     while n.val < maxNoeud:
         curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (n.val,))
@@ -218,7 +219,7 @@ def sauvegarde_graphe_(data_base_path):
         n.nouvelleValeur()
     # graphe.close()
     print("graphe sauvé")
-    # graphe_t = shelve.open(data_base_path + '/liste_ajacence_graphe_transpose')
+    # graphe_t = shelve.open(project_path + '/BDs/liste_ajacence_graphe_transpose')
     n = noeud()
     while n.val < maxNoeud:
         curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (n.val,))
@@ -242,17 +243,17 @@ def sauvegarde_graphe_(data_base_path):
     print("graphe transposé sauvé")
 
 
-def grapheConstruit(data_base_path):
+def grapheConstruit(project_path):
     """
     Se connecte a la base de donnée et retourne la permier ligne de la TABLE grapheGalaxiesSource
     Permet de tester si la base est bien remplie
     """
-    # todo : ca na pas l'air de posser de probleme de d'ouvrir la base sans la refermé
-    #       mais je ne suis pas sur que cela soit une bonne pratique
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    curseur.execute('''SELECT * FROM grapheGalaxiesSource''')
-    return curseur.fetchone()
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''SELECT * FROM grapheGalaxiesSource''')
+    result = cursor.fetchone()
+    connexion.close()
+    return result
 
 
 def egal(L1, L2):

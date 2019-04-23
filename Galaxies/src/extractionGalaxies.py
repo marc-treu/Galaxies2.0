@@ -49,10 +49,9 @@ class galaxie:  # permet d'énumérer composantes connexes
 
     def sauvegarde(self):
         dict = shelve.open(self.data_base_path + '/listeGalaxies')
-        x = 0  # changement dimanche 14
+        x = 0
         while x < self.val:
             dict[str(x)] = self.compositionGalaxie[x]
-            # print("galaxie sauvée: "+str(x))
             x += 1
         dict['nbreGalaxies'] = self.val
         dict.close()
@@ -219,23 +218,23 @@ class noeudMarques():
             return g
 
 
-def extractionComposantesConnexes(maxNoeud, data_base_path):
-    graphe = shelve.open(data_base_path + '/liste_ajacence_graphe')
-    graphe_t = shelve.open(data_base_path + '/liste_ajacence_graphe_transpose')
-    noeuds = noeudMarques(maxNoeud)
-    Galaxie = galaxie(data_base_path)
-    nouveauNoeud = noeuds.noeudNonVisite(0)
-    while nouveauNoeud != None:  # < maxNoeud:
-        # L = composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds)
-        # print("Nouveau noeud: "+str(nouveauNoeud)+" - galaxie: "+str(Galaxie.val))
-        Galaxie.noeudsGalaxie(Galaxie.val, composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds))
-        Galaxie.nouvelleValeur()
-        nouveauNoeud = noeuds.noeudNonVisite(nouveauNoeud)
-    graphe_t.close()
-    graphe.close()
-    Galaxie.sauvegarde()
-    Galaxie.rangement()
-    return Galaxie
+# def extractionComposantesConnexes(maxNoeud, data_base_path):
+#     graphe = shelve.open(data_base_path + '/liste_ajacence_graphe')
+#     graphe_t = shelve.open(data_base_path + '/liste_ajacence_graphe_transpose')
+#     noeuds = noeudMarques(maxNoeud)
+#     Galaxie = galaxie(data_base_path)
+#     nouveauNoeud = noeuds.noeudNonVisite(0)
+#     while nouveauNoeud != None:  # < maxNoeud:
+#         # L = composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds)
+#         # print("Nouveau noeud: "+str(nouveauNoeud)+" - galaxie: "+str(Galaxie.val))
+#         Galaxie.noeudsGalaxie(Galaxie.val, composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds))
+#         Galaxie.nouvelleValeur()
+#         nouveauNoeud = noeuds.noeudNonVisite(nouveauNoeud)
+#     graphe_t.close()
+#     graphe.close()
+#     Galaxie.sauvegarde()
+#     Galaxie.rangement()
+#     return Galaxie
 
 
 def composanteConnexe(N, g, graphe, graphe_t, noeuds):
@@ -266,13 +265,13 @@ def fils(X, graphe, graphe_t):
     return graphe[str(X)] + graphe_t[str(X)]
 
 
-def extractionComposantesConnexes_(maxNoeud, data_base_path, step=10000):
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+def extractionComposantesConnexes_(maxNoeud, project_path, step=10000):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     # curseur.execute('''DROP INDEX idNoeud''')
     # curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
     noeuds = noeudMarques(maxNoeud)
-    Galaxie = galaxie(data_base_path)
+    Galaxie = galaxie(project_path + '/BDs')
     tg1 = time.clock()
     nouveauNoeud = noeuds.noeudNonVisite(0)
     nbre_noeuds = 0
@@ -555,7 +554,8 @@ def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
 
     baseDonnees.reload_query_table(cursor)
     update_query_table(cursor, listeGalaxiesTriee)
-    update_query_table(cursor, listeGrossesGalaxies)
+    for id_amas in listeGrossesGalaxies:
+        update_query_table(cursor, [str(id_amas)+'-'+str(id_partition) for id_partition in listeGrossesGalaxies[id_amas]])
 
     dirGalaxies.close()
     connexion.commit()

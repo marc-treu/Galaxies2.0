@@ -15,18 +15,18 @@ import sqlite3
 import time
 
 
-def lecture(tab_file, data_base_path, number_of_line=0):
+def lecture(tab_file, project_path, number_of_line=0):
     """
     Lit le fichier tab_file passer en parametres et remplie la base de donnée
 
     :param tab_file:
-    :param data_base_path:
+    :param project_path:
     :param number_of_line:
     :return:
     """
     print("Appel lecture fichier sur "+str(tab_file))
     #FichierEntree = codecs.open(fic, 'r', 'utf-8', errors="ignore")
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db')
+    connexion = sqlite3.connect(project_path + '/galaxie.db')
     curseur = connexion.cursor()
     #Entete = FichierEntree.readline()
     #print("Entete: "+str(Entete))
@@ -99,27 +99,11 @@ def metaData(clef, dict):
     """
     return dict[clef] if clef in dict.keys() else ''
 
-def fichierNonCache(L):
-    """
-    Fonction qui va retourné le premier fichier d'une liste
-    L : List de dossiers ou de fichiers retourné par os.listdir()
-    """
-    # TODO: Retourner une liste de fichiers potentielle a traités, pas seulement le premier
-    #       peu etre regarder tous ce qui n'est pas un dossiers et qui fini par .tab
-    if L == 0 or not L:
-        print("Il n'y a pas de fichier de ressources!")
-        return
-    elif L[0][0] == '.': # On ne se préocupe pas de ./ et de ../
-        return fichierNonCache(L[1:])
-    elif os.path.isfile(L[0]):
-        return L[0]
-    else:
-        return fichierNonCache(L[1:])
-
-
 def init_directory(project_path):
     """
-    initialise la creation des dossiers pour recuperer les informations
+        initializes the creation of folders, for the current project
+
+    :param project_path: The path of the project
     """
     os.mkdir(project_path)
     os.mkdir(project_path + '/BDs')
@@ -162,12 +146,3 @@ def presenceClef(Clef, Fic): # Fonction jamais utiliser dans le reste du code
         L = FichierEntree.readline()
     print(liste_lignes)
     FichierEntree.close()
-
-
-def rechercheDossiersBDsAmasetGraphes(D): # Fonction qui crée nos dossiers BDs amas et graphe ?
-    if not 'BDs' in os.listdir(D):
-        os.makedirs(D+"BDs")
-    if not 'amas' in os.listdir(D):
-        os.makedirs(D+"amas")
-    if not 'graphes' in os.listdir(D):
-        os.makedirs(D+"graphes")
