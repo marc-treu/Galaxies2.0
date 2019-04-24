@@ -348,7 +348,6 @@ class InterfaceGalaxies(tk.Tk):
         """
             Function that display meta information about the current user selected Galaxie
         """
-        # todo: faire en sorte que get_meta_data_on_galaxie fonctionne aussi avec les amas
         self.graph_info['text'] = self.galaxie.get_meta_data_on_galaxie(self.get_idGalaxie())
         self.update()
 
@@ -377,6 +376,7 @@ class InterfaceGalaxies(tk.Tk):
         index = w.curselection()  # we get the active selection
         if index != ():  # if the selection is not empty
             self.graph_selected = w.get(index[0])  # we get the graph that correspond at the index of the selection
+            print('self.graph_selected =',self.graph_selected)
             self.display_graph_info()  # Display the graph information
 
     def disabled_window(self):
@@ -410,9 +410,14 @@ class InterfaceGalaxies(tk.Tk):
         if self.graph_selected is None:
             return  # if no galaxie are selected
 
-        self.galaxie.display_webbrower(self.get_name_file())
+        self.galaxie.display_webbrower(self.get_idGalaxie())
 
-    def get_name_file(self):
+    def get_idGalaxie(self):
+        """
+            Function that return the id of the galaxie that have been selected
+
+        :return: an string which is the ID of the current that have been selected by the user
+        """
         number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected))]
         if len(number) == 2:  # Alors il s'agit d'une Galaxie
             return str(number[0])
@@ -420,15 +425,6 @@ class InterfaceGalaxies(tk.Tk):
             return str(number[0]) + '-' + str(number[1])
         else:
             return
-
-    def get_idGalaxie(self):
-        """
-            Function that return the id of the galaxie that have been selected
-
-        :return: an Int which is the ID of the current that have been selected by the user
-        """
-        # todo : faire en sorte que cela fonctionne aussi avec les amas
-        return re.findall(r'\d+', str(self.graph_selected))[0]
 
     def set_progress_bar_values(self, values, max_values):
         self.progressbar['value'] = values / max_values * 100
