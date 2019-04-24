@@ -326,10 +326,10 @@ class InterfaceGalaxies(tk.Tk):
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
         if self.sort_method == 'number of node descending':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
-        if self.sort_method == 'longest text':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
         if self.sort_method == 'shortest text':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path)
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
+        if self.sort_method == 'longest text':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)[::-1]
         if self.sort_method == 'name':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path)
         if self.sort_method == 'text average length ascending':
