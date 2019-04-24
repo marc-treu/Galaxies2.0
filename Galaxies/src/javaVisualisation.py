@@ -153,7 +153,7 @@ def affichage(nomFichier):
     os.remove(parametres.DirPgm + 'code2.js')
 
 
-def change_html_graph_display(filename, project_path):
+def change_html_graph_display(id_galaxie, project_path):
     """
     Change graph to display on browser, by modify the first line of the javascript
     file.
@@ -163,6 +163,11 @@ def change_html_graph_display(filename, project_path):
     with open(project_path+'/code.js', 'r') as f:
         lines = f.readlines()   # On lit toute les lignes
 
+    number = [int(s) for s in re.findall(r'\d+', id_galaxie.split("/")[-1])]
+    if len(number) == 1:
+        filename = 'galaxie_' + str(number[0])
+    elif len(number) == 2:
+        filename = 'galaxie_' + str(number[0]) + '_amas_' + str(number[1])
     lines[0] = '$.getJSON("jsons/'+filename+'.json", function (data) {\n'
                                 # On remplace la premiere
     with open(project_path+'/code.js', 'w') as f:

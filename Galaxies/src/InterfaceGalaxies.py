@@ -404,24 +404,20 @@ class InterfaceGalaxies(tk.Tk):
         self.update()
 
     def display_graph_webbrowser(self):
-        if self.graph_selected is None: return
-        filename = self.get_name_file()
+        """
+            We get the graph that is selected and call display_webbrower method from Galaxies
+        """
+        if self.graph_selected is None:
+            return  # if no galaxie are selected
 
-        project_path = self.galaxie.get_project_path()
-
-        if project_path is None:
-            return  # if no project are selected or stared
-
-        javaVisualisation.change_html_graph_display(filename, project_path)
-        webbrowser.open(project_path + '/index.html')
-        print(self.graph_selected)
+        self.galaxie.display_webbrower(self.get_name_file())
 
     def get_name_file(self):
         number = [int(s) for s in re.findall(r'\d+', str(self.graph_selected))]
         if len(number) == 2:  # Alors il s'agit d'une Galaxie
-            return 'galaxie_' + str(number[0])
+            return str(number[0])
         if len(number) == 3:  # Alors il s'agit d'un Amas
-            return 'galaxie_' + str(number[1]) + '_amas_' + str(number[0])
+            return str(number[0]) + '-' + str(number[1])
         else:
             return
 

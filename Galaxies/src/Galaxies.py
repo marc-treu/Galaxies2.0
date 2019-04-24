@@ -8,11 +8,13 @@ import amas
 import baseDonnees
 import extractionGalaxies
 import grapheGalaxies
+import visualisationGraphe
 import javaVisualisation
 import lecture_fic
 
 import time
 import os
+import webbrowser
 
 
 class Galaxie:
@@ -112,7 +114,7 @@ class Galaxie:
 
     def _execute_query(self, query):
         amas.requetesUser(query, self.project_path)
-        #javaVisualisation.preparationVisualisation(self.project_path)
+        # javaVisualisation.preparationVisualisation(self.project_path)
 
     def get_requete_preprocessing(self):
         # todo : tache possiblement longue, necessite la progress bar
@@ -170,6 +172,16 @@ class Galaxie:
         meta_data = extractionGalaxies.get_meta_data_from_idGalaxie(self.project_path, idGalaxie)
         return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
                'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
+
+    def display_webbrower(self, id_galaxie):
+        print('id_galaxie = ',id_galaxie)
+        if self.project_path is None:
+            return  # if no project are selected or stared
+
+        filename = visualisationGraphe.sauveGrapheGalaxie(id_galaxie, self.project_path)
+        javaVisualisation.visualisation(filename, self.project_path)
+        javaVisualisation.change_html_graph_display(id_galaxie, self.project_path)
+        webbrowser.open(self.project_path + '/index.html')
 
     def print_verbose(self, *args, **kwargs):
         if self.verbose:

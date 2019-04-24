@@ -72,20 +72,18 @@ def creerGrapheTextes(ListeNoeuds, fichier, ext, project_path):
             arcs[Noeud] = set()
         for R in L:
             arcs[Noeud].add(R[0])
-    print("arcs =", arcs)
+    # print("arcs =", arcs)
     Graphe = nx.Graph()
     #    idRef = set()
     #    print("Ensemble des réutilisations: "+ str(reutilisations))
     # print('Arcs émergents: '+str(arcs_emergents)+" - arcs incidents: "+str(arcs_incidents))
     for Pere in arcs.keys():
-        print(Pere)
         # print("Arcs émergents noeud "+str(X)+": "+str(arcs_emergents[X]))
         # if(Pere%10000==0):
         #     print(Pere)
         if not Pere in Graphe:
-            print("not Pere in Graphe")
             curseur.execute('''SELECT texte, idRowLivre FROM texteNoeuds WHERE idNoeud = (?)''', (str(Pere),))
-            RefPere = curseur.fetchall()
+            RefPere = curseur.fetchall()[0]
             T = caracterisquesReference(RefPere[1], curseur)
 
             Graphe.add_node(str(Pere), texte=RefPere[0], longueurTexte=len(RefPere[0]), auteur=T[0], titre=T[1],
