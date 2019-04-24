@@ -171,7 +171,6 @@ class Galaxie:
         return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
                'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
 
-    def print_verbose(self, *args, sep=' ', end='\n', file=None):
+    def print_verbose(self, *args, **kwargs):
         if self.verbose:
-            for arg in args:
-                print(arg, sep, end, file)
+            print(*args, **kwargs)
