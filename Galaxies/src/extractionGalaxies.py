@@ -4,17 +4,17 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-import sqlite3
-import parametres
-import time
-import shelve
-import os
+import amas
+import baseDonnees
 import filtres
+import os
+import parametres
+import shelve
+import sqlite3
+import time
 import visualisationGraphe
 import cProfile
 import grapheGalaxies
-
-import baseDonnees
 
 
 # import unicodedata
@@ -23,13 +23,15 @@ import baseDonnees
 
 class galaxie:  # permet d'énumérer composantes connexes
 
-    def __init__(self, data_base_path):
+    def __init__(self, project_path, max_length_galaxie):
         self.val = 0
         self.compositionGalaxie = dict()
         self.tempsIni = time.clock()
         self.pasGalaxies = 10000
         self.pasNbreNoeud = 10000
-        self.data_base_path = data_base_path
+        self.max_length_galaxie = max_length_galaxie
+        self.project_path = project_path
+        self.data_base_path = project_path + '/BDs'
 
     def nouvelleValeur(self):
         self.val += 1
@@ -44,19 +46,35 @@ class galaxie:  # permet d'énumérer composantes connexes
         return self.val
 
     def noeudsGalaxie(self, n, L):
-        self.compositionGalaxie[n] = L
+        self.compositionGalaxie[str(n)] = L
         return len(L)
 
+    def add_galaxie(self, id_galaxie, nodes_list):
+        self.compositionGalaxie[str(id_galaxie)] = nodes_list
+
     def sauvegarde(self):
-        dict = shelve.open(self.data_base_path + '/listeGalaxies')
+        list_galaxie = shelve.open(self.data_base_path + '/listeGalaxies')
         x = 0
-        while x < self.val:
-            dict[str(x)] = self.compositionGalaxie[x]
+        for id_galaxie in range(self.val):
+            list_galaxie[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
             x += 1
-        dict['nbreGalaxies'] = self.val
-        dict.close()
+            if len(self.compositionGalaxie[str(id_galaxie)]) > self.max_length_galaxie:
+                print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =', self.compositionGalaxie[str(id_galaxie)])
+                # list_galaxie.close()
+                list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], id_galaxie, self.project_path)
+                for id_partition in list_amas:
+                    ama_name = str(id_galaxie)+'-'+str(id_partition)
+                    list_galaxie[ama_name] = list_amas[id_partition]
+                    self.add_galaxie(ama_name, list_amas[id_partition])
+                    x += 1
+                # list_galaxie = shelve.open(self.data_base_path + '/listeGalaxies')
+
+        # list_galaxie['nbreGalaxies'] = x
+        self.val = x
+        list_galaxie.close()
 
     def rangement(self):
+        print("self.compositionGalaxie['9-81'] =", self.compositionGalaxie['9-81'])
         tr = time.clock()
         print("         Extraction des galaxies terminées; opérations de rangement...")
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
@@ -67,22 +85,23 @@ class galaxie:  # permet d'énumérer composantes connexes
         # connexion.commit()
         t0 = tr
         i = 0
-        while i < self.val:
+        for galaxie in self.compositionGalaxie:
+
             if divmod(i, self.pasGalaxies)[1] == 0 and i != 0:
                 t1 = time.clock()
                 print('Nombre galaxies rangées: ' + str(i) + ' sur ' + str(self.val) + " (" + str(
                     int((float(i) / float(self.val)) * 100)) + '%) en ' + format(t1 - t0, 'f') + 'sec.')
                 t0 = t1
-            lnoeuds = self.compositionGalaxie[i]
+            lnoeuds = self.compositionGalaxie[galaxie]
             n = len(lnoeuds)
             longueur = 0
             longueurMax = 0
-            for texte in texteGalaxie(i, curseur2, self.data_base_path):
+            for texte in texteGalaxie(galaxie, curseur2, self.data_base_path):
                 longueur += len(texte)
                 longueurMax = max(len(texte), longueurMax)
-            curseur2.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(i),))
+            curseur2.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(galaxie),))
             curseur2.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
-                             (str(i), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
+                             (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
             # connexion.commit()
             # print("degré galaxie n°"+str(i)+": "+str(n))
             i += 1
@@ -265,13 +284,13 @@ def fils(X, graphe, graphe_t):
     return graphe[str(X)] + graphe_t[str(X)]
 
 
-def extractionComposantesConnexes_(maxNoeud, project_path, step=10000):
+def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie,step=10000):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     # curseur.execute('''DROP INDEX idNoeud''')
     # curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
     noeuds = noeudMarques(maxNoeud)
-    Galaxie = galaxie(project_path + '/BDs')
+    Galaxie = galaxie(project_path, max_length_galaxie)
     tg1 = time.clock()
     nouveauNoeud = noeuds.noeudNonVisite(0)
     nbre_noeuds = 0
@@ -328,7 +347,7 @@ def degreGalaxie(idGalaxie, cursor, select_item="degreGalaxie"):
     :param select_item:
     :return: The degre of idGalaxie
     """
-    query = "SELECT {} FROM degreGalaxies WHERE idGalaxie = {}".format(select_item, idGalaxie)
+    query = "SELECT {} FROM degreGalaxies WHERE idGalaxie = '{}'".format(select_item, idGalaxie)
     cursor.execute(query)
     return cursor.fetchone()[0]
 
@@ -361,6 +380,18 @@ def fils_(X, curseur):
     for X in curseur.fetchall():
         L.append(X[0])
     return L
+
+
+def get_graph_from_nodes(nodes_list, cursor):
+    graph = {}
+    for node in nodes_list:
+        cursor.execute('''SELECT idNoeudFils FROM grapheGalaxies WHERE idNoeudPere = (?)''', (node,))
+        child_list = cursor.fetchall()
+        if child_list != []:
+            graph[node] = set()
+        for child in child_list:
+            graph[node].add(child[0])
+    return graph
 
 
 def cible(arc, curseur):
@@ -533,34 +564,37 @@ def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     numero = 0
     listeGalaxies = []
     listeGrossesGalaxies = dict()
-    while numero < nombreTotalGalaxies:
-        EnsNoeuds = dirGalaxies[str(numero)]
-        if metaDonneesFiltreAux(EnsNoeuds, query, cursor):
-            if len(EnsNoeuds) < tailleMinGrosseGalaxie:
-                listeGalaxies.append(numero)
-            else:
-                tmp = amasFiltre(numero, query, cursor, project_path)
-                if tmp:
-                    listeGrossesGalaxies[str(numero)] = tmp
+
+    # while numero < nombreTotalGalaxies:
+    for id_galaxie in dirGalaxies:
+        nodes_list = dirGalaxies[id_galaxie]
+        if metaDonneesFiltreAux(nodes_list, query, cursor):
+            # if len(nodes_list) < tailleMinGrosseGalaxie:
+            listeGalaxies.append(id_galaxie)
+            # else:
+            #     tmp = amasFiltre(numero, query, cursor, project_path)
+            #     if tmp:
+            #         listeGrossesGalaxies[str(numero)] = tmp
         numero += 1
     listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
+    print("trier !")
     if 'longueur_texte_maximal' in query.keys():
         listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, query['longueur_texte_maximal'],
                                                             cursor, dirGalaxies)
-        for gal in listeGrossesGalaxies:
-            listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
-                                                                            query['longueur_texte_maximal'], cursor,
-                                                                            dirGalaxies)
+        # for gal in listeGrossesGalaxies:
+        #     listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
+        #                                                                     query['longueur_texte_maximal'], cursor,
+        #                                                                     dirGalaxies)
 
     baseDonnees.reload_query_table(cursor)
     update_query_table(cursor, listeGalaxiesTriee)
-    for id_amas in listeGrossesGalaxies:
-        update_query_table(cursor, [str(id_amas)+'-'+str(id_partition) for id_partition in listeGrossesGalaxies[id_amas]])
+    # for id_amas in listeGrossesGalaxies:
+    #     update_query_table(cursor, [str(id_amas)+'-'+str(id_partition) for id_partition in listeGrossesGalaxies[id_amas]])
 
     dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return listeGalaxiesTriee, listeGrossesGalaxies
+    return listeGalaxiesTriee #, listeGrossesGalaxies
 
 
 def amasFiltre(numGalaxie, requete, curseur, project_path):

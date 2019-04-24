@@ -27,11 +27,12 @@ class Galaxie:
     def get_project_path(self):
         return self.project_path
 
-    def start_from_textalign_file(self, maxNoeud=0):
+    def start_from_textalign_file(self, maxNoeud=0, max_length_galaxie=300):
         """
-        Starting a new project with a textAlign file
+            Starting a new project with a textAlign file
 
         :param maxNoeud:
+        :param max_length_galaxie:
         """
         self.interface.disabled_window()
         project_directory = '/'.join(os.getcwd().split('/')[:-2])
@@ -72,12 +73,12 @@ class Galaxie:
         if maxNoeud == 0:
             maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
-        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path)
+        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path, max_length_galaxie)
         self.interface.set_progress_bar_values(80, 100)
         t2 = time.clock()
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         self.interface.set_progress_bar_values(90, 100)
-        amas.recupererAmas(self.project_path)
+        #amas.recupererAmas(self.project_path)
         self.print_verbose("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
         self.interface.reset_progress_bar()
@@ -172,4 +173,5 @@ class Galaxie:
 
     def print_verbose(self, *args, sep=' ', end='\n', file=None):
         if self.verbose:
-            print(args, sep, end, file)
+            for arg in args:
+                print(arg, sep, end, file)

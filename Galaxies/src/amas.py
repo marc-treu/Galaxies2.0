@@ -6,9 +6,10 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import shelve
 import time
-import community as louvain
 import os
 import shutil
+import sqlite3
+import community as louvain
 import networkx as nx
 
 import visualisationGraphe
@@ -42,6 +43,29 @@ def listeAmas(numGalaxie, project_path):
 
     os.remove(fichierGrapheGalaxie)
     listeAmas.close()
+
+
+def create_partition(nodes_list, id_galaxie, project_path):
+
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    graph = extractionGalaxies.get_graph_from_nodes(nodes_list, cursor)
+    nx_graph = nx.Graph()
+    nx_graph.add_nodes_from(list(graph.keys()))
+    for key in graph.keys():
+        for value in graph[key]:
+            nx_graph.add_edge(key, value)
+
+    amas = louvain.best_partition(nx_graph)
+
+    amas_list = dict()
+    for ama in amas:
+        if amas[ama] in amas_list.keys():
+            amas_list[amas[ama]].append(ama)
+        else:
+            amas_list[amas[ama]] = [ama]
+
+    return amas_list
 
 
 def recupererAmas(project_path, tailleMinGrosseGalaxie=300):
