@@ -118,7 +118,7 @@ class galaxie:  # permet d'énumérer composantes connexes
         idRefCible, texteCible, ordonneeCible, empanCible from GrapheReutilisations''')
         curseurSource = connexion.cursor()
         curseurCible = connexion.cursor()
-        List_node_to_merge = shelve.open(self.data_base_path + '/list_node')
+        list_node_to_merge = shelve.open(self.data_base_path + '/list_node')
 
         X = curseur.fetchone()
         while X:
@@ -126,17 +126,18 @@ class galaxie:  # permet d'énumérer composantes connexes
                                   (str(X[0]),))
             curseurCible.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = ?''', (str(X[0]),))
             self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource,
-                                List_node_to_merge)
-            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible, List_node_to_merge)
+                                list_node_to_merge)
+            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible, list_node_to_merge)
             X = curseur.fetchone()
 
-        for node in List_node_to_merge:
-            if len(List_node_to_merge[str(node)]) > 1:
-                new_node = get_max_text(List_node_to_merge[str(node)])
+        for node in list_node_to_merge:
+            # print('list_node_to_merge[str(node)]) =',list_node_to_merge[str(node)])
+            if len(list_node_to_merge[str(node)]) > 1:
+                new_node = merge_nodes(list_node_to_merge[str(node)])
                 curseurCible.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(node),))
                 curseurCible.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
                                      (str(node), new_node[0], new_node[1], new_node[2], new_node[3],))
-        List_node_to_merge.close()
+        list_node_to_merge.close()
 
     def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur, List_node_to_merge):
         # print("miseAJourNoeud")
@@ -146,7 +147,11 @@ class galaxie:  # permet d'énumérer composantes connexes
         # print("X =", X)
 
         if X:  # if the node is already in the table texteNoeuds, we must merge it
-            List_node_to_merge[str(Noeud)].append([texte, idRef, ordonnee, empan])
+            # print('X =',X)
+            # print(List_node_to_merge[str(Noeud)])
+            temp = List_node_to_merge[str(Noeud)]
+            temp.append([texte, idRef, ordonnee, empan])
+            List_node_to_merge[str(Noeud)] = temp
             # new_node = get_max_text(ordonnee, len(texte), texte, X[0][1], len(X[0][0]), X[0][0])
             # # print("new_node  =", new_node)
             # curseur.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
@@ -158,9 +163,37 @@ class galaxie:  # permet d'énumérer composantes connexes
                             (str(Noeud), texte, idRef, ordonnee, len(texte),))
 
 
-def get_max_text(list_node):
-    print('list_node =',list_node)
-    return list_node[1]
+def merge_nodes(list_node):
+
+    list_node_sort = sorted(list_node, key=lambda x: x[2])
+    new_node = list_node_sort[0]
+
+    for i in range(1, len(list_node_sort)):
+        new_node[0] = merge_text(new_node[0], list_node_sort[i][0])
+
+    print(new_node[0])
+    return [new_node[0], new_node[1], new_node[2], len(new_node[0])]
+
+
+def merge_text(text1, text2):
+    if text2 in text1:
+        return text1
+    list_text1, list_text2 = text1.split(), text2.split()
+    i, j = 0, 0
+    while i < len(list_text1):
+        if list_text1[i] == list_text2[j]:
+            if i == len(list_text1)-1:
+                result = list_text1 + list_text2[1:]
+                return " ".join(result)
+            if list_text1[i:] == list_text2[j:j+(len(list_text1)-i)]:
+                result = list_text1 + list_text2[j+(len(list_text1)-i):]
+                return " ".join(result)
+        i += 1
+    result = list_text1 + list_text2
+    return " ".join(result)
+
+
+
     #
     #
     #
