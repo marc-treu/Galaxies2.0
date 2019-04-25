@@ -59,11 +59,13 @@ class galaxie:  # permet d'énumérer composantes connexes
             list_galaxie[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
             x += 1
             if len(self.compositionGalaxie[str(id_galaxie)]) > self.max_length_galaxie:
-                print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =', self.compositionGalaxie[str(id_galaxie)])
+                print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =',
+                      self.compositionGalaxie[str(id_galaxie)])
                 # list_galaxie.close()
-                list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], id_galaxie, self.project_path)
+                list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], id_galaxie,
+                                                  self.project_path)
                 for id_partition in list_amas:
-                    ama_name = str(id_galaxie)+'-'+str(id_partition)
+                    ama_name = str(id_galaxie) + '-' + str(id_partition)
                     list_galaxie[ama_name] = list_amas[id_partition]
                     self.add_galaxie(ama_name, list_amas[id_partition])
                     x += 1
@@ -74,7 +76,6 @@ class galaxie:  # permet d'énumérer composantes connexes
         list_galaxie.close()
 
     def rangement(self):
-        print("self.compositionGalaxie['9-81'] =", self.compositionGalaxie['9-81'])
         tr = time.clock()
         print("         Extraction des galaxies terminées; opérations de rangement...")
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
@@ -117,30 +118,61 @@ class galaxie:  # permet d'énumérer composantes connexes
         idRefCible, texteCible, ordonneeCible, empanCible from GrapheReutilisations''')
         curseurSource = connexion.cursor()
         curseurCible = connexion.cursor()
+        List_node_to_merge = shelve.open(self.data_base_path + '/list_node')
+
         X = curseur.fetchone()
         while X:
             curseurSource.execute('''SELECT idNoeud FROM grapheGalaxiesSource WHERE idReutilisation = ?''',
                                   (str(X[0]),))
             curseurCible.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = ?''', (str(X[0]),))
-            self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource)
-            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible)
+            self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource,
+                                List_node_to_merge)
+            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible, List_node_to_merge)
             X = curseur.fetchone()
 
-    def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur):
+        for node in List_node_to_merge:
+            if len(List_node_to_merge[str(node)]) > 1:
+                new_node = get_max_text(List_node_to_merge[str(node)])
+                curseurCible.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(node),))
+                curseurCible.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
+                                     (str(node), new_node[0], new_node[1], new_node[2], new_node[3],))
+        List_node_to_merge.close()
+
+    def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur, List_node_to_merge):
+        # print("miseAJourNoeud")
+        # print(Noeud, idRef, texte, ordonnee, empan)
         curseur.execute('''SELECT texte, ordonnee, empan FROM texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
         X = curseur.fetchall()
-        if X:
-            if texte == X[0][0]:
-                # print('le texte est le meme')
-                return
-            L = chaineMax(ordonnee, empan, texte, X[0][1], X[0][2], X[0][0])
-            curseur.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
-            # print("Texte ancien: "+str(X)+" - texte nouveau: (\""+str(texte)+"\","+str(ordonnee)+", "+str(empan)+") jointure: "+str(L[0]))
-            curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
-                            (str(Noeud), L[0], idRef, L[1], L[2],))
+        # print("X =", X)
+
+        if X:  # if the node is already in the table texteNoeuds, we must merge it
+            List_node_to_merge[str(Noeud)].append([texte, idRef, ordonnee, empan])
+            # new_node = get_max_text(ordonnee, len(texte), texte, X[0][1], len(X[0][0]), X[0][0])
+            # # print("new_node  =", new_node)
+            # curseur.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
+            # curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
+            #                 (str(Noeud), new_node[0], idRef, new_node[1], new_node[2],))
         else:
+            List_node_to_merge[str(Noeud)] = [[texte, idRef, ordonnee, empan]]
             curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
-                            (str(Noeud), texte, idRef, ordonnee, empan,))
+                            (str(Noeud), texte, idRef, ordonnee, len(texte),))
+
+
+def get_max_text(list_node):
+    print('list_node =',list_node)
+    return list_node[1]
+    #
+    #
+    #
+    # if ordonnee1 > ordonnee2:
+    #     return get_max_text(ordonnee2, empan2, text2, ordonnee1, empan1, text1)
+    # index = (ordonnee1 + empan1) - ordonnee2
+    # if index < 0:
+    #     # print("Erreur in get_max_text, index < 0, index =", index)
+    #     # print(ordonnee1, empan1, text1, ordonnee2, empan2, text2)
+    #     return [text1, ordonnee1, empan1]
+    # new_text = text1[:index-1] + text2
+    # return [new_text, ordonnee1, len(new_text)]
 
 
 def chaineMax(ordonnee1, empan1, texte1, ordonnee2, empan2, texte2):
@@ -156,21 +188,22 @@ def chaineMax(ordonnee1, empan1, texte1, ordonnee2, empan2, texte2):
 
     deltaInit = ordonnee2 - ordonnee1
     deltaFin = ordonnee2 + empan2 - ordonnee1 - empan1 - 1
-    # print("Delta fin: " + str(deltaFin)+" - "+"delta init: " + str(deltaInit))
+    print("Delta fin: " + str(deltaFin) + " - " + "delta init: " + str(deltaInit))
     if deltaInit == 0:
         if deltaFin >= 0:
             return [texte2, ordonnee2, empan2]
         else:
             return [texte1, ordonnee1, empan1]
-    elif deltaInit > 0:
-        if deltaFin > 0:
+    elif deltaInit > 0:  # if ordonnee2 > ordonnee1
+        if deltaFin > 0:  # if ordonnee2 + empan2 > ordonnee1 + empan1
             if texte1[deltaInit - 1:] != texte2[:-deltaFin]:
                 # print("ERREUR chevauchement= "+texte1[deltaInit-1:]+" - "+texte2[:-deltaFin]+"\n Texte1: "+texte1+" - texte2: "+texte2)
-                # print("ordonnée1: "+str(ordonnee1)+" empan1: "+str(empan1))
-                # print("ordonnée2: " + str(ordonnee2) + " empan2: " + str(empan2))
+                print("texte1: " + texte1 + " - texte2: " + texte2)
+                print("ordonnée1: " + str(ordonnee1) + " empan1: " + str(empan1))
+                print("ordonnée2: " + str(ordonnee2) + " empan2: " + str(empan2))
                 # print("Résultats: "+texte1 + texte2[-deltaFin:])
                 ecart = ajustement(texte1, ordonnee1, empan1, texte2, ordonnee2, empan2)
-                # print("Ajustement: "+str(ecart))
+                print("Ajustement: " + str(ecart))
                 ordonnee2 = ordonnee2 + ecart
                 # print("Bout1 texte1: "+texte1[:ordonnee2-ordonnee1]+" bout2 texte1: "+texte1[ordonnee2-ordonnee1:])
                 # print("Bout1 texte2: " + texte2[:empan1+ordonnee1-ordonnee2] + " bout2 texte2: " + texte2[empan1+ordonnee1-ordonnee2:])
@@ -284,7 +317,7 @@ def fils(X, graphe, graphe_t):
     return graphe[str(X)] + graphe_t[str(X)]
 
 
-def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie,step=10000):
+def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, step=10000):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
     # curseur.execute('''DROP INDEX idNoeud''')
@@ -536,7 +569,6 @@ def update_query_table(cursor, galaxies_list):
 
 
 def get_number_galaxies(cursor=None, project_path=None):
-
     if cursor is None and project_path is None:
         raise ValueError("exactly one argument must be given")
 
@@ -594,7 +626,7 @@ def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
     dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return listeGalaxiesTriee #, listeGrossesGalaxies
+    return listeGalaxiesTriee  # , listeGrossesGalaxies
 
 
 def amasFiltre(numGalaxie, requete, curseur, project_path):
@@ -636,7 +668,8 @@ def galaxiesFiltreListe(Lrequete, project_path, tailleMinGrosseGalaxie=300):
 def get_list_galaxie(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute('''SELECT Query.idGalaxie, degreGalaxie FROM Query LEFT OUTER JOIN degreGalaxies ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
+    cursor.execute(
+        '''SELECT Query.idGalaxie, degreGalaxie FROM Query LEFT OUTER JOIN degreGalaxies ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
     connexion.close()
     return result
@@ -659,7 +692,8 @@ def sort_list_galaxie(project_path, table_index=0):
     galaxies_list = get_list_galaxie(project_path)
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne', 4: 'longueurTexteMax'}
+    select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne',
+                   4: 'longueurTexteMax'}
     result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie[0], cursor, select_item[table_index]))
     connexion.close()
     return result

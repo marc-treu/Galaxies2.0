@@ -114,6 +114,7 @@ def idLivre(auteur, titre, date, curseur, nbre_lignes):
 
 def ajoutReutilisation(idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible,
                        empanCible, texteCible, metaDataCible, curseur, nbre_lignes):
+    # print("ajoutReutilisation : ",'idSource=',idSource,' coordonneeSource =', coordonneeSource, 'empanSource=',empanSource,' texteSource=', texteSource," metaDataSource=", metaDataSource, "idCible=",idCible, "coordonneeCible=",coordonneeCible, "empanCible=",empanCible, "texteCible=",texteCible, "metaDataCible=",metaDataCible,end='\n\n')
     curseur.execute('''INSERT INTO grapheReutilisations values (?,?,?, ?, ?, ?, ?, ?,?,?)''', (
     idSource, coordonneeSource, empanSource, texteSource, metaDataSource, idCible, coordonneeCible, empanCible,
     texteCible, metaDataCible))

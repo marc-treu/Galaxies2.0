@@ -26,7 +26,7 @@ def lecture(tab_file, project_path, number_of_line=0):
     """
     print("Appel lecture fichier sur "+str(tab_file))
     #FichierEntree = codecs.open(fic, 'r', 'utf-8', errors="ignore")
-    connexion = sqlite3.connect(project_path + '/galaxie.db')
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db')
     curseur = connexion.cursor()
     #Entete = FichierEntree.readline()
     #print("Entete: "+str(Entete))
@@ -47,7 +47,7 @@ def lecture(tab_file, project_path, number_of_line=0):
                                itemNum('source_create_date', L), curseur, nbre_ligne)
         baseDonnees.ajoutLivre(item('target_author', L),
                                item('target_title', L),
-                               itemNum('target_create_date',L), curseur, nbre_ligne)
+                               itemNum('target_create_date', L), curseur, nbre_ligne)
         idSource = baseDonnees.idLivre(item('source_author', L),
                                        item('source_title', L),
                                        itemNum('source_create_date', L), curseur, nbre_ligne)
@@ -74,7 +74,6 @@ def lecture(tab_file, project_path, number_of_line=0):
     connexion.close()
 
 
-
 def item(clef, dict):
     """
     Retourne la valeur de L[Clef] si elle existe, sinon Inconnu
@@ -82,6 +81,7 @@ def item(clef, dict):
     Clef : une clef potentielle de L
     """
     return dict[clef] if clef in dict.keys() else "Inconnu"
+
 
 def itemNum(clef, dict):
     """
@@ -91,6 +91,7 @@ def itemNum(clef, dict):
     """
     return dict[clef] if clef in dict.keys() else 0
 
+
 def metaData(clef, dict):
     """
     Retourne la valeur de L[Clef] si elle existe, sinon ''
@@ -98,6 +99,7 @@ def metaData(clef, dict):
     Clef : une clef potentielle de L
     """
     return dict[clef] if clef in dict.keys() else ''
+
 
 def init_directory(project_path):
     """
@@ -126,10 +128,12 @@ def load_query(project_path):
 
 #### les Fonctions dans la suite n'on pas l'aire utile
 
+
 def clefsFichier(Fic): # Fonction jamais utiliser dans le reste du code
     FichierEntree = codecs.open(Fic, 'r', 'utf-8')
     L=json.loads(FichierEntree.readline()[0:-1])
     print(L.keys())
+
 
 def presenceClef(Clef, Fic): # Fonction jamais utiliser dans le reste du code
     FichierEntree = codecs.open(Fic, 'r', 'utf-8')

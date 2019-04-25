@@ -32,6 +32,7 @@ def construction_graphe(project_path):
     """
     Fonction qui va construire le Graphe
     """
+    # print("c'est ici que tout commence")
     t1 = time.clock()
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
@@ -57,6 +58,8 @@ def fusion_sources_cibles(idRef, c, n):
     c : un pipe qui est connecté a notre BD
     n : la class Noeud qui permet de compter les noeuds de notre graphe
     """
+    # print("idReference =", idRef)
+
     curseurSource = c.cursor()  # On creer deux curseur
     curseurCible = c.cursor()
     curseurSource.execute(
@@ -64,10 +67,14 @@ def fusion_sources_cibles(idRef, c, n):
     curseurCible.execute('''SELECT ordonneeCible, empanCible, rowid FROM grapheReutilisations WHERE idRefCible = ?''',
                          idRef)
     listeReutilisationSource = curseurSource.fetchall()
+    # print('listeReutilisationSource=',listeReutilisationSource)
     listeReutilisationCible = curseurCible.fetchall()
+    # print('listeReutilisationCible =',listeReutilisationCible )
     listeReutilisationMarquee = marquage(listeReutilisationCible, 'cible') + listeReutilisationSource
     listeReutilisationMarquee.sort()
+    # print("listeReutilisationMarquee =",listeReutilisationMarquee)
     R = fusion(listeReutilisationMarquee, idRef, n)
+    # print("R =",R)
     if R:
         n.nouvelleValeur()
     for X in R:
@@ -134,6 +141,7 @@ def fusionAux(Tete, Suivant, Entree, Noeud, Resultat):
 
 
 def ajoutSource(L, Curseur):
+    # print("L =",L)
     Curseur.execute('''INSERT INTO grapheGalaxiesSource values (?,?)''', (L[2], L[3],))
 
 
@@ -193,6 +201,7 @@ def sauvegarde_graphe(data_base_path):
 
 
 def sauvegarde_graphe_(project_path):
+    # print("\nsauvegarde_graphe_\n")
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur_arc = connexion.cursor()
     curseur_noeud = connexion.cursor()
@@ -211,6 +220,7 @@ def sauvegarde_graphe_(project_path):
             curseur_noeud.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = (?)''',
                                   (reutilisation[0],))
             nouveau_noeud = curseur_noeud.fetchone()
+            # print("nouveau_noeud =", nouveau_noeud )
             # liste_adjacence.append(nouveau_noeud[0])
             curseur_graphe.execute('''INSERT INTO grapheGalaxies values (?,?)''', (n.val, nouveau_noeud[0],))
             reutilisation = curseur_arc.fetchone()

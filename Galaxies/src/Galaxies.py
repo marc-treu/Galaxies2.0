@@ -62,7 +62,7 @@ class Galaxie:
         t2 = time.clock()
         self.print_verbose("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
         t1 = time.clock()
-        lecture_fic.lecture(file, self.project_path + '/BDs')  # On remplie notre BD avec notre fichiers .tab
+        lecture_fic.lecture(file, self.project_path)  # On remplie notre BD avec notre fichiers .tab
         self.interface.set_progress_bar_values(50, 100)
         t2 = time.clock()
         self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
