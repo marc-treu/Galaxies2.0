@@ -7,14 +7,13 @@ __author__ = 'Jean-Gabriel Ganascia'
 import amas
 import baseDonnees
 import filtres
-import os
 import parametres
+import re
 import shelve
 import sqlite3
 import time
 import visualisationGraphe
 # import cProfile
-# import grapheGalaxies
 
 
 # import unicodedata
@@ -102,7 +101,7 @@ class galaxie:  # permet d'énumérer composantes connexes
             curseur2.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
                              (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
             if int(longueur / n) > longueurMax:
-                print("posse probleme, galaxie =",galaxie)
+                print("ERROR : average length > max length, galaxie =", galaxie)
             i += 1
         connexion.commit()
         connexion.commit()
@@ -162,19 +161,17 @@ def merge_nodes(list_node):
 def merge_text(text1, text2):
     if text2 in text1:
         return text1
-    list_text1, list_text2 = text1.replace(',', '').split(), text2.replace(',', '').split()
-    i, j = 0, 0
-    while i < len(list_text1):
-        if list_text1[i] == list_text2[j]:
-            if i == len(list_text1)-1:
-                result = text1.split()[:-1] + text2.split()[:]
-                return " ".join(result)
-            if list_text1[i:] == list_text2[j:j+(len(list_text1)-i)]:
-                result = text1.split()[:-1] + text2.split()[j+(len(list_text1)-i)-1:]
-                return " ".join(result)
+    i = 0
+    while i < len(text1):
+        if text1[i] == text2[0]:
+            if i == len(text1)-1:
+                return text1[:-1] + text2
+            if text1[i:] == text2[:len(text1)-i]:
+                return text1[:i]+text2
         i += 1
-    result = text1.split() + text2.split()
-    return " ".join(result)
+    print("ERROR : text 1 :", text1, '\nand text 2 have nothing in commun :', text2)
+
+    return text1 + text2
 
 
 class noeudMarques():
@@ -339,7 +336,8 @@ def auteursGalaxie(numero, data_base_path):
     auteurs = set()
     for Noeud in ListeNoeuds:
         curseur.execute(
-            '''SELECT auteur FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
+            '''SELECT auteur FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE 
+            idNoeud = (?)''',
             (Noeud,))
         L = curseur.fetchall()[0][0]
         if L != 'Inconnu':
