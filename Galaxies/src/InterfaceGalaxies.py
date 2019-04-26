@@ -331,7 +331,8 @@ class InterfaceGalaxies(tk.Tk):
         if self.sort_method == 'longest text':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)[::-1]
         if self.sort_method == 'name':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path)
+            list_graph = sorted(extractionGalaxies.get_list_galaxie(project_path),
+                                key=lambda x: extractionGalaxies.get_int(x[0]))
         if self.sort_method == 'text average length ascending':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
         if self.sort_method == 'text average length descending':

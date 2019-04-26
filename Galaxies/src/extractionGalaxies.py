@@ -524,6 +524,21 @@ def sort_list_galaxie(project_path, table_index=0):
     return result
 
 
+def get_int(id_galaxie):
+    """
+        Function that is aim for give a order in id_galaxie name. Because an id is a number like 425 or a ama number
+    such as 9-12, we can not just use int() operator
+
+    :param id_galaxie: The id of a galaxie
+    :return: A tuple that is the number of the galaxie and then the ama that is correspond, e.g. 9-12 become (9,12).
+            Or for a unique galaxie it is (425,-1)
+    """
+    if "-" in id_galaxie:  # if we are manipulating an ama
+        number_ama = re.findall(r'\d+', id_galaxie)
+        return int(number_ama[0]), int(number_ama[1])
+    return int(id_galaxie), -1
+
+
 def galaxiesFiltreListeAffiche(Lrequete):
     listeGalaxies = galaxiesFiltreListe(Lrequete)
     print("Il y a " + str(len(listeGalaxies)) + " satisfaisant à votre requête. Souhaitez-vous les afficher?")
