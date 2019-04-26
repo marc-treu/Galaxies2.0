@@ -23,7 +23,15 @@ $.getJSON("jsons/exemple.json", function (data) {
                 "border-color": "#AAD8FF",
                 "border-opacity": "0.5",
                 "background-color": "#77828C",
-                "text-outline-color": "#77828C"
+                  "text-outline-color": "#77828C",
+		  'text-background-color':'#ADFF2F',
+		  'text-background-opacity':'0.8',
+		  'text-background-shape': 'roundrectangle',
+		  'text-background-padding': '3px',
+		  'text-border-opacity': 1,
+		  'text-border-width':'3px',
+		  'text-border-style':'dashed',
+		  'text-border-color':'#FF0000'
               }
             }, {
                 selector: 'edge',
@@ -38,7 +46,10 @@ $.getJSON("jsons/exemple.json", function (data) {
             }
         ],
         layout: {
-            name: 'circle'
-        }
+            name: 'cose-bilkent',
+	    nodeDimensionsIncludeLabels: true,
+	    animate : false
+	}
     });
   });
+
