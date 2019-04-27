@@ -8,8 +8,8 @@ $.getJSON("jsons/exemple.json", function (data) {
                 style: {
                     'label': 'data(id)',
                     //'content': 'data(texte)',
-                    'width': '60px',
-                    'height': '60px',
+                    'width': 'data(longueurTexte)',
+		    'height' : 'data(longueurTexte)',
                     'background-color': '#286990',
                     'color': 'blue',
                     'background-fit': 'contain',
