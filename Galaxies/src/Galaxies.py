@@ -173,15 +173,27 @@ class Galaxie:
         return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
                'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
 
-    def display_webbrower(self, id_galaxie):
-        print('id_galaxie = ',id_galaxie)
+    def display_webbrowser(self, id_galaxie):
+        """
+            Function that create the files which contains the galaxie id_galaxie, and then display it on web browser
+
+        :param id_galaxie: The id of the galaxie we want to display
+        """
+
         if self.project_path is None:
             return  # if no project are selected or stared
+        self.print_verbose('id_galaxie = ', id_galaxie)
 
         filename = visualisationGraphe.sauveGrapheGalaxie(id_galaxie, self.project_path)
         javaVisualisation.visualisation(filename, self.project_path)
         javaVisualisation.change_html_graph_display(id_galaxie, self.project_path)
-        webbrowser.open(self.project_path + '/index.html')
+
+        try:
+            webbrowser.get('firefox').open(self.project_path + '/index.html')
+            self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with firefox')
+        except:
+            webbrowser.open(self.project_path + '/index.html')
+            self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with default')
 
     def print_verbose(self, *args, **kwargs):
         if self.verbose:

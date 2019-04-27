@@ -411,7 +411,7 @@ class InterfaceGalaxies(tk.Tk):
         if self.graph_selected is None:
             return  # if no galaxie are selected
 
-        self.galaxie.display_webbrower(self.get_idGalaxie())
+        self.galaxie.display_webbrowser(self.get_idGalaxie())
 
     def get_idGalaxie(self):
         """
