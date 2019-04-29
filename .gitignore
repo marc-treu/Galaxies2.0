@@ -1,4 +1,5 @@
 Galaxies/projects/*
+Galaxies/src/nltk_teste.py
 !Galaxies/projects/.gitkeep 
 Tab/teste.tab
 .idea/
