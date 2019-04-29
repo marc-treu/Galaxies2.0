@@ -10,7 +10,7 @@ $.getJSON("jsons/exemple.json", function (data) {
                     //'content': 'data(texte)',
                     'width': 'data(longueurTexte)',
 		    'height' : 'data(longueurTexte)',
-                    'background-color': '#286990',
+                    'background-color': function(node){ return 'rgb(0,'+(255-(node.degree()-1)*10)+',255)';},
                     'color': 'blue',
                     'background-fit': 'contain',
                     'background-clip': 'none'
