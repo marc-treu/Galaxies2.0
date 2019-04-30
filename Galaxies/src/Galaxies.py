@@ -10,7 +10,7 @@ import extractionGalaxies
 import grapheGalaxies
 import visualisationGraphe
 import javaVisualisation
-import lecture_fic
+import lecture_fic  
 
 import time
 import os
@@ -182,7 +182,6 @@ class Galaxie:
 
         if self.project_path is None:
             return  # if no project are selected or stared
-        self.print_verbose('id_galaxie = ', id_galaxie)
 
         filename = visualisationGraphe.sauveGrapheGalaxie(id_galaxie, self.project_path)
         javaVisualisation.visualisation(filename, self.project_path)
