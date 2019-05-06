@@ -71,7 +71,10 @@ class InterfaceGalaxies(tk.Tk):
         scrollbar.pack(side="right", fill="y")
 
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
-        self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
+        self.liste_Graphe.bind('<Button-1>', self.select_graph) # tab
+        self.liste_Graphe.bind('<Double-Button-1>', self.select_display_graph) # tab
+        self.liste_Graphe.bind('<Button-3>', self.save_graph) # tab
+        # self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph) # tab
 
         # Right Panel
         self.frame_right = tk.Frame(self, height=580, width=550)
@@ -380,6 +383,13 @@ class InterfaceGalaxies(tk.Tk):
             print('self.graph_selected =',self.graph_selected)
             self.display_graph_info()  # Display the graph information
 
+    def select_display_graph(self, evt): # tab
+        self.select_graph(evt)
+        self.display_graph_webbrowser()
+        
+    def save_graph(self, evt):
+        pass
+            
     def disabled_window(self):
         """
             Disable the window, by disable all buttons on the page
