@@ -23,7 +23,6 @@ class InterfaceGalaxies(tk.Tk):
             - frame_right = La zone droite de notre affichage
             - liste_Graphe = La Listebox des graphes contenue dans frame_left
             - graph_selected = La liste des graphes selectionner par l'utilisateur
-            - graph_selected_last = Le dernier graphe selectionner par l'utilisateur
 
 
         """
@@ -57,9 +56,9 @@ class InterfaceGalaxies(tk.Tk):
         tk.Label(self.frame_left_top, text="How to sort graphs").pack(side=tk.RIGHT, pady='2', padx='20')
         self.sort_method = self.combo_box.get()
 
-        self.button_query_graphs = tk.Button(self.frame_left_top, text="Query graph structure",
-                                             command=self.galaxie.get_query_graphs_structure)
-        self.button_query_graphs.pack(side=tk.LEFT, padx='5')
+        self.button_mark_galaxie = tk.Button(self.frame_left_top, text="Mark Galaxie",
+                                             command=self.mark_node)
+        self.button_mark_galaxie.pack(side=tk.LEFT, padx='5')
 
         # Left Listbox
         self.liste_Graphe = tk.Listbox(self.frame_left, selectmode=tk.SINGLE, height=50, bg="gray88",
@@ -71,7 +70,7 @@ class InterfaceGalaxies(tk.Tk):
         scrollbar.pack(side="right", fill="y")
 
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
-        self.liste_Graphe.bind('<Button-1>', self.select_graph)
+        self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
         self.liste_Graphe.bind('<Double-Button-1>', self.display_graph)
 
         # Right Panel
@@ -269,50 +268,50 @@ class InterfaceGalaxies(tk.Tk):
         self.wait_window(fenetre)
         return {0: requete} if is_close[0] is False else None
 
-    def get_query_graphs_structure_from_user(self):
-        """
-
-        :return: query graphs_structure a dict with specific information:
-                    - nbre_minimal_noeuds   # minimal number of node for a graph
-                    - nbre_maximal_noeuds   # maximal number of node for a graph
-        """
-
-        def valid():
-            if node_min.get():
-                query['nbre_minimal_noeuds'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
-            if node_max.get():
-                query['nbre_maximal_noeuds'] = [int(s) for s in node_max.get().split() if s.isdigit()].pop(0)
-            window.destroy()
-
-        def close_window():
-            is_close[0] = True
-            window.destroy()
-
-        window = tk.Toplevel()
-        window.title("Graph Feature")
-        # window.geometry("800x350")
-
-        is_close = [False]
-        query = dict()
-
-        tk.Label(window, text="\nPlease enter what graph characteristic you want\n", font="FreeSerif 14 bold").grid(
-            row=0, column=0)
-
-        tk.Label(window, text="Minimal number of nodes:", font="Arial 11").grid(sticky="w", row=1, column=0)
-        node_min = tk.Entry(window, width=30)
-        node_min.grid(sticky="w", row=1, column=1)
-
-        tk.Label(window, text="Maximal number of nodes:", font="Arial 11").grid(sticky="w", row=2, column=0)
-        node_max = tk.Entry(window, width=30)
-        node_max.grid(sticky="w", row=2, column=1)
-
-        tk.Button(window, text="Valid", command=valid).grid(row=3, column=2, padx=5, pady=10)
-        tk.Button(window, text="Cancel", command=close_window).grid(sticky="w", row=3, column=0, padx=5, pady=10)
-
-        window.bind("<Return>", lambda e: valid())
-        window.bind("<Escape>", lambda e: close_window())
-        self.wait_window(window)
-        return {0: query} if is_close[0] is False else None
+    # def get_query_graphs_structure_from_user(self):
+    #     """
+    #
+    #     :return: query graphs_structure a dict with specific information:
+    #                 - nbre_minimal_noeuds   # minimal number of node for a graph
+    #                 - nbre_maximal_noeuds   # maximal number of node for a graph
+    #     """
+    #
+    #     def valid():
+    #         if node_min.get():
+    #             query['nbre_minimal_noeuds'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
+    #         if node_max.get():
+    #             query['nbre_maximal_noeuds'] = [int(s) for s in node_max.get().split() if s.isdigit()].pop(0)
+    #         window.destroy()
+    #
+    #     def close_window():
+    #         is_close[0] = True
+    #         window.destroy()
+    #
+    #     window = tk.Toplevel()
+    #     window.title("Graph Feature")
+    #     # window.geometry("800x350")
+    #
+    #     is_close = [False]
+    #     query = dict()
+    #
+    #     tk.Label(window, text="\nPlease enter what graph characteristic you want\n", font="FreeSerif 14 bold").grid(
+    #         row=0, column=0)
+    #
+    #     tk.Label(window, text="Minimal number of nodes:", font="Arial 11").grid(sticky="w", row=1, column=0)
+    #     node_min = tk.Entry(window, width=30)
+    #     node_min.grid(sticky="w", row=1, column=1)
+    #
+    #     tk.Label(window, text="Maximal number of nodes:", font="Arial 11").grid(sticky="w", row=2, column=0)
+    #     node_max = tk.Entry(window, width=30)
+    #     node_max.grid(sticky="w", row=2, column=1)
+    #
+    #     tk.Button(window, text="Valid", command=valid).grid(row=3, column=2, padx=5, pady=10)
+    #     tk.Button(window, text="Cancel", command=close_window).grid(sticky="w", row=3, column=0, padx=5, pady=10)
+    #
+    #     window.bind("<Return>", lambda e: valid())
+    #     window.bind("<Escape>", lambda e: close_window())
+    #     self.wait_window(window)
+    #     return {0: query} if is_close[0] is False else None
 
     def display_graph_list(self):
         """
@@ -410,7 +409,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
         self.button_new_query.configure(state='disable')
-        self.button_query_graphs.configure(state='disable')
+        self.button_mark_galaxie.configure(state='disable')
         self.combo_box.configure(state='disable')
         self.update()
 
@@ -422,7 +421,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
-        self.button_query_graphs.configure(state='normal')
+        self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
         self.update()
 
