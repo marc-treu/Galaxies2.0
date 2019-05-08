@@ -73,8 +73,6 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
         self.liste_Graphe.bind('<Button-1>', self.select_graph)
         self.liste_Graphe.bind('<Double-Button-1>', self.display_graph)
-        self.liste_Graphe.bind('<Button-3>', self.mark_node)
-
 
         # Right Panel
         self.frame_right = tk.Frame(self, height=580, width=550)
@@ -125,6 +123,11 @@ class InterfaceGalaxies(tk.Tk):
         menu2 = tk.Menu(menubar, tearoff=0)
         menu2.add_command(label="Existing project", command=self.galaxie.open_existing_project)
         menubar.add_cascade(label="Open", menu=menu2)
+
+        menu3 = tk.Menu(menubar, tearoff=0)
+        menu3.add_command(label="Prepossessing", command=self.get_help_preprocessing)
+        menu3.add_command(label="Postprocessing", command=self.get_help_postprocessing)
+        menubar.add_cascade(label="Help", menu=menu3)
 
         menubar.add_command(label="Quit", command=self.destroy)
         self.config(menu=menubar)
@@ -345,7 +348,9 @@ class InterfaceGalaxies(tk.Tk):
 
         for graph in list_graph:
             space = " " * (14 - 2 * len(str(graph[0]))) + " with "
-            self.liste_Graphe.insert(tk.END, 'Galaxie number : ' + str(graph[0]) + space + str(graph[1]) + " nodes")
+            text = 'Galaxie number : ' + str(graph[0]) + space + str(graph[1]) + " nodes"
+            text = text + "    *" if graph[2] else text
+            self.liste_Graphe.insert(tk.END, text)
         self.update()
 
     def display_graph_info(self):
@@ -388,7 +393,14 @@ class InterfaceGalaxies(tk.Tk):
         self.display_graph_webbrowser()
 
     def mark_node(self):
-        pass
+        """
+            Function that mark the current galaxie that is select.
+        By mark we mean, that galaxie will appear with a star * on the listBox
+        """
+        if self.graph_selected is None:
+            return
+
+        self.galaxie.mark_galaxie(self.graph_selected)  # Display the graph information
 
     def disabled_window(self):
         """
@@ -436,6 +448,16 @@ class InterfaceGalaxies(tk.Tk):
             return str(number[0]) + '-' + str(number[1])
         else:
             return
+
+    def get_help_preprocessing(self):
+        text = "Preprocessing evaluate each galaxie " \
+               "\nand if at least one node match with your query, the galaxie is keep"
+        self.display_info(text)
+
+    def get_help_postprocessing(self):
+        text = "Postprocessing evaluate each node " \
+               "\nand if the node match with your query, it is keep in the galaxie"
+        self.display_info(text)
 
     def set_progress_bar_values(self, values, max_values):
         self.progressbar['value'] = values / max_values * 100

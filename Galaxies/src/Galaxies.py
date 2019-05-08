@@ -193,6 +193,9 @@ class Galaxie:
             webbrowser.open(self.project_path + '/index.html')
             self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with default')
 
+    def mark_galaxie(self, id_galaxie):
+        extractionGalaxies.mark_galaxie_query_table(self.project_path, id_galaxie)
+
     def print_verbose(self, *args, **kwargs):
         if self.verbose:
             print(*args, **kwargs)

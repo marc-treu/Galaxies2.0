@@ -28,7 +28,7 @@ def create_bd(project_path):
     cursor.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
     cursor.execute('''CREATE TABLE degreGalaxies (idGalaxie TEXT UNIQUE, degreGalaxie INTEGER, 
         longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
-    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT)''')
+    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
 
     cursor.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     cursor.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
@@ -54,7 +54,7 @@ def reload_query_table(cursor):
     :param cursor: cursor on the DB
     """
     cursor.execute('''DROP TABLE Query''')
-    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT)''')
+    cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
 
 
 def dateToInt(date):

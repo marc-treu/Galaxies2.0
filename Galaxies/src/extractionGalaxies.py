@@ -390,7 +390,16 @@ def metaDonnees(LNoeuds, project_path):
 
 def update_query_table(cursor, galaxies_list):
     for galaxie in galaxies_list:
-        cursor.execute('''INSERT INTO Query values (?)''', (galaxie,))
+        cursor.execute('''INSERT INTO Query values (?,?)''', (galaxie, False,))
+
+
+def mark_galaxie_query_table(project_path, id_galaxie):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''DELETE from Query WHERE idGalaxie = ?''', (id_galaxie,))
+    cursor.execute('''INSERT INTO Query values (?,?)''', (id_galaxie, True,))
+    connexion.commit()
+    connexion.close()
 
 
 def get_number_galaxies(cursor=None, project_path=None):
@@ -494,7 +503,8 @@ def get_list_galaxie(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     cursor.execute(
-        '''SELECT Query.idGalaxie, degreGalaxie FROM Query LEFT OUTER JOIN degreGalaxies ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
+        '''SELECT Query.idGalaxie, degreGalaxie, mark FROM Query LEFT OUTER JOIN degreGalaxies 
+            ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
     connexion.close()
     return result
