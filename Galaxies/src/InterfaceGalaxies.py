@@ -71,7 +71,10 @@ class InterfaceGalaxies(tk.Tk):
         scrollbar.pack(side="right", fill="y")
 
         self.liste_Graphe.config(yscrollcommand=scrollbar.set)
-        self.liste_Graphe.bind('<<ListboxSelect>>', self.select_graph)
+        self.liste_Graphe.bind('<Button-1>', self.select_graph)
+        self.liste_Graphe.bind('<Double-Button-1>', self.display_graph)
+        self.liste_Graphe.bind('<Button-3>', self.mark_node)
+
 
         # Right Panel
         self.frame_right = tk.Frame(self, height=580, width=550)
@@ -377,8 +380,15 @@ class InterfaceGalaxies(tk.Tk):
         index = w.curselection()  # we get the active selection
         if index != ():  # if the selection is not empty
             self.graph_selected = w.get(index[0])  # we get the graph that correspond at the index of the selection
-            print('self.graph_selected =',self.graph_selected)
+            print('self.graph_selected =', self.graph_selected)
             self.display_graph_info()  # Display the graph information
+
+    def display_graph(self, evt):
+        self.select_graph(evt)
+        self.display_graph_webbrowser()
+
+    def mark_node(self):
+        pass
 
     def disabled_window(self):
         """
