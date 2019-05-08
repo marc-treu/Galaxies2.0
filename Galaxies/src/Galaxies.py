@@ -66,8 +66,7 @@ class Galaxie:
         self.interface.set_progress_bar_values(50, 100)
         t2 = time.clock()
         self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
-        self.print_verbose("premier line de la BD = ", grapheGalaxies.grapheConstruit(self.project_path))
-
+        
         maxNoeud = grapheGalaxies.construction_graphe(self.project_path)
         self.interface.set_progress_bar_values(60, 100)
         grapheGalaxies.sauvegarde_graphe_(self.project_path)  # Et on le sauvegarde
@@ -193,6 +192,9 @@ class Galaxie:
         except:
             webbrowser.open(self.project_path + '/index.html')
             self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with default')
+
+    def mark_galaxie(self, id_galaxie):
+        extractionGalaxies.mark_galaxie_query_table(self.project_path, id_galaxie)
 
     def print_verbose(self, *args, **kwargs):
         if self.verbose:
