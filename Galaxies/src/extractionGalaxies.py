@@ -12,12 +12,6 @@ import re
 import shelve
 import sqlite3
 import time
-import visualisationGraphe
-# import cProfile
-
-
-# import unicodedata
-# from django.utils import encoding
 
 
 class galaxie:  # permet d'énumérer composantes connexes
@@ -389,6 +383,8 @@ def metaDonnees(LNoeuds, project_path):
 
 
 def update_query_table(cursor, galaxies_list):
+
+    baseDonnees.reload_query_table(cursor)
     for galaxie in galaxies_list:
         cursor.execute('''INSERT INTO Query values (?,?)''', (galaxie, False,))
 
@@ -423,81 +419,49 @@ def get_number_galaxies(cursor=None, project_path=None):
     return result
 
 
-def galaxiesFiltre(query, project_path, tailleMinGrosseGalaxie=300):
+def galaxiesFiltre(query, project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    nombreTotalGalaxies = get_number_galaxies(cursor)
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    numero = 0
     listeGalaxies = []
-    listeGrossesGalaxies = dict()
 
-    # while numero < nombreTotalGalaxies:
     for id_galaxie in dirGalaxies:
         nodes_list = dirGalaxies[id_galaxie]
         if metaDonneesFiltreAux(nodes_list, query, cursor):
-            # if len(nodes_list) < tailleMinGrosseGalaxie:
             listeGalaxies.append(id_galaxie)
-            # else:
-            #     tmp = amasFiltre(numero, query, cursor, project_path)
-            #     if tmp:
-            #         listeGrossesGalaxies[str(numero)] = tmp
-        numero += 1
+
     listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
-    print("trier !")
+
     if 'longueur_texte_maximal' in query.keys():
         listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, query['longueur_texte_maximal'],
                                                             cursor, dirGalaxies)
-        # for gal in listeGrossesGalaxies:
-        #     listeGrossesGalaxies[str(gal)] = filtres.filtreLongueurMaximale(listeGrossesGalaxies[str(gal)],
-        #                                                                     query['longueur_texte_maximal'], cursor,
-        #                                                                     dirGalaxies)
-
-    baseDonnees.reload_query_table(cursor)
     update_query_table(cursor, listeGalaxiesTriee)
-    # for id_amas in listeGrossesGalaxies:
-    #     update_query_table(cursor, [str(id_amas)+'-'+str(id_partition) for id_partition in listeGrossesGalaxies[id_amas]])
 
     dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return listeGalaxiesTriee  # , listeGrossesGalaxies
+    return listeGalaxiesTriee 
 
 
-def amasFiltre(numGalaxie, requete, curseur, project_path):
-    dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(numGalaxie))
-    res = []
-    for numero in range(len(dirAmas) - 1):
-        EnsNoeuds = dirAmas[str(numero)]
-        if metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
-            res.append(numero)
-    dirAmas.close()
-    return res
-
-
-def galaxiesFiltreListe(Lrequete, project_path, tailleMinGrosseGalaxie=300):
+def galaxiesFiltreListe(Lrequete, project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    curseur.execute('''SELECT nbre FROM nombreGalaxies''')
-    nombreTotalGalaxies = curseur.fetchall()[0][0]
+    cursor = connexion.cursor()
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    numero = 0
     listeGalaxies = []
-    listeGrossesGalaxies = dict()
-    while numero < nombreTotalGalaxies:
-        EnsNoeuds = dirGalaxies[str(numero)]
-        if metaDonneesFiltreListeAux(EnsNoeuds, Lrequete, curseur):
-            if len(EnsNoeuds) < tailleMinGrosseGalaxie:
-                listeGalaxies.append(numero)
-            else:
-                tmp = amasFiltreListe(numero, Lrequete, curseur, project_path)
-                if tmp:
-                    listeGrossesGalaxies[str(numero)] = tmp
-        numero += 1
-    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda Galaxie: -degreGalaxie(Galaxie, curseur))
+
+    for id_galaxie in dirGalaxies:
+        nodes_list = dirGalaxies[id_galaxie]
+        if metaDonneesFiltreListeAux(nodes_list, Lrequete, cursor):
+            listeGalaxies.append(id_galaxie)
+
+    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
+
+    update_query_table(cursor, listeGalaxiesTriee)
+
     dirGalaxies.close()
+    connexion.commit()
     connexion.close()
-    return (listeGalaxiesTriee, listeGrossesGalaxies)
+    return listeGalaxiesTriee
 
 
 def get_list_galaxie(project_path):
@@ -507,7 +471,6 @@ def get_list_galaxie(project_path):
         '''SELECT Query.idGalaxie, degreGalaxie, mark FROM Query LEFT OUTER JOIN degreGalaxies 
             ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
-    print("result =", result)
     connexion.close()
     return result
 
@@ -549,32 +512,6 @@ def get_int(id_galaxie):
         number_ama = re.findall(r'\d+', id_galaxie)
         return int(number_ama[0]), int(number_ama[1])
     return int(id_galaxie), -1
-
-
-def galaxiesFiltreListeAffiche(Lrequete):
-    listeGalaxies = galaxiesFiltreListe(Lrequete)
-    print("Il y a " + str(len(listeGalaxies)) + " satisfaisant à votre requête. Souhaitez-vous les afficher?")
-    # print(listeGalaxies)
-    G = lectureNumeroGalaxie(Lrequete, listeGalaxies)
-    while G != False:
-        texte = textesEtReferencesGalaxie(G)
-        i = 0
-        print("Nombre total textes: ", len(texte), " - seuls les ", parametres.nombreGroupesImprimes,
-              " seront imprimés.")
-        while i < parametres.nombreGroupesImprimes and texte != set():
-            print("- ", texte.pop())
-            i += 1
-        C = input("Souhaitez-vous sauver cette galaxie? ")
-        if str.lower(C) in ["oui", "o", "y", "yes", "O", "Y", "Oui", "Yes"]:
-            requete = filtres.choixRequeteSauvegarde(Lrequete)
-        else:
-            requete = False
-        if requete == 0:
-            visualisationGraphe.sauveGrapheGalaxie(G)
-        elif requete != False:
-            visualisationGraphe.sauveGrapheGalaxieAffichage(requete, G)
-        print("Il y a ", len(listeGalaxies), " satisfaisant à votre requête. Souhaitez-vous en afficher certains?")
-        G = lectureNumeroGalaxie(Lrequete, listeGalaxies)
 
 
 def lectureNumeroGalaxie(Lrequete, listeGalaxies):
@@ -623,22 +560,9 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
             '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
             (Noeud,))
         LLivres = curseur.fetchall()[0]
-        # print("Livres: "+str(LLivres))
-        # print("Requête: "+str(requete)+" - satifaction requête livres: "+str(filtreLivres(requete, LLivres)))
-
+        print("LLivres =", LLivres)
         if filtres.filtreLivres(requete, LLivres):
-            curseur.execute(
-                '''SELECT metaDataSource, metaDataCible FROM grapheGalaxiesSource LEFT OUTER JOIN grapheReutilisations ON (grapheReutilisations.rowid = grapheGalaxiesSource.idReutilisation) WHERE idNoeud = (?)''',
-                (Noeud,))
-            MetaData1 = curseur.fetchall()
-            curseur.execute(
-                '''SELECT metaDataSource, metaDataCible FROM grapheGalaxiesCible LEFT OUTER JOIN grapheReutilisations ON (grapheReutilisations.rowid = grapheGalaxiesCible.idReutilisation) WHERE idNoeud = (?)''',
-                (Noeud,))
-            MetaData2 = curseur.fetchall()
-            MetaData = MetaData1 + MetaData2
-            # print("Requête: " + str(requete) + " - satifaction requête métadata: " + str(filtreMetaData(requete, MetaData[0])))
-            if filtres.filtreMetaData(requete, MetaData[0]):
-                return True
+            return True
     return False
 
 

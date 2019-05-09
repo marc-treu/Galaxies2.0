@@ -169,7 +169,7 @@ class InterfaceGalaxies(tk.Tk):
     def get_requete_from_user(self):
 
         def recupere():
-            if (auteur.get()):
+            if auteur.get():
                 requete['auteur'] = auteur.get().split()
             if (notauteur.get()):
                 requete['-auteur'] = notauteur.get().split()
