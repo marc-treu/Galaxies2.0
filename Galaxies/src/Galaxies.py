@@ -29,7 +29,7 @@ class Galaxie:
     def get_project_path(self):
         return self.project_path
 
-    def start_from_textalign_file(self, maxNoeud=0, max_length_galaxie=300):
+    def start_from_textalign_file(self, maxNoeud=0, max_length_galaxie=1000000):
         """
             Starting a new project with a textAlign file
 
@@ -56,11 +56,11 @@ class Galaxie:
 
         lecture_fic.init_directory(self.project_path)  # Creation of the project folder
         self.interface.set_progress_bar_values(5, 100)
-        t1 = time.clock()
+        tt1 = time.clock()
         baseDonnees.create_bd(self.project_path)  # Creation of the database
         self.interface.set_progress_bar_values(10, 100)
-        t2 = time.clock()
-        self.print_verbose("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
+        # t2 = time.clock()
+        # self.print_verbose("Temps de construction de la base de données: " + format(t2 - t1, 'f') + " sec.")
         t1 = time.clock()
         lecture_fic.lecture(file, self.project_path)  # On remplie notre BD avec notre fichiers .tab
         self.interface.set_progress_bar_values(50, 100)
@@ -75,14 +75,18 @@ class Galaxie:
             maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path, max_length_galaxie)
+
+        tt2 = time.clock()
+        self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
+
         self.interface.set_progress_bar_values(80, 100)
         t2 = time.clock()
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         self.interface.set_progress_bar_values(90, 100)
-        #amas.recupererAmas(self.project_path)
         self.print_verbose("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
         self.interface.reset_progress_bar()
+
 
     def open_existing_project(self):
 

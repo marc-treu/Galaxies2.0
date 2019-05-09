@@ -121,25 +121,26 @@ class galaxie:  # permet d'énumérer composantes connexes
             X = curseur.fetchone()
 
         for node in list_node_to_merge:
-            if len(list_node_to_merge[str(node)]) > 1:
-                new_node = merge_nodes(list_node_to_merge[str(node)])
-                curseurCible.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(node),))
-                curseurCible.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
-                                     (str(node), new_node[0], new_node[1], new_node[2], new_node[3],))
+            curseurCible.execute('''SELECT * from texteNoeuds WHERE idNoeud = ?''', (str(node),))
+            list_node = list_node_to_merge[str(node)]
+            list_node.append([element for element in curseurCible.fetchone()[1:]])
+            new_node = merge_nodes(list_node)
+            curseurCible.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(node),))
+            curseurCible.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
+                                 (str(node), new_node[0], new_node[1], new_node[2], new_node[3],))
 
         list_node_to_merge.close()
 
     def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur, List_node_to_merge):
 
-        curseur.execute('''SELECT texte, ordonnee, empan FROM texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
+        curseur.execute('''SELECT texte FROM texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
         X = curseur.fetchall()
 
         if X:  # if the node is already in the table texteNoeuds, we must merge it
-            temp = List_node_to_merge[str(Noeud)]
+            temp = List_node_to_merge.get(str(Noeud), [])
             temp.append([texte, idRef, ordonnee, empan])
             List_node_to_merge[str(Noeud)] = temp
         else:
-            List_node_to_merge[str(Noeud)] = [[texte, idRef, ordonnee, empan]]
             curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
                             (str(Noeud), texte, idRef, ordonnee, len(texte),))
 
@@ -158,10 +159,10 @@ def merge_text(text1, text2):
     i = 0
     while i < len(text1):
         if text1[i] == text2[0]:
-            if i == len(text1)-1:
+            if i == len(text1) - 1:
                 return text1[:-1] + text2
-            if text1[i:] == text2[:len(text1)-i]:
-                return text1[:i]+text2
+            if text1[i:] == text2[:len(text1) - i]:
+                return text1[:i] + text2
         i += 1
     print("ERROR : text 1 :", text1, '\nand text 2 have nothing in commun :', text2)
 
@@ -383,7 +384,6 @@ def metaDonnees(LNoeuds, project_path):
 
 
 def update_query_table(cursor, galaxies_list):
-
     baseDonnees.reload_query_table(cursor)
     for galaxie in galaxies_list:
         cursor.execute('''INSERT INTO Query values (?,?)''', (galaxie, False,))
@@ -440,7 +440,7 @@ def galaxiesFiltre(query, project_path):
     dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return listeGalaxiesTriee 
+    return listeGalaxiesTriee
 
 
 def galaxiesFiltreListe(Lrequete, project_path):
