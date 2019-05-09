@@ -396,7 +396,9 @@ def update_query_table(cursor, galaxies_list):
 def mark_galaxie_query_table(project_path, id_galaxie):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute('''UPDATE Query SET mark = (?) WHERE idGalaxie = (?)''', (True, id_galaxie))
+    cursor.execute('''SELECT mark from Query WHERE idGalaxie = ?''', (id_galaxie,))
+    is_marked = not (cursor.fetchone()[0])
+    cursor.execute('''UPDATE Query SET mark = (?) WHERE idGalaxie = (?)''', (is_marked, id_galaxie,))
     connexion.commit()
     connexion.close()
 
