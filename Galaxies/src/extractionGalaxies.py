@@ -396,8 +396,7 @@ def update_query_table(cursor, galaxies_list):
 def mark_galaxie_query_table(project_path, id_galaxie):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute('''DELETE from Query WHERE idGalaxie = ?''', (id_galaxie,))
-    cursor.execute('''INSERT INTO Query values (?,?)''', (id_galaxie, True,))
+    cursor.execute('''UPDATE Query SET mark = (?) WHERE idGalaxie = (?)''', (True, id_galaxie))
     connexion.commit()
     connexion.close()
 
@@ -506,6 +505,7 @@ def get_list_galaxie(project_path):
         '''SELECT Query.idGalaxie, degreGalaxie, mark FROM Query LEFT OUTER JOIN degreGalaxies 
             ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
+    print("result =", result)
     connexion.close()
     return result
 

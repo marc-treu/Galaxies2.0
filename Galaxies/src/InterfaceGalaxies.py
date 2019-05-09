@@ -161,7 +161,7 @@ class InterfaceGalaxies(tk.Tk):
         :return: The path of the .tab file
         """
         return filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file",
-                                             filetypes=[('tab files', '.tab')])
+                                          filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self, project_directory):
         return filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
@@ -324,24 +324,25 @@ class InterfaceGalaxies(tk.Tk):
         self.liste_Graphe.delete(0, tk.END)
 
         self.sort_method = self.combo_box.get()
-        project_path = self.galaxie.get_project_path()
-        if self.sort_method == 'number of node ascending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
-        if self.sort_method == 'number of node descending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
-        if self.sort_method == 'shortest text':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
-        if self.sort_method == 'longest text':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)[::-1]
-        if self.sort_method == 'name':
-            list_graph = sorted(extractionGalaxies.get_list_galaxie(project_path),
-                                key=lambda x: extractionGalaxies.get_int(x[0]))
-        if self.sort_method == 'text average length ascending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
-        if self.sort_method == 'text average length descending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)
+
         if self.sort_method == '':
             list_graph = extractionGalaxies.get_list_galaxie(project_path)
+        elif self.sort_method == 'number of node ascending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
+        elif self.sort_method == 'number of node descending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
+        elif self.sort_method == 'shortest text':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
+        elif self.sort_method == 'longest text':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)[::-1]
+        elif self.sort_method == 'name':
+            list_graph = sorted(extractionGalaxies.get_list_galaxie(project_path),
+                                key=lambda x: extractionGalaxies.get_int(x[0]))
+        elif self.sort_method == 'text average length ascending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
+        elif self.sort_method == 'text average length descending':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)
+        print("list_graph =", list_graph)
 
         for graph in list_graph:
             space = " " * (14 - 2 * len(str(graph[0]))) + " with "
@@ -385,7 +386,6 @@ class InterfaceGalaxies(tk.Tk):
             print('self.graph_selected =', self.graph_selected)
             self.display_graph_info()  # Display the graph information
 
-
     def display_graph(self, evt):
         self.select_graph(evt)
         self.display_graph_webbrowser()
@@ -397,8 +397,8 @@ class InterfaceGalaxies(tk.Tk):
         """
         if self.graph_selected is None:
             return
-
-        self.galaxie.mark_galaxie(self.graph_selected)  # Display the graph information
+        self.galaxie.mark_galaxie(self.get_idGalaxie())  # Display the graph information
+        self.display_graph_list()
 
     def disabled_window(self):
         """
