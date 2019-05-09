@@ -1,15 +1,12 @@
-import tkinter.filedialog
 import tkinter as tk
+from tkinter import filedialog
 from tkinter import ttk
 from tkinter import simpledialog
 
-import baseDonnees
-import Galaxies
-import javaVisualisation
 import re
-import webbrowser
 
 import extractionGalaxies
+import Galaxies
 
 
 class InterfaceGalaxies(tk.Tk):
@@ -163,11 +160,11 @@ class InterfaceGalaxies(tk.Tk):
         :param project_directory: The path above the project
         :return: The path of the .tab file
         """
-        return tk.filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file",
+        return filedialog.askopenfilename(initialdir=project_directory, title="Open a tab file",
                                              filetypes=[('tab files', '.tab')])
 
     def ask_open_existing_project(self, project_directory):
-        return tk.filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
+        return filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
 
     def get_requete_from_user(self):
 

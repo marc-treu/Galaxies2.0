@@ -98,6 +98,10 @@ class Galaxie:
 
         directory = self.interface.ask_open_existing_project(project_directory)
 
+        if directory == ():
+            self.interface.enabled_window()
+            return
+
         if directory.split('/')[-1] not in project_list:  # if the selected folder is not a Galaxie project
             self.interface.display_info("This is not a Galaxie project folder, please select a valid project")
             self.interface.enabled_window()
