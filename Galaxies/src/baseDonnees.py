@@ -29,6 +29,8 @@ def create_bd(project_path):
     cursor.execute('''CREATE TABLE degreGalaxies (idGalaxie TEXT UNIQUE, degreGalaxie INTEGER, 
         longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
     cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
+    cursor.execute('''CREATE TABLE ListeNoeuds (idNoeud INTEGER, texte TEXT, idRowLivre INTEGER, 
+        ordonnee INTEGER, empan INTEGER)''')
 
     cursor.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     cursor.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
@@ -37,6 +39,7 @@ def create_bd(project_path):
     cursor.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
     cursor.execute('''CREATE INDEX idNoeudf ON grapheGalaxies (idNoeudFils)''')
     cursor.execute('''CREATE INDEX identifiantNoeud ON texteNoeuds (idNoeud)''')
+    cursor.execute('''CREATE INDEX identifiantNomNoeud ON ListeNoeuds (idNoeud)''')
     # cursor.execute('''CREATE INDEX dateIndex ON livres (date) ASC''')
     # cursor.execute('''CREATE INDEX idReutSource ON grapheGalaxiesSource (idReutilisation)''')
     # cursor.execute('''CREATE INDEX idReutCible ON grapheGalaxiesCible (idReutilisation)''')
