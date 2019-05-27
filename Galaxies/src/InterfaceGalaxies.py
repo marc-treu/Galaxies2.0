@@ -96,16 +96,14 @@ class InterfaceGalaxies(tk.Tk):
         # Progress bar
         self.frame_progressbar = tk.Frame(self)
         self.frame_progressbar.grid(row=1, column=0, columnspan=2, sticky=tk.N + tk.S + tk.W + tk.E, padx=3, pady=4)
-        # todo : Faire une progress bar tout en bas de la fenetre pour voire ou en ai la generation du graphe ou toute
-        #        autre tache qui requiere du temps
         style = ttk.Style()
         style.configure("gray.Horizontal.TProgressbar", foreground="grey", background="grey")
         self.progressbar = ttk.Progressbar(self.frame_progressbar, style="gray.Horizontal.TProgressbar",
-                                           mode="determinate")
+                                           mode="indeterminate")
         self.progressbar.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.progressbar.pack_propagate(0)
 
-        self.operation_progressbar = tk.Label(self.frame_progressbar, text="operation name")
+        self.operation_progressbar = tk.Label(self.frame_progressbar, text="No file load")
         self.operation_progressbar.grid(row=0, column=1, sticky=tk.W + tk.E)
         self.frame_progressbar.grid_columnconfigure(0, weight=6)
         self.frame_progressbar.grid_columnconfigure(1, weight=1)
@@ -114,7 +112,7 @@ class InterfaceGalaxies(tk.Tk):
         menubar = tk.Menu(self)
         menu1 = tk.Menu(menubar, tearoff=0)
         menu1.add_command(label="New project with a text-align file", command=self.galaxie.start_from_textalign_file)
-        menu1.add_command(label="By Compare 2 corpus")
+        # menu1.add_command(label="By Compare 2 corpus")
         menubar.add_cascade(label="Start", menu=menu1)
 
         menu2 = tk.Menu(menubar, tearoff=0)
@@ -266,51 +264,6 @@ class InterfaceGalaxies(tk.Tk):
         self.wait_window(fenetre)
         return {0: requete} if is_close[0] is False else None
 
-    # def get_query_graphs_structure_from_user(self):
-    #     """
-    #
-    #     :return: query graphs_structure a dict with specific information:
-    #                 - nbre_minimal_noeuds   # minimal number of node for a graph
-    #                 - nbre_maximal_noeuds   # maximal number of node for a graph
-    #     """
-    #
-    #     def valid():
-    #         if node_min.get():
-    #             query['nbre_minimal_noeuds'] = [int(s) for s in node_min.get().split() if s.isdigit()].pop(0)
-    #         if node_max.get():
-    #             query['nbre_maximal_noeuds'] = [int(s) for s in node_max.get().split() if s.isdigit()].pop(0)
-    #         window.destroy()
-    #
-    #     def close_window():
-    #         is_close[0] = True
-    #         window.destroy()
-    #
-    #     window = tk.Toplevel()
-    #     window.title("Graph Feature")
-    #     # window.geometry("800x350")
-    #
-    #     is_close = [False]
-    #     query = dict()
-    #
-    #     tk.Label(window, text="\nPlease enter what graph characteristic you want\n", font="FreeSerif 14 bold").grid(
-    #         row=0, column=0)
-    #
-    #     tk.Label(window, text="Minimal number of nodes:", font="Arial 11").grid(sticky="w", row=1, column=0)
-    #     node_min = tk.Entry(window, width=30)
-    #     node_min.grid(sticky="w", row=1, column=1)
-    #
-    #     tk.Label(window, text="Maximal number of nodes:", font="Arial 11").grid(sticky="w", row=2, column=0)
-    #     node_max = tk.Entry(window, width=30)
-    #     node_max.grid(sticky="w", row=2, column=1)
-    #
-    #     tk.Button(window, text="Valid", command=valid).grid(row=3, column=2, padx=5, pady=10)
-    #     tk.Button(window, text="Cancel", command=close_window).grid(sticky="w", row=3, column=0, padx=5, pady=10)
-    #
-    #     window.bind("<Return>", lambda e: valid())
-    #     window.bind("<Escape>", lambda e: close_window())
-    #     self.wait_window(window)
-    #     return {0: query} if is_close[0] is False else None
-
     def display_graph_list(self):
         """
         Fonction qui affiche dans la partie gauche la liste des graphe
@@ -410,6 +363,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='disable')
         self.button_mark_galaxie.configure(state='disable')
         self.combo_box.configure(state='disable')
+        self.progressbar.start()
+
         self.update()
 
     def enabled_window(self):
@@ -422,6 +377,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='normal')
         self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
+        self.progressbar.stop()
+
         self.update()
 
     def display_graph_webbrowser(self):
@@ -457,12 +414,8 @@ class InterfaceGalaxies(tk.Tk):
                "\nand if the node match with your query, it is keep in the galaxie"
         self.display_info(text)
 
-    def set_progress_bar_values(self, values, max_values):
-        self.progressbar['value'] = values / max_values * 100
-        self.update()
-
-    def reset_progress_bar(self):
-        self.progressbar['value'] = 0
+    def set_operation_name(self, text):
+        self.operation_progressbar['text'] = text
         self.update()
 
     def change_name(self, project_name):

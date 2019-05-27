@@ -560,7 +560,6 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
             '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
             (Noeud,))
         LLivres = curseur.fetchall()[0]
-        print("LLivres =", LLivres)
         if filtres.filtreLivres(requete, LLivres):
             return True
     return False
