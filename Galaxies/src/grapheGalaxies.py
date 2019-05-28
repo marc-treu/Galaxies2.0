@@ -32,7 +32,6 @@ def construction_graphe(project_path):
     """
     Fonction qui va construire le Graphe
     """
-    # print("c'est ici que tout commence")
     t1 = time.clock()
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
@@ -51,7 +50,6 @@ def construction_graphe(project_path):
 
 
 def fusion_sources_cibles(idRef, c, n):
-    # todo: l'erreur du texte qui se repéte doit etre ici selon Ganascia
     """
 
     idRef : l'id d'une des lignes du tableau qui est de la forme (n,)
@@ -73,7 +71,7 @@ def fusion_sources_cibles(idRef, c, n):
     listeReutilisationMarquee = marquage(listeReutilisationCible, 'cible') + listeReutilisationSource
     listeReutilisationMarquee.sort()
     # print("listeReutilisationMarquee =",listeReutilisationMarquee)
-    R = fusion(listeReutilisationMarquee, idRef, n)
+    R = fusion(listeReutilisationMarquee, n)
     # print("R =",R)
     if R:
         n.nouvelleValeur()
@@ -96,18 +94,18 @@ def marquage(L, M):
     return R
 
 
-def fusion(L, idRef, n):
-    if L == []:
+def fusion(L, n):
+    if L is []:
         return []
     elif len(L) == 1:
         return [[L[0][0], L[0][1], L[0][2], n.val]]
     else:
         Tete = L[0]
         Suivant = L[1]
-        return fusionAux(Tete, Suivant, L[2:], n, [])
+        return fusion_aux(Tete, Suivant, L[2:], n, [])
 
 
-def fusionAux(Tete, Suivant, Entree, Noeud, Resultat):
+def fusion_aux(Tete, Suivant, Entree, Noeud, Resultat):
     R = Resultat
     E = Entree
     T = Tete
