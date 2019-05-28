@@ -99,7 +99,7 @@ class InterfaceGalaxies(tk.Tk):
         style = ttk.Style()
         style.configure("gray.Horizontal.TProgressbar", foreground="grey", background="grey")
         self.progressbar = ttk.Progressbar(self.frame_progressbar, style="gray.Horizontal.TProgressbar",
-                                           mode="indeterminate")
+                                           mode="determinate")
         self.progressbar.grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
         self.progressbar.pack_propagate(0)
 
@@ -363,8 +363,6 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='disable')
         self.button_mark_galaxie.configure(state='disable')
         self.combo_box.configure(state='disable')
-        self.progressbar.start()
-
         self.update()
 
     def enabled_window(self):
@@ -377,8 +375,6 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='normal')
         self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
-        self.progressbar.stop()
-
         self.update()
 
     def display_graph_webbrowser(self):
@@ -416,6 +412,14 @@ class InterfaceGalaxies(tk.Tk):
 
     def set_operation_name(self, text):
         self.operation_progressbar['text'] = text
+        self.update()
+
+    def set_progress_bar_values(self, values, max_values):
+        self.progressbar['value'] = values / max_values * 100
+        self.update()
+
+    def reset_progress_bar(self):
+        self.progressbar['value'] = 0
         self.update()
 
     def change_name(self, project_name):
