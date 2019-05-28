@@ -66,19 +66,16 @@ class Galaxie:
         self.interface.set_progress_bar_values(50, 100, "creation of the galaxies")
         maxNoeud = grapheGalaxies.construction_graphe(self.project_path)
         grapheGalaxies.sauvegarde_graphe_(self.project_path)  # Et on le sauvegarde
-        self.interface.set_progress_bar_values(70, 100)
+        self.interface.set_progress_bar_values(70, 100, "saving + split the huge galaxies")
         if maxNoeud == 0:
             maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path, max_length_galaxie)
-
+        self._get_all_graph()
         tt2 = time.clock()
         self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
-
-        self.interface.set_progress_bar_values(80, 100)
         t2 = time.clock()
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
-        self.interface.set_progress_bar_values(90, 100)
         self.print_verbose("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
         self.interface.reset_progress_bar("Operation ended")
@@ -118,20 +115,32 @@ class Galaxie:
         amas.requetesUser(query, self.project_path)
         # javaVisualisation.preparationVisualisation(self.project_path)
 
+    def _get_all_graph(self):
+        self._execute_query({0: {}})
+        self.interface.display_graph_list()
+
     def get_requete_preprocessing(self):
-        # todo : tache possiblement longue, necessite la progress bar
+        """
+            Function that get the query of the user, and then display the result
+        """
+
         self.interface.disabled_window()
+
         if self.project_path is None:  # if no project are selected or stared
             self.interface.enabled_window()
             return
 
-        self.print_verbose("debut de fonction get_requete_preprocessing")
+        self.print_verbose("start of get_requete_preprocessing")
+        self.interface.set_progress_bar_values(5, 100, "Collecting request")
         query = self.interface.get_requete_from_user()
 
         self.query = query
-        self.print_verbose("la requete = ", self.query)
+        self.print_verbose("query from user =", self.query)
+        self.interface.set_progress_bar_values(5, 100, "Collecting request")
+
         if self.query is None:  # if no query were ask on project
             self.interface.enabled_window()
+            self.interface.reset_progress_bar("Operation ended")
             return
 
         self._execute_query(self.query)
@@ -151,7 +160,6 @@ class Galaxie:
 
         if self.query_graphs_structure is not None:
             self.print_verbose("self.query_graphs_structure is not None")
-            # todo : tache possiblement longue, necessite la progress bar
             self._execute_query(self.query)  # if we have already change the list of graphs answer, we rebuild it
 
         self.query_graphs_structure = self.interface.get_query_graphs_structure_from_user()

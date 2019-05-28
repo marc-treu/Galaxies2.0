@@ -169,34 +169,34 @@ class InterfaceGalaxies(tk.Tk):
         def recupere():
             if auteur.get():
                 requete['auteur'] = auteur.get().split()
-            if (notauteur.get()):
+            if notauteur.get():
                 requete['-auteur'] = notauteur.get().split()
-            if (mcles.get()):
+            if mcles.get():
                 requete['mots_titre'] = mcles.get().split()
-            if (notmcles.get()):
+            if notmcles.get():
                 requete['-mots_titre'] = notmcles.get().split()
-            if (date.get()):
+            if date.get():
                 requete['date'] = [int(s) for s in date.get().split() if s.isdigit()]
-                if (len(requete['date']) == 0):
+                if len(requete['date']) == 0:
                     del requete['date']
-                elif (len(requete['date']) == 1):
+                elif len(requete['date']) == 1:
                     i = 1
-                    while (date.get()[i] == ' '):
+                    while date.get()[i] == ' ':
                         i = i + 1
-                    if (date.get()[i] == '-'):
+                    if date.get()[i] == '-':
                         requete['date'].insert(0, "-")
                     else:
                         requete['date'].append("-")
-                elif (len(requete['date']) == 0):
+                elif len(requete['date']) == 0:
                     print("Erreur à la déclaration de l'intervalle")
                 elif requete['date'][0] > requete['date'][1]:
                     print(
                         "Erreur dans la déclaration de l'intervalle\nDonner en premier argument une date antérieure à la seconde")
-            if (empan.get()):
+            if empan.get():
                 requete['empan'] = [int(s) for s in empan.get().split() if s.isdigit()].pop()
-            if (ltexte_max.get()):
+            if ltexte_max.get():
                 requete['longueur_texte_maximal'] = [int(s) for s in ltexte_max.get().split() if s.isdigit()].pop(0)
-            if (nbnoeuds_min.get()):
+            if nbnoeuds_min.get():
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
             fenetre.destroy()
 
@@ -208,8 +208,7 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.title("Recherche dans les galaxies")
         fenetre.geometry("800x350")
 
-        instructions = tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(
-            row=0, column=1)
+        tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0, column=1)
 
         lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(
             sticky="w", row=1, column=1)
@@ -255,9 +254,9 @@ class InterfaceGalaxies(tk.Tk):
         requete = dict()
         is_close = [False]
 
-        space = tk.Label(fenetre, text="\n").grid(row=10)
-        bouton = tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
-        close = tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
+        tk.Label(fenetre, text="\n").grid(row=10)
+        tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
+        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
         fenetre.bind("<Return>", lambda e: recupere())
         fenetre.bind("<Escape>", lambda e: close_window())
 
