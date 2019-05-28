@@ -414,11 +414,15 @@ class InterfaceGalaxies(tk.Tk):
         self.operation_progressbar['text'] = text
         self.update()
 
-    def set_progress_bar_values(self, values, max_values):
+    def set_progress_bar_values(self, values, max_values, operation_name=None):
+        if operation_name is not None:
+            self.set_operation_name(operation_name)
         self.progressbar['value'] = values / max_values * 100
         self.update()
 
-    def reset_progress_bar(self):
+    def reset_progress_bar(self, operation_name=None):
+        if operation_name is not None:
+            self.set_operation_name(operation_name)
         self.progressbar['value'] = 0
         self.update()
 
