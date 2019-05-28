@@ -123,8 +123,8 @@ class galaxie:  # permet d'énumérer composantes connexes
             curseur.execute('''SELECT texte, idRowLivre, ordonnee, empan FROM ListeNoeuds WHERE idNoeud = ?''', noeud)
             S = []
             for X in curseur.fetchall():
-                new_node =[X[0],X[1],X[2],X[3]]
-                if not new_node in S:
+                new_node = [X[0], X[1], X[2], X[3]]
+                if new_node not in S:
                     S.append(new_node)
             if len(S) > 1:
                 new_node = merge_nodes(S)
