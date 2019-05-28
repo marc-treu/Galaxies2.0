@@ -108,41 +108,31 @@ class galaxie:  # permet d'énumérer composantes connexes
         idRefCible, texteCible, ordonneeCible, empanCible from GrapheReutilisations''')
         curseurSource = connexion.cursor()
         curseurCible = connexion.cursor()
-        list_node_to_merge = shelve.open(self.data_base_path + '/list_node')
-
         X = curseur.fetchone()
         while X:
             curseurSource.execute('''SELECT idNoeud FROM grapheGalaxiesSource WHERE idReutilisation = ?''',
                                   (str(X[0]),))
             curseurCible.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = ?''', (str(X[0]),))
-            self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource,
-                                list_node_to_merge)
-            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible, list_node_to_merge)
+            self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource)
+            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible)
             X = curseur.fetchone()
+        curseur.execute('''SELECT idNoeud from ListeNoeuds''')
+        EnsembleNoeuds = set(curseur.fetchall())
 
-        for node in list_node_to_merge:
-            curseurCible.execute('''SELECT * from texteNoeuds WHERE idNoeud = ?''', (str(node),))
-            list_node = list_node_to_merge[str(node)]
-            list_node.append([element for element in curseurCible.fetchone()[1:]])
-            new_node = merge_nodes(list_node)
-            curseurCible.execute('''DELETE from texteNoeuds WHERE idNoeud = ?''', (str(node),))
-            curseurCible.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
-                                 (str(node), new_node[0], new_node[1], new_node[2], new_node[3],))
+        for noeud in EnsembleNoeuds:
+            curseur.execute('''SELECT texte, idRowLivre, ordonnee, empan FROM ListeNoeuds WHERE idNoeud = ?''', noeud)
+            S = []
+            for X in curseur.fetchall():
+                new_node =[X[0],X[1],X[2],X[3]]
+                if not new_node in S:
+                    S.append(new_node)
+            if len(S) > 1:
+                new_node = merge_nodes(S)
+            curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''', (str(noeud[0]), new_node[0], new_node[1], new_node[2], new_node[3],))
 
-        list_node_to_merge.close()
-
-    def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur, List_node_to_merge):
-
-        curseur.execute('''SELECT texte FROM texteNoeuds WHERE idNoeud = ?''', (str(Noeud),))
-        X = curseur.fetchall()
-
-        if X:  # if the node is already in the table texteNoeuds, we must merge it
-            temp = List_node_to_merge.get(str(Noeud), [])
-            temp.append([texte, idRef, ordonnee, empan])
-            List_node_to_merge[str(Noeud)] = temp
-        else:
-            curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''',
-                            (str(Noeud), texte, idRef, ordonnee, len(texte),))
+    def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur):
+        curseur.execute('''INSERT INTO listeNoeuds values (?,?,?,?,?)''',
+                        (str(Noeud), texte, idRef, ordonnee, len(texte),))
 
 
 def merge_nodes(list_node):
