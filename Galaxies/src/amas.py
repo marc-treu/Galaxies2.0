@@ -90,31 +90,11 @@ def recupererAmas(project_path, tailleMinGrosseGalaxie=300):
     noeudsGalaxies.close()
 
 
-def requetesUser(requetes, project_path):
-    l = len(requetes)
-    if l == 0:
+def execute_query(query, project_path):
+    number_of_qry = len(query)
+    if number_of_qry == 0:
         return
-    elif l == 1:
-        print(requetes)
-        gal = extractionGalaxies.galaxiesFiltre(requetes[0], project_path)
+    elif number_of_qry == 1:
+        extractionGalaxies.galaxiesFiltre(query, project_path)
     else:
-        print(requetes)
-        gal = extractionGalaxies.galaxiesFiltreListe(requetes, project_path)
-
-    # print('gal = ', gal)
-    #
-    # check = os.listdir(project_path + "/graphs")
-    # if check:
-    #     shutil.rmtree(project_path + "/graphs")
-    #     os.mkdir(project_path + "/graphs")
-    # if gal[0]:
-    #     for num in gal[0]:
-    #         visualisationGraphe.sauveGrapheGalaxie(num, project_path)
-    #
-    # check = os.listdir(project_path + "/amas")
-    # if check:
-    #     shutil.rmtree(project_path + "/amas")
-    #     os.mkdir(project_path + "/amas")
-    # if gal[1]:
-    #     for numero in gal[1]:
-    #         visualisationGraphe.sauveGrapheAmas_(numero, gal[1][numero], project_path)
+        extractionGalaxies.galaxiesFiltreListe(query, project_path)
