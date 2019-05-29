@@ -87,6 +87,8 @@ class InterfaceGalaxies(tk.Tk):
         # Initialisation des variables
         self.graph_selected = None
         self.button_new_query = None
+        self.button_add_query = None
+        self.button_undo_query = None
         self.button_apply_filter = None
         self.button_display_graph = None
 
@@ -128,7 +130,7 @@ class InterfaceGalaxies(tk.Tk):
         self.config(menu=menubar)
 
     def create_button_menu(self):
-        processing = tk.Frame(self.frame_right_button, height=20, width=20)
+        processing = tk.Frame(self.frame_right_button)#, height=20, width=20)
         processing.pack(side=tk.TOP, fill="both", expand=True)
 
         processing.grid_columnconfigure(0, weight=1)
@@ -136,11 +138,20 @@ class InterfaceGalaxies(tk.Tk):
         processing.grid_rowconfigure(0, weight=1)
         processing.grid_rowconfigure(1, weight=1)
         tk.Label(processing, text="Prepossessing").grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
-        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
+        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=12, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_new_query.grid(row=1, rowspan=3, column=0)
+
+        self.button_add_query = tk.Button(processing, text="Add Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_add_query.grid(row=4, rowspan=3, column=0)
+
+        self.button_undo_query = tk.Button(processing, text="Undo Query", command=self.galaxie.undo_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_undo_query.grid(row=8, rowspan=3, column=0)
+
+        self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
+        self.button_apply_filter.grid(row=1, rowspan=3, column=2)
 
         self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
         self.button_apply_filter.grid(row=1, rowspan=3, column=2)
@@ -175,9 +186,9 @@ class InterfaceGalaxies(tk.Tk):
 
         def recupere():
             if auteur.get():
-                requete['auteur'] = auteur.get().split()
+                requete['auteur'] = auteur.get().split(',')
             if notauteur.get():
-                requete['-auteur'] = notauteur.get().split()
+                requete['-auteur'] = notauteur.get().split(',')
             if mcles.get():
                 requete['mots_titre'] = mcles.get().split()
             if notmcles.get():
@@ -205,6 +216,9 @@ class InterfaceGalaxies(tk.Tk):
                 requete['longueur_texte_maximal'] = [int(s) for s in ltexte_max.get().split() if s.isdigit()].pop(0)
             if nbnoeuds_min.get():
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
+            if nbnoeuds_max.get():
+                requete['nbre_maximal_noeuds'] = [int(s) for s in nbnoeuds_max.get().split() if s.isdigit()].pop(0)
+
             fenetre.destroy()
 
         def close_window():
@@ -213,57 +227,62 @@ class InterfaceGalaxies(tk.Tk):
 
         fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
-        fenetre.geometry("800x350")
+        fenetre.geometry("800x400")
 
         tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0, column=1)
 
-        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(
-            sticky="w", row=1, column=1)
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                             , row=1
+                                                                                                             , column=1)
         auteur = tk.Entry(fenetre, width=100)
         auteur.grid(row=1, column=2)
 
-        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(
-            sticky="w", row=2, column=1)
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                          , row=2
+                                                                                                          , column=1)
         notauteur = tk.Entry(fenetre, width=100)
         notauteur.grid(row=2, column=2)
 
-        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",
-                                                                                                             row=3,
-                                                                                                             column=1)
+        tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w", row=3
+                                                                                                      , column=1)
         date = tk.Entry(fenetre, width=80)
         date.insert(0, '[ AAAA - AAAA ]')
         date.grid(sticky="w", row=3, column=2)
 
-        lab4 = tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4,
-                                                                                             column=1)
+        tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4, column=1)
         mcles = tk.Entry(fenetre, width=100)
         mcles.grid(row=4, column=2)
 
-        lab5 = tk.Label(fenetre, text="Mots absents des titres :", font="Arial 11").grid(sticky="w", row=5, column=1)
+        tk.Label(fenetre, text="Mots absents des titres :", font="Arial 11").grid(sticky="w", row=5, column=1)
         notmcles = tk.Entry(fenetre, width=100)
         notmcles.grid(row=5, column=2)
 
-        lab6 = tk.Label(fenetre, text="Longueur minimale du texte :", font="Arial 11").grid(sticky="w", row=6, column=1)
+        tk.Label(fenetre, text="Longueur minimale du texte :", font="Arial 11").grid(sticky="w", row=6, column=1)
         empan = tk.Entry(fenetre, width=30)
         empan.grid(sticky="w", row=6, column=2)
 
-        lab7 = tk.Label(fenetre, text="Longueur minimale du plus long texte de la galaxie :", font="Arial 11").grid(
-            sticky="w", row=7, column=1)
+        tk.Label(fenetre, text="Longueur minimale du plus long texte de la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                             , row=7
+                                                                                                             , column=1)
         ltexte_max = tk.Entry(fenetre, width=30)
         ltexte_max.grid(sticky="w", row=7, column=2)
 
-        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",
-                                                                                                          row=8,
-                                                                                                          column=1)
+        tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w", row=8
+                                                                                                   , column=1)
         nbnoeuds_min = tk.Entry(fenetre, width=30)
         nbnoeuds_min.grid(sticky="w", row=8, column=2)
+
+        tk.Label(fenetre, text="Nombre maximal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w", row=9
+                                                                                                   , column=1)
+        nbnoeuds_max = tk.Entry(fenetre, width=30)
+        nbnoeuds_max.grid(sticky="w", row=9, column=2)
 
         requete = dict()
         is_close = [False]
 
-        tk.Label(fenetre, text="\n").grid(row=10)
-        tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
-        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
+        tk.Label(fenetre, text="\n").grid(row=11)
+        tk.Button(fenetre, text="Valider", command=recupere).grid(row=12, column=2)
+        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=12, column=1)
         fenetre.bind("<Return>", lambda e: recupere())
         fenetre.bind("<Escape>", lambda e: close_window())
 
@@ -367,6 +386,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
         self.button_new_query.configure(state='disable')
+        self.button_add_query.configure(state='disable')
+        self.button_undo_query.configure(state='disable')
         self.button_mark_galaxie.configure(state='disable')
         self.combo_box.configure(state='disable')
         self.update()
@@ -379,6 +400,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
+        self.button_add_query.configure(state='normal')
+        self.button_undo_query.configure(state='normal')
         self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
         self.reset_progress_bar("Operation ended")
@@ -441,7 +464,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         self.title('Galaxies - ' + project_name)
 
-    def askyesno_txt(self, text, titre="messagebox"):
+    def ask_for_yes_no_txt(self, text, titre="messagebox"):
         return tk.messagebox.askyesno(titre, text)
 
     def ask_for_project_name(self):

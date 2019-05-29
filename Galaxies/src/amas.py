@@ -94,7 +94,10 @@ def execute_query(query, project_path):
     number_of_qry = len(query)
     if number_of_qry == 0:
         return
-    elif number_of_qry == 1:
-        extractionGalaxies.galaxiesFiltre(query, project_path)
     else:
-        extractionGalaxies.galaxiesFiltreListe(query, project_path)
+        extractionGalaxies._galaxiesFiltre(query, project_path)
+    #
+    # elif number_of_qry == 1:
+    #     extractionGalaxies.galaxiesFiltre(query[0], project_path)
+    # else:
+    #     extractionGalaxies.galaxiesFiltreListe(query, project_path)

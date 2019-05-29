@@ -67,17 +67,17 @@ class Galaxie:
             number_of_node = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes_(number_of_node, self.project_path, self.max_length_galaxie)
-        self._get_all_graph()
         tt2 = time.clock()
         self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
         t2 = time.clock()
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         self.print_verbose("Operation terminée start_from_textAlign_file")
-        self.interface.enabled_window()
+        self._get_all_graph()
 
     def _get_all_graph(self):
         amas.execute_query({0: {}}, self.project_path)
         self.interface.display_graph_list()
+        self.interface.enabled_window()
 
     def open_existing_project(self):
 
@@ -114,7 +114,6 @@ class Galaxie:
         """
             Function that get the query of the user, and then display the result
         """
-
         self.interface.disabled_window()
 
         if self.project_path is None:  # if no project are selected or stared
@@ -130,6 +129,9 @@ class Galaxie:
             return
 
         self._add_query(query)
+        self._execute_query()
+
+    def _execute_query(self):
         self.print_verbose("query from user =", self.query)
         self.interface.set_progress_bar_values(10, 100, "Executing query")
 
@@ -143,6 +145,24 @@ class Galaxie:
         self.print_verbose("Galaxies list display")
 
         self.interface.enabled_window()
+
+    def new_query(self):
+        if self.query is None:
+            self.get_requete_preprocessing()
+        elif self.interface.ask_for_yes_no_txt("Are you sure you want to erase your Query", "Erase current Query"):
+            self.query = None
+            self.get_requete_preprocessing()
+
+    def undo_query(self):
+        if self.query is not None:
+            self.interface.disabled_window()
+            self.interface.set_progress_bar_values(5, 100, "Suppress last query")
+            if len(self.query) == 1:
+                self.query = None
+                self._get_all_graph()
+            else:
+                del self.query[len(self.query)-1]
+                self._execute_query()
 
     def _add_query(self, query):
         """
