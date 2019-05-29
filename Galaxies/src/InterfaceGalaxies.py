@@ -87,6 +87,7 @@ class InterfaceGalaxies(tk.Tk):
         # Initialisation des variables
         self.graph_selected = None
         self.button_new_query = None
+        self.button_add_query = None
         self.button_apply_filter = None
         self.button_display_graph = None
 
@@ -128,7 +129,7 @@ class InterfaceGalaxies(tk.Tk):
         self.config(menu=menubar)
 
     def create_button_menu(self):
-        processing = tk.Frame(self.frame_right_button, height=20, width=20)
+        processing = tk.Frame(self.frame_right_button)#, height=20, width=20)
         processing.pack(side=tk.TOP, fill="both", expand=True)
 
         processing.grid_columnconfigure(0, weight=1)
@@ -139,8 +140,14 @@ class InterfaceGalaxies(tk.Tk):
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_new_query.grid(row=1, rowspan=3, column=0)
+
+        self.button_add_query = tk.Button(processing, text="Add Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_add_query.grid(row=4, rowspan=3, column=0)
+
+        self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
+        self.button_apply_filter.grid(row=1, rowspan=3, column=2)
 
         self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
         self.button_apply_filter.grid(row=1, rowspan=3, column=2)
@@ -441,7 +448,7 @@ class InterfaceGalaxies(tk.Tk):
         """
         self.title('Galaxies - ' + project_name)
 
-    def askyesno_txt(self, text, titre="messagebox"):
+    def ask_for_yes_no_txt(self, text, titre="messagebox"):
         return tk.messagebox.askyesno(titre, text)
 
     def ask_for_project_name(self):

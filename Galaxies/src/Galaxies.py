@@ -114,7 +114,6 @@ class Galaxie:
         """
             Function that get the query of the user, and then display the result
         """
-
         self.interface.disabled_window()
 
         if self.project_path is None:  # if no project are selected or stared
@@ -143,6 +142,13 @@ class Galaxie:
         self.print_verbose("Galaxies list display")
 
         self.interface.enabled_window()
+
+    def new_query(self):
+        if self.query is None:
+            self.get_requete_preprocessing()
+        elif self.interface.ask_for_yes_no_txt("Are you sure you want to erase your Query", "Erase current Query"):
+            self.query = None
+            self.get_requete_preprocessing()
 
     def _add_query(self, query):
         """
