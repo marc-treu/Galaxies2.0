@@ -88,6 +88,7 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_selected = None
         self.button_new_query = None
         self.button_add_query = None
+        self.button_undo_query = None
         self.button_apply_filter = None
         self.button_display_graph = None
 
@@ -137,7 +138,7 @@ class InterfaceGalaxies(tk.Tk):
         processing.grid_rowconfigure(0, weight=1)
         processing.grid_rowconfigure(1, weight=1)
         tk.Label(processing, text="Prepossessing").grid(row=0, column=0, sticky=tk.N + tk.S + tk.W + tk.E)
-        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
+        ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=12, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
         self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
@@ -145,6 +146,9 @@ class InterfaceGalaxies(tk.Tk):
 
         self.button_add_query = tk.Button(processing, text="Add Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_add_query.grid(row=4, rowspan=3, column=0)
+
+        self.button_undo_query = tk.Button(processing, text="Undo Query", command=self.galaxie.undo_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_undo_query.grid(row=8, rowspan=3, column=0)
 
         self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
         self.button_apply_filter.grid(row=1, rowspan=3, column=2)
@@ -374,6 +378,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
         self.button_new_query.configure(state='disable')
+        self.button_add_query.configure(state='disable')
+        self.button_undo_query.configure(state='disable')
         self.button_mark_galaxie.configure(state='disable')
         self.combo_box.configure(state='disable')
         self.update()
@@ -386,6 +392,8 @@ class InterfaceGalaxies(tk.Tk):
         self.button_apply_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
+        self.button_add_query.configure(state='normal')
+        self.button_undo_query.configure(state='normal')
         self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
         self.reset_progress_bar("Operation ended")
