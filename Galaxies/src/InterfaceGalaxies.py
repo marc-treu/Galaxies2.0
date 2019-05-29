@@ -216,6 +216,9 @@ class InterfaceGalaxies(tk.Tk):
                 requete['longueur_texte_maximal'] = [int(s) for s in ltexte_max.get().split() if s.isdigit()].pop(0)
             if nbnoeuds_min.get():
                 requete['nbre_minimal_noeuds'] = [int(s) for s in nbnoeuds_min.get().split() if s.isdigit()].pop(0)
+            if nbnoeuds_max.get():
+                requete['nbre_maximal_noeuds'] = [int(s) for s in nbnoeuds_max.get().split() if s.isdigit()].pop(0)
+
             fenetre.destroy()
 
         def close_window():
@@ -224,57 +227,62 @@ class InterfaceGalaxies(tk.Tk):
 
         fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
-        fenetre.geometry("800x350")
+        fenetre.geometry("800x400")
 
         tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0, column=1)
 
-        lab = tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(
-            sticky="w", row=1, column=1)
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs présents dans la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                             , row=1
+                                                                                                             , column=1)
         auteur = tk.Entry(fenetre, width=100)
         auteur.grid(row=1, column=2)
 
-        lab2 = tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(
-            sticky="w", row=2, column=1)
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs absents de la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                          , row=2
+                                                                                                          , column=1)
         notauteur = tk.Entry(fenetre, width=100)
         notauteur.grid(row=2, column=2)
 
-        lab3 = tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w",
-                                                                                                             row=3,
-                                                                                                             column=1)
+        tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w", row=3
+                                                                                                      , column=1)
         date = tk.Entry(fenetre, width=80)
         date.insert(0, '[ AAAA - AAAA ]')
         date.grid(sticky="w", row=3, column=2)
 
-        lab4 = tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4,
-                                                                                             column=1)
+        tk.Label(fenetre, text="Mots présents dans le titre :", font="Arial 11").grid(sticky="w", row=4, column=1)
         mcles = tk.Entry(fenetre, width=100)
         mcles.grid(row=4, column=2)
 
-        lab5 = tk.Label(fenetre, text="Mots absents des titres :", font="Arial 11").grid(sticky="w", row=5, column=1)
+        tk.Label(fenetre, text="Mots absents des titres :", font="Arial 11").grid(sticky="w", row=5, column=1)
         notmcles = tk.Entry(fenetre, width=100)
         notmcles.grid(row=5, column=2)
 
-        lab6 = tk.Label(fenetre, text="Longueur minimale du texte :", font="Arial 11").grid(sticky="w", row=6, column=1)
+        tk.Label(fenetre, text="Longueur minimale du texte :", font="Arial 11").grid(sticky="w", row=6, column=1)
         empan = tk.Entry(fenetre, width=30)
         empan.grid(sticky="w", row=6, column=2)
 
-        lab7 = tk.Label(fenetre, text="Longueur minimale du plus long texte de la galaxie :", font="Arial 11").grid(
-            sticky="w", row=7, column=1)
+        tk.Label(fenetre, text="Longueur minimale du plus long texte de la galaxie :", font="Arial 11").grid(sticky="w"
+                                                                                                             , row=7
+                                                                                                             , column=1)
         ltexte_max = tk.Entry(fenetre, width=30)
         ltexte_max.grid(sticky="w", row=7, column=2)
 
-        lab8 = tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w",
-                                                                                                          row=8,
-                                                                                                          column=1)
+        tk.Label(fenetre, text="Nombre minimal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w", row=8
+                                                                                                   , column=1)
         nbnoeuds_min = tk.Entry(fenetre, width=30)
         nbnoeuds_min.grid(sticky="w", row=8, column=2)
+
+        tk.Label(fenetre, text="Nombre maximal de noeuds dans la galaxie :", font="Arial 11").grid(sticky="w", row=9
+                                                                                                   , column=1)
+        nbnoeuds_max = tk.Entry(fenetre, width=30)
+        nbnoeuds_max.grid(sticky="w", row=9, column=2)
 
         requete = dict()
         is_close = [False]
 
-        tk.Label(fenetre, text="\n").grid(row=10)
-        tk.Button(fenetre, text="Valider", command=recupere).grid(row=11, column=2)
-        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=11, column=1)
+        tk.Label(fenetre, text="\n").grid(row=11)
+        tk.Button(fenetre, text="Valider", command=recupere).grid(row=12, column=2)
+        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=12, column=1)
         fenetre.bind("<Return>", lambda e: recupere())
         fenetre.bind("<Escape>", lambda e: close_window())
 
