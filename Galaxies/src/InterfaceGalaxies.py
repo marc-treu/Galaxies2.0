@@ -139,7 +139,7 @@ class InterfaceGalaxies(tk.Tk):
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=4, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.get_requete_preprocessing)
+        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_new_query.grid(row=1, rowspan=3, column=0)
 
         self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
@@ -163,6 +163,13 @@ class InterfaceGalaxies(tk.Tk):
 
     def ask_open_existing_project(self, project_directory):
         return filedialog.askdirectory(initialdir=project_directory, title="Open a existing project")
+
+    def _try_fonction(self, fonction):
+
+        try:
+            fonction()
+        except:
+            self.enabled_window()
 
     def get_requete_from_user(self):
 
@@ -261,7 +268,7 @@ class InterfaceGalaxies(tk.Tk):
         fenetre.bind("<Escape>", lambda e: close_window())
 
         self.wait_window(fenetre)
-        return {0: requete} if is_close[0] is False else None
+        return requete if is_close[0] is False else None
 
     def display_graph_list(self):
         """
@@ -374,6 +381,7 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query.configure(state='normal')
         self.button_mark_galaxie.configure(state='normal')
         self.combo_box.configure(state='normal')
+        self.reset_progress_bar("Operation ended")
         self.update()
 
     def display_graph_webbrowser(self):
@@ -443,6 +451,11 @@ class InterfaceGalaxies(tk.Tk):
         :return: A String that correspond to the project name
         """
         return simpledialog.askstring("Project Name", "What name for your Project ?")
+
+    def ask_for_max_length_galaxie(self, current_max):
+        text = "Do you want to change the maximal size of galaxie ?\nThe actual size is " + str(current_max)\
+               + "\n\nCancel for keep the previous size "
+        return simpledialog.askinteger("Set max length for galaxie", text, parent=self, minvalue=10)
 
 
 if __name__ == '__main__':
