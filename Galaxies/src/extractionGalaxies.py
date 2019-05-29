@@ -425,56 +425,11 @@ def get_number_galaxies(cursor=None, project_path=None):
     return result
 
 
-def galaxiesFiltre(query, project_path):
+def galaxies_filter(query, project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    listeGalaxies = []
-
-    for id_galaxie in dirGalaxies:
-        nodes_list = dirGalaxies[id_galaxie]
-        if metaDonneesFiltreAux(nodes_list, query, cursor):
-            listeGalaxies.append(id_galaxie)
-
-    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
-
-    if 'longueur_texte_maximal' in query.keys():
-        listeGalaxiesTriee = filtres.filtreLongueurMaximale(listeGalaxiesTriee, query['longueur_texte_maximal'],
-                                                            cursor, dirGalaxies)
-    update_query_table(cursor, listeGalaxiesTriee)
-
-    dirGalaxies.close()
-    connexion.commit()
-    connexion.close()
-    return listeGalaxiesTriee
-
-
-def galaxiesFiltreListe(Lrequete, project_path):
-    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    cursor = connexion.cursor()
-    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    listeGalaxies = []
-
-    for id_galaxie in dirGalaxies:
-        nodes_list = dirGalaxies[id_galaxie]
-        if metaDonneesFiltreListeAux(nodes_list, Lrequete, cursor):
-            listeGalaxies.append(id_galaxie)
-
-    listeGalaxiesTriee = sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
-
-    update_query_table(cursor, listeGalaxiesTriee)
-
-    dirGalaxies.close()
-    connexion.commit()
-    connexion.close()
-    return listeGalaxiesTriee
-
-
-def _galaxiesFiltre(query, project_path):
-    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    cursor = connexion.cursor()
-    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    listeGalaxies = []
+    list_galaxies = []
 
     for id_galaxie in dirGalaxies:
         nodes_list = dirGalaxies[id_galaxie]
@@ -484,16 +439,18 @@ def _galaxiesFiltre(query, project_path):
                 append = False
                 break
         if append:
-            listeGalaxies.append(id_galaxie)
+            list_galaxies.append(id_galaxie)
 
-    listeGalaxiesTriee = listeGalaxies  # sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
-
-    update_query_table(cursor, listeGalaxiesTriee)
+    update_query_table(cursor, list_galaxies)
 
     dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return listeGalaxiesTriee
+    return list_galaxies
+
+
+def nodes_filter(filter_, project_path):
+    pass
 
 
 def get_list_galaxie(project_path):

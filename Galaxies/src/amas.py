@@ -91,13 +91,14 @@ def recupererAmas(project_path, tailleMinGrosseGalaxie=300):
 
 
 def execute_query(query, project_path):
-    number_of_qry = len(query)
-    if number_of_qry == 0:
+
+    if len(query) == 0:
         return
-    else:
-        extractionGalaxies._galaxiesFiltre(query, project_path)
-    #
-    # elif number_of_qry == 1:
-    #     extractionGalaxies.galaxiesFiltre(query[0], project_path)
-    # else:
-    #     extractionGalaxies.galaxiesFiltreListe(query, project_path)
+    extractionGalaxies.galaxies_filter(query, project_path)
+
+
+def execute_filter(filter_, project_path):
+
+    if len(filter_) == 0:
+        return
+    extractionGalaxies.nodes_filter(filter_, project_path)

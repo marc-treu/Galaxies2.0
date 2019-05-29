@@ -24,16 +24,9 @@ def lecture(tab_file, project_path, number_of_line=0):
     :param number_of_line:
     :return:
     """
-    print("Appel lecture fichier sur "+str(tab_file))
-    #FichierEntree = codecs.open(fic, 'r', 'utf-8', errors="ignore")
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db')
     curseur = connexion.cursor()
-    #Entete = FichierEntree.readline()
-    #print("Entete: "+str(Entete))
-
-    #ligne=FichierEntree.readline()
     nbre_ligne = 0
-    #print("Ligne n°"+str(nbre_ligne+1)+": "+str(ligne))
 
     t1 = time.clock()
     for line in codecs.open(tab_file, 'r', 'utf-8', errors="ignore"):
@@ -116,8 +109,9 @@ def init_directory(project_path):
     shutil.copy('./index.html', project_path + '/')
 
 
-def save_query(query, project_path):
-    pickle.dump(query, open(project_path + '/query', 'wb'))
+def save_query(query, filter_, project_path):
+    queries = {"query": query, "filter": filter_}
+    pickle.dump(queries, open(project_path + '/query', 'wb'))
 
 
 def load_query(project_path):
@@ -125,28 +119,3 @@ def load_query(project_path):
         return pickle.load(open(project_path + '/query', 'rb'))
     except:
         return None
-
-#### les Fonctions dans la suite n'on pas l'aire utile
-
-
-def clefsFichier(Fic): # Fonction jamais utiliser dans le reste du code
-    FichierEntree = codecs.open(Fic, 'r', 'utf-8')
-    L=json.loads(FichierEntree.readline()[0:-1])
-    print(L.keys())
-
-
-def presenceClef(Clef, Fic): # Fonction jamais utiliser dans le reste du code
-    FichierEntree = codecs.open(Fic, 'r', 'utf-8')
-    L = FichierEntree.readline()
-    nligne = 0
-    liste_lignes=[]
-    while L != "":
-        nligne+=1
-        if not Clef in json.loads(L[0:-1]).keys():
-            liste_lignes.append((nligne))
-            print("Absence clef \'"+Clef+"\' sur ligne n°"+str(nligne))
-        if nligne.__mod__(100000)==0:
-            print("\tNombre lignes explorées "+str(nligne))
-        L = FichierEntree.readline()
-    print(liste_lignes)
-    FichierEntree.close()
