@@ -186,9 +186,9 @@ class InterfaceGalaxies(tk.Tk):
 
         def recupere():
             if auteur.get():
-                requete['auteur'] = auteur.get().split()
+                requete['auteur'] = auteur.get().split(',')
             if notauteur.get():
-                requete['-auteur'] = notauteur.get().split()
+                requete['-auteur'] = notauteur.get().split(',')
             if mcles.get():
                 requete['mots_titre'] = mcles.get().split()
             if notmcles.get():

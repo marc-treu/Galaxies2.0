@@ -470,6 +470,32 @@ def galaxiesFiltreListe(Lrequete, project_path):
     return listeGalaxiesTriee
 
 
+def _galaxiesFiltre(query, project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
+    listeGalaxies = []
+
+    for id_galaxie in dirGalaxies:
+        nodes_list = dirGalaxies[id_galaxie]
+        append = True
+        for num_query in query:
+            if not metaDonneesFiltreAux(nodes_list, query[num_query], cursor):
+                append = False
+                break
+        if append:
+            listeGalaxies.append(id_galaxie)
+
+    listeGalaxiesTriee = listeGalaxies  # sorted(listeGalaxies, key=lambda idGalaxie: -degreGalaxie(idGalaxie, cursor))
+
+    update_query_table(cursor, listeGalaxiesTriee)
+
+    dirGalaxies.close()
+    connexion.commit()
+    connexion.close()
+    return listeGalaxiesTriee
+
+
 def get_list_galaxie(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
@@ -561,12 +587,25 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
         return False
     if 'nbre_maximal_noeuds' in requete.keys() and requete['nbre_maximal_noeuds'] < len(EnsNoeuds):
         return False
+
+    long_enough = True
+    long_comparator = -1
+    if 'longueur_texte_maximal' in requete.keys():
+        long_enough = False
+        long_comparator = requete['longueur_texte_maximal']
+
+    filtre = False
+
     for Noeud in EnsNoeuds:
         curseur.execute(
             '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
             (Noeud,))
         LLivres = curseur.fetchall()[0]
+        if LLivres[3] >= long_comparator:
+            long_enough = True
         if filtres.filtreLivres(requete, LLivres):
+            filtre = True
+        if filtre and long_enough:
             return True
     return False
 

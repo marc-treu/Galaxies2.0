@@ -6,28 +6,31 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import parametres
 
+FILTRE = ['empan', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date']
+
 
 def filtreLivres(requete, LLivre):
+
     clefs = requete.keys()
+
+    if not any(clef in FILTRE for clef in clefs):  # If we don't have any of those FILTRE keys in the query
+        return True  # We return True
+
     if 'empan' in clefs:
         if not LLivre[3] > requete['empan']:
             return False
     if 'auteur' in clefs:
-        for nom in requete['auteur']:
-            if not nom.lower() in LLivre[0].lower():
-                return False
+        if not any(name.lower() in LLivre[0].lower() for name in requete['auteur']):
+            return False
     if 'mots_titre' in clefs:
-        for mot in requete['mots_titre']:
-            if not mot.lower() in LLivre[1].lower():
-                return False
+        if not any(word.lower() in LLivre[1].lower() for word in requete['mots_titre']):
+            return False
     if '-auteur' in clefs:
-        for nom in requete['-auteur']:
-            if nom.lower() in LLivre[0].lower():
-                return False
+        if any(name.lower() in LLivre[0].lower() for name in requete['-auteur']):
+            return False
     if '-mots_titre' in clefs:
-        for mot in requete['-mots_titre']:
-            if mot.lower() in LLivre[1].lower():
-                return False
+        if any(word.lower() in LLivre[1].lower() for word in requete['-mots_titre']):
+            return False
     if 'date' in clefs:
         if not testNum(LLivre[2], requete['date']):
             return False
