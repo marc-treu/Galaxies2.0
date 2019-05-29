@@ -25,15 +25,11 @@ class Galaxie:
         self.project_path = None
         self.query = None
         self.query_graphs_structure = None
+        self.max_length_galaxie = 100_000
 
-    def get_project_path(self):
-        return self.project_path
-
-    def start_from_textalign_file(self, maxNoeud=0, max_length_galaxie=1000000):
+    def start_from_textalign_file(self):
         """
             Starting a new project with a textAlign file
-        :param maxNoeud:
-        :param max_length_galaxie:
         """
         self.interface.disabled_window()
         project_directory = '/'.join(os.getcwd().split('/')[:-2])
@@ -43,9 +39,9 @@ class Galaxie:
             return  # if the user cancel
 
         newdirproject = self.interface.ask_for_project_name()  # Ask for project name
-
+        new_max = self.interface.ask_for_max_length_galaxie(self.max_length_galaxie)
+        self.max_length_galaxie = new_max if new_max is not None else self.max_length_galaxie
         if newdirproject == "" or newdirproject is None:
-            # todo : Verifier que l'utilisateur n'a pas entrer un nom de project déjà existant
             self.interface.enabled_window()
             return  # if the user cancel or enter a empty word
 
@@ -64,13 +60,13 @@ class Galaxie:
         t2 = time.clock()
         self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
         self.interface.set_progress_bar_values(50, 100, "creation of the galaxies")
-        maxNoeud = grapheGalaxies.construction_graphe(self.project_path)
+        number_of_node = grapheGalaxies.construction_graphe(self.project_path)
         grapheGalaxies.sauvegarde_graphe_(self.project_path)  # Et on le sauvegarde
         self.interface.set_progress_bar_values(70, 100, "saving + split the huge galaxies")
-        if maxNoeud == 0:
-            maxNoeud = baseDonnees.maxNoeuds(self.project_path + '/BDs')
+        if number_of_node == 0:
+            number_of_node = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
-        extractionGalaxies.extractionComposantesConnexes_(maxNoeud, self.project_path, max_length_galaxie)
+        extractionGalaxies.extractionComposantesConnexes_(number_of_node, self.project_path, self.max_length_galaxie)
         self._get_all_graph()
         tt2 = time.clock()
         self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
@@ -78,7 +74,10 @@ class Galaxie:
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
         self.print_verbose("Operation terminée start_from_textAlign_file")
         self.interface.enabled_window()
-        self.interface.reset_progress_bar("Operation ended")
+
+    def _get_all_graph(self):
+        amas.execute_query({0: {}}, self.project_path)
+        self.interface.display_graph_list()
 
     def open_existing_project(self):
 
@@ -111,14 +110,6 @@ class Galaxie:
         self.interface.display_info(text, self.query)
         self.interface.enabled_window()
 
-    def _execute_query(self, query):
-        amas.requetesUser(query, self.project_path)
-        # javaVisualisation.preparationVisualisation(self.project_path)
-
-    def _get_all_graph(self):
-        self._execute_query({0: {}})
-        self.interface.display_graph_list()
-
     def get_requete_preprocessing(self):
         """
             Function that get the query of the user, and then display the result
@@ -131,24 +122,41 @@ class Galaxie:
             return
 
         self.print_verbose("start of get_requete_preprocessing")
-        self.interface.set_progress_bar_values(5, 100, "Collecting request")
+        self.interface.set_progress_bar_values(5, 100, "Collecting query")
         query = self.interface.get_requete_from_user()
 
-        self.query = query
-        self.print_verbose("query from user =", self.query)
-        self.interface.set_progress_bar_values(5, 100, "Collecting request")
-
-        if self.query is None:  # if no query were ask on project
+        if query is None:  # if no query were ask on project
             self.interface.enabled_window()
-            self.interface.reset_progress_bar("Operation ended")
             return
 
-        self._execute_query(self.query)
+        self._add_query(query)
+        self.print_verbose("query from user =", self.query)
+        self.interface.set_progress_bar_values(10, 100, "Executing query")
+
+        amas.execute_query(self.query, self.project_path)
+        self.interface.set_progress_bar_values(80, 100, "Saving Query")
         lecture_fic.save_query(self.query, self.project_path)
-        self.print_verbose("okay ! requete traiter")
+        self.print_verbose("Query executed")
+
+        self.interface.set_progress_bar_values(90, 100, "Display result")
         self.interface.display_graph_list()
-        self.print_verbose("okay ! graphes afficher")
+        self.print_verbose("Galaxies list display")
+
         self.interface.enabled_window()
+
+    def _add_query(self, query):
+        """
+            function that create our query on galaxie, we just add up query enter by the user in a dictionnary,
+        where keys are the order of the query were enter, and value a dictionnary which represente the query.
+        {0: {'auteur': ['Balzac'], 'mots_titre': ['Goriot']}, ...}
+
+        :param query: The new query the user just enter in
+        :type query: A dictionnary which containt a Query, {'auteur': ['Balzac'], 'mots_titre': ['Goriot']}
+        """
+        if self.query is None:
+            self.query = {0: query}
+        else:
+            self.query[len(self.query)] = query
 
     def get_query_graphs_structure(self):
         self.print_verbose("get_query_graphs_structure")
@@ -160,14 +168,16 @@ class Galaxie:
 
         if self.query_graphs_structure is not None:
             self.print_verbose("self.query_graphs_structure is not None")
-            self._execute_query(self.query)  # if we have already change the list of graphs answer, we rebuild it
+
+            # if we have already change the list of graphs answer, we rebuild it
+            amas.execute_query(self.query, self.project_path)
 
         self.query_graphs_structure = self.interface.get_query_graphs_structure_from_user()
         if self.query_graphs_structure is None:
             self.interface.enabled_window()
             return
 
-        self._execute_query({0: dict(self.query_graphs_structure[0], **self.query[0])})
+        amas.execute_query({0: dict(self.query_graphs_structure[0], **self.query[0])}, self.project_path)
         self.interface.display_graph_list()
         self.interface.enabled_window()
 
@@ -206,6 +216,9 @@ class Galaxie:
 
     def mark_galaxie(self, id_galaxie):
         extractionGalaxies.mark_galaxie_query_table(self.project_path, id_galaxie)
+
+    def get_project_path(self):
+        return self.project_path
 
     def print_verbose(self, *args, **kwargs):
         if self.verbose:
