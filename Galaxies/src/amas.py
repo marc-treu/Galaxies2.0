@@ -45,7 +45,7 @@ def listeAmas(numGalaxie, project_path):
     listeAmas.close()
 
 
-def create_partition(nodes_list, id_galaxie, project_path):
+def create_partition(nodes_list, project_path):
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()

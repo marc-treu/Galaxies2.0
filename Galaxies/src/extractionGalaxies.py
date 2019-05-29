@@ -54,8 +54,26 @@ class galaxie:  # permet d'énumérer composantes connexes
             if len(self.compositionGalaxie[str(id_galaxie)]) > self.max_length_galaxie:
                 print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =',
                       self.compositionGalaxie[str(id_galaxie)])
-                list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], id_galaxie,
-                                                  self.project_path)
+                list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], self.project_path)
+                print(list_amas)
+                while any([len(list_amas[ama]) > self.max_length_galaxie for ama in list_amas]):
+                    list_amas_temp = dict()
+                    i = len(list_amas)
+                    for ama in list_amas:
+                        if len(list_amas[ama]) > self.max_length_galaxie:
+                            print("ama we want to resplit =", ama)
+                            print("list_amas[ama] =", list_amas[ama])
+                            print('len(list_amas[ama]) =', len(list_amas[ama]))
+                            list_amas_split = amas.create_partition(list_amas[ama], self.project_path)
+                            print("list_amas_split =", list_amas_split)
+                            for sub_ama in list_amas_split:
+                                list_amas_temp[ama + i] = list_amas_split[sub_ama]
+                                i += 1
+                        else:
+                            list_amas_temp[ama] = list_amas[ama]
+
+                    list_amas = list_amas_temp
+
                 for id_partition in list_amas:
                     ama_name = str(id_galaxie) + '-' + str(id_partition)
                     list_galaxie[ama_name] = list_amas[id_partition]
@@ -196,10 +214,9 @@ class noeudMarques():
 
 
 def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, step=10000):
+
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
-    # curseur.execute('''DROP INDEX idNoeud''')
-    # curseur.execute('''CREATE INDEX idNoeud ON grapheGalaxies (idNoeudPere)''')
     noeuds = noeudMarques(maxNoeud)
     Galaxie = galaxie(project_path, max_length_galaxie)
     tg1 = time.clock()
@@ -208,8 +225,7 @@ def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, s
     nbre_noeuds_mod = 0
 
     while nouveauNoeud is not None:  # < maxNoeud:
-        # L = composanteConnexe(nouveauNoeud, Galaxie, graphe, graphe_t, noeuds)
-        # print("Nouveau noeud: "+str(nouveauNoeud)+" - galaxie: "+str(Galaxie.val))
+
         nbre_noeuds = nbre_noeuds + Galaxie.noeudsGalaxie(Galaxie.val,
                                                           composanteConnexe_(nouveauNoeud, Galaxie, curseur, noeuds))
         if divmod(nbre_noeuds, step)[0] > nbre_noeuds_mod:
