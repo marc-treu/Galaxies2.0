@@ -61,7 +61,7 @@ class Galaxie:
         self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
         self.interface.set_progress_bar_values(50, 100, "creation of the galaxies")
         number_of_node = grapheGalaxies.construction_graphe(self.project_path)
-        grapheGalaxies.sauvegarde_graphe_(self.project_path)  # Et on le sauvegarde
+        grapheGalaxies.sauvegarde_graphe(self.project_path)  # Et on le sauvegarde
         self.interface.set_progress_bar_values(70, 100, "saving + split the huge galaxies")
         if number_of_node == 0:
             number_of_node = baseDonnees.maxNoeuds(self.project_path + '/BDs')
