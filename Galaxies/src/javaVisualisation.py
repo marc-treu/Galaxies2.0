@@ -41,9 +41,6 @@ def visualisation(fichier, project_path):
     edges = data1['links']
     for i in edges:
         del i['id']
-    # print(type(nodes))
-    # print(len(edges))
-    # nv_nodes=dict()
 
     nv_nodes = []
     for i in nodes:
@@ -66,60 +63,17 @@ def visualisation(fichier, project_path):
     data1["elements"]["edges"] = nv_edges
 
     tab = [int(s) for s in re.findall(r'\d+', fichier.split("/")[-1])]
-    if (len(tab) == 1):
+    if len(tab) == 1:
         filename = project_path + '/jsons/galaxie_' + str(tab[0]) + '.json'
-    elif (len(tab) == 2):
+    elif len(tab) == 2:
         filename = project_path + '/jsons/galaxie_' + str(tab[0]) + '_amas_' + str(tab[1]) + '.json'
     else:
         print(fichier)
         print(tab)
 
-    # print(data1)
-    # création d'un fichier json à la répertoire indiquée
     if filename is not None:
         with open(filename, 'w') as f:
             json.dump(data1, f)
-
-# chemin vers le fichier gexf contenant le graphe
-# def visualisation(fichier):
-#     G = nx.read_gexf(fichier)
-#     data1 = json_graph.node_link_data(G)
-#
-#     nodes = data1['nodes']
-#     edges = data1['links']
-#     for i in edges:
-#         del i['id']
-#     # print(type(nodes))
-#     # print(len(edges))
-#     # nv_nodes=dict()
-#
-#     nv_nodes = []
-#     for i in nodes:
-#         d = dict()
-#         d["data"] = i
-#         nv_nodes.append(d)
-#
-#     nv_edges = []
-#
-#     for i in edges:
-#         d = dict()
-#         d["data"] = i
-#         nv_edges.append(d)
-#
-#     del data1["nodes"]
-#     del data1["links"]
-#
-#     data1["elements"] = dict()
-#     data1["elements"]["nodes"] = nv_nodes
-#     data1["elements"]["edges"] = nv_edges
-#     # print(data1)
-#     # création d'un fichier json à la répertoire indiquée
-#     with open(parametres.DirAffichage + 'graphe.json', 'w') as f:
-#         json.dump(data1, f)
-#         # ouvrir le fichier dans le navigateur
-#     # b = webbrowser.get(using='firefox')
-#     # b.open_new('file://'+ parametres.DirAffichage + 'pop-up1.html')
-# #    webbrowser.open_new_tab('file://' + parametres.DirAffichage + 'pop-up1.html')
 
 
 def selectionGrapheAffichage(nomFichier):
