@@ -86,32 +86,37 @@ class galaxie:  # permet d'énumérer composantes connexes
         print("         Extraction des galaxies terminées; opérations de rangement...")
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         cursor = connexion.cursor()
-        cursor.execute('''INSERT INTO nombreGalaxies values (?)''', (str(self.val),))
-        print("Nombre de galaxies: " + str(self.val))
         self.ajoutTexteNoeuds(connexion, cursor)
         t0 = tr
         i = 0
         for galaxie in self.compositionGalaxie:
-            if divmod(i, 1000)[1] == 0 and i != 0:
-                connexion.commit()
-                t1 = time.clock()
-                print('Nombre galaxies rangées: ' + str(i) + ' sur ' + str(self.val) + " (" + str(
-                    int((float(i) / float(self.val)) * 100)) + '%) en ' + format(t1 - t0, 'f') + 'sec.')
-                t0 = t1
-            list_nodes = self.compositionGalaxie[galaxie]
-            add_nodes_database(cursor, list_nodes, galaxie)
-            n = len(list_nodes)
-            longueur = 0
-            longueurMax = 0
-            for texte in texteGalaxie(galaxie, cursor, self.data_base_path):
-                longueur += len(texte)
-                longueurMax = max(len(texte), longueurMax)
-            cursor.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(galaxie),))
-            cursor.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
-                             (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
-            if int(longueur / n) > longueurMax:
-                print("ERROR : average length > max length, galaxie =", galaxie)
-            i += 1
+            if len(self.compositionGalaxie[str(galaxie)]) < self.max_length_galaxie:
+                if divmod(i, 1000)[1] == 0 and i != 0:
+                    connexion.commit()
+                    t1 = time.clock()
+                    print('Nombre galaxies rangées: ' + str(i) + ' sur ' + str(self.val) + " (" + str(
+                        int((float(i) / float(self.val)) * 100)) + '%) en ' + format(t1 - t0, 'f') + 'sec.')
+                    t0 = t1
+                list_nodes = self.compositionGalaxie[galaxie]
+                add_nodes_database(cursor, list_nodes, galaxie)
+                n = len(list_nodes)
+                longueur = 0
+                longueurMax = 0
+                for texte in texteGalaxie(galaxie, cursor, self.data_base_path):
+                    longueur += len(texte)
+                    longueurMax = max(len(texte), longueurMax)
+                cursor.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
+                                 (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
+                if int(longueur / n) > longueurMax:
+                    print("ERROR : average length > max length, galaxie =", galaxie)
+                i += 1
+            else:
+                dirGalaxies = shelve.open(self.data_base_path + '/listeGalaxies')
+                del dirGalaxies[galaxie]
+                dirGalaxies.close()
+
+        cursor.execute('''INSERT INTO nombreGalaxies values (?)''', (str(i),))
+        print("Nombre de galaxies :" + str(i))
 
         connexion.commit()
         connexion.close()
