@@ -66,7 +66,7 @@ class Galaxie:
         if number_of_node == 0:
             number_of_node = baseDonnees.maxNoeuds(self.project_path + '/BDs')
         t1 = time.clock()
-        extractionGalaxies.extractionComposantesConnexes_(number_of_node, self.project_path, self.max_length_galaxie)
+        extractionGalaxies.extractionComposantesConnexes(number_of_node, self.project_path, self.max_length_galaxie)
         tt2 = time.clock()
         self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
         t2 = time.clock()

@@ -46,12 +46,16 @@ class galaxie:  # permet d'énumérer composantes connexes
         self.compositionGalaxie[str(id_galaxie)] = nodes_list
 
     def sauvegarde(self):
-        list_galaxie = shelve.open(self.data_base_path + '/listeGalaxies')
+        list_galaxies = shelve.open(self.data_base_path + '/listeGalaxies')
+        connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
+        cursor = connexion.cursor()
         x = 0
         for id_galaxie in range(self.val):
-            list_galaxie[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
+
+            list_galaxies[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
             x += 1
             if len(self.compositionGalaxie[str(id_galaxie)]) > self.max_length_galaxie:
+                del list_galaxies[str(id_galaxie)]
                 print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =',
                       self.compositionGalaxie[str(id_galaxie)])
                 list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], self.project_path)
@@ -76,12 +80,12 @@ class galaxie:  # permet d'énumérer composantes connexes
 
                 for id_partition in list_amas:
                     ama_name = str(id_galaxie) + '-' + str(id_partition)
-                    list_galaxie[ama_name] = list_amas[id_partition]
+                    list_galaxies[ama_name] = list_amas[id_partition]
                     self.add_galaxie(ama_name, list_amas[id_partition])
                     x += 1
 
         self.val = x
-        list_galaxie.close()
+        list_galaxies.close()
 
     def rangement(self):
         tr = time.clock()
@@ -89,9 +93,7 @@ class galaxie:  # permet d'énumérer composantes connexes
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         curseur2 = connexion.cursor()
         curseur2.execute('''INSERT INTO nombreGalaxies values (?)''', (str(self.val),))
-        # connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         print("Nombre de galaxies: " + str(self.val))
-        # connexion.commit()
         self.ajoutTexteNoeuds(connexion, curseur2)
         t0 = tr
         i = 0
@@ -213,7 +215,7 @@ class noeudMarques():
             return g
 
 
-def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, step=10000):
+def extractionComposantesConnexes(maxNoeud, project_path, max_length_galaxie, step=10000):
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
@@ -227,7 +229,7 @@ def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, s
     while nouveauNoeud is not None:  # < maxNoeud:
 
         nbre_noeuds = nbre_noeuds + Galaxie.noeudsGalaxie(Galaxie.val,
-                                                          composanteConnexe_(nouveauNoeud, Galaxie, curseur, noeuds))
+                                                          _composanteConnexe(nouveauNoeud, Galaxie, curseur, noeuds))
         if divmod(nbre_noeuds, step)[0] > nbre_noeuds_mod:
             nbre_noeuds_mod = divmod(nbre_noeuds, step)[0]
             tg2 = time.clock()
@@ -242,26 +244,16 @@ def extractionComposantesConnexes_(maxNoeud, project_path, max_length_galaxie, s
     return Galaxie
 
 
-def composanteConnexe_(N, g, curseur, noeuds):
+def _composanteConnexe(N, g, curseur, noeuds):
     E_noeuds = set()
     E_noeuds.add(N)
     noeudsVisites = set()
     while E_noeuds.__len__() != 0:
-        # E_noeuds = E_noeuds.difference(noeudsVisites)
-        # print("LNoeuds: "+str(E_noeuds)+"; noeuds visités: "+str(noeudsVisites))
         E = E_noeuds.pop()
         if not E in noeudsVisites:
             noeuds.affectationGalaxie(E, g)
-            # L = fils_(E, curseur)
-            E_noeuds.update(fils_(E, curseur))
+            E_noeuds.update(_fils(E, curseur))
             noeudsVisites.add(E)
-        # print("E_noeuds = ", str(E_noeuds))
-        # E_noeuds.difference_update(noeudsVisites) ## Il me semble que l'on pourrait remplacer cela pour éviter de refaire une soustraction...
-        # print("E-noeuds après: "+str(E_noeuds))
-        # if E_noeuds.intersection(noeudsVisites) != set():
-        #     print("attention!! Noeud "+str(E))
-        # #if noeudsVisites == {}:
-        # #    print("Attention, noeud "+str(E))
     return noeudsVisites
 
 
@@ -296,7 +288,7 @@ def get_meta_data_from_idGalaxie(project_path, idGalaxie):
     return result
 
 
-def fils_(X, curseur):
+def _fils(X, curseur):
     curseur.execute('''SELECT idNoeudFils FROM grapheGalaxies WHERE idNoeudPere = (?)''', (X,))
     L = []
     for X in curseur.fetchall():
@@ -328,67 +320,6 @@ def texteGalaxie(numero, curseur, data_base_path):
     return textes
 
 
-def auteursGalaxie(numero, data_base_path):
-    dirGalaxies = shelve.open(data_base_path + '/listeGalaxies')
-    ListeNoeuds = dirGalaxies[str(numero)]
-    dirGalaxies.close()
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    auteurs = set()
-    for Noeud in ListeNoeuds:
-        curseur.execute(
-            '''SELECT auteur FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE 
-            idNoeud = (?)''',
-            (Noeud,))
-        L = curseur.fetchall()[0][0]
-        if L != 'Inconnu':
-            auteurs.add(L)
-    connexion.close()
-    return auteurs
-
-
-def metaDonneesLivres(LNoeuds):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    metaDonnees = set()
-    for Noeud in LNoeuds:
-        curseur.execute(
-            '''SELECT auteur, titre, date FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
-            (Noeud,))
-        LLivres = curseur.fetchall()[0]
-        metaDonnees.add(LLivres)
-    connexion.close()
-    # print(metaDonnees)
-    return metaDonnees
-
-
-def metaDonnees(LNoeuds, project_path):
-    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    metaDonnees = set()
-    for Noeud in LNoeuds:
-        curseur.execute(
-            '''SELECT auteur, titre, date FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
-            (Noeud,))
-        LLivres = curseur.fetchall()
-        curseur.execute(
-            '''SELECT metaDataSource, metaDataCible FROM grapheGalaxiesSource LEFT OUTER JOIN grapheReutilisations ON (grapheReutilisations.rowid = grapheGalaxiesSource.idReutilisation) WHERE idNoeud = (?)''',
-            (Noeud,))
-        MetaData1 = curseur.fetchall()
-        # print(MetaData1)
-        curseur.execute(
-            '''SELECT metaDataSource, metaDataCible FROM grapheGalaxiesCible LEFT OUTER JOIN grapheReutilisations ON (grapheReutilisations.rowid = grapheGalaxiesCible.idReutilisation) WHERE idNoeud = (?)''',
-            (Noeud,))
-        MetaData2 = curseur.fetchall()
-        # print(MetaData2)
-        MetaData = MetaData1 + MetaData2
-        # print(MetaData)
-        metaDonnees.add(LLivres[0] + MetaData[0])
-    connexion.close()
-    # print(metaDonnees)
-    return metaDonnees
-
-
 def update_query_table(cursor, galaxies_list):
     baseDonnees.reload_query_table(cursor)
     for galaxie in galaxies_list:
@@ -403,26 +334,6 @@ def mark_galaxie_query_table(project_path, id_galaxie):
     cursor.execute('''UPDATE Query SET mark = (?) WHERE idGalaxie = (?)''', (is_marked, id_galaxie,))
     connexion.commit()
     connexion.close()
-
-
-def get_number_galaxies(cursor=None, project_path=None):
-    if cursor is None and project_path is None:
-        raise ValueError("exactly one argument must be given")
-
-    open_bd = True if cursor is None else False
-    connexion = None
-
-    if open_bd:
-        connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-        cursor = connexion.cursor()
-
-    cursor.execute('''SELECT nbre FROM nombreGalaxies''')
-    result = cursor.fetchall()[0][0]
-
-    if open_bd:
-        connexion.close()
-
-    return result
 
 
 def galaxies_filter(query, project_path):
@@ -450,7 +361,36 @@ def galaxies_filter(query, project_path):
 
 
 def nodes_filter(filter_, project_path):
-    pass
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
+    list_galaxies = []
+    cursor.execute('''SELECT auteur, titre, date, empan, texte FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid 
+    = texteNoeuds.idRowLivre)''')
+
+    node = cursor.fetchone()
+    while node:
+
+
+
+
+        node = cursor.fetchone()
+    for id_galaxie in dirGalaxies:
+        nodes_list = dirGalaxies[id_galaxie]
+        append = True
+        for num_query in query:
+            if not metaDonneesFiltreAux(nodes_list, query[num_query], cursor):
+                append = False
+                break
+        if append:
+            list_galaxies.append(id_galaxie)
+
+    update_query_table(cursor, list_galaxies)
+
+    dirGalaxies.close()
+    connexion.commit()
+    connexion.close()
+    return list_galaxies
 
 
 def get_list_galaxie(project_path):
@@ -503,42 +443,6 @@ def get_int(id_galaxie):
     return int(id_galaxie), -1
 
 
-def lectureNumeroGalaxie(Lrequete, listeGalaxies):
-    C = input("Si oui, indiquez un nombre entre 1 et " + str(len(listeGalaxies)) + ", sinon 0: ")
-    if not filtres.chaineChiffres(C) or int(C) > len(listeGalaxies):
-        return lectureNumeroGalaxie(Lrequete, listeGalaxies)
-    elif int(C) == 0:
-        return False
-    else:
-        return listeGalaxies[int(C) - 1]
-
-
-def galaxieFiltre(requete, numero):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
-    ListeNoeuds = dirGalaxies[str(numero)]
-    dirGalaxies.close()
-    return metaDonneesFiltre(ListeNoeuds, requete)
-
-
-def galaxieFiltreListe(Lrequete, numero):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
-    ListeNoeuds = dirGalaxies[str(numero)]
-    dirGalaxies.close()
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    satifactionRequete = metaDonneesFiltreListeAux(ListeNoeuds, Lrequete, curseur)
-    connexion.close()
-    return satifactionRequete
-
-
-def metaDonneesFiltre(EnsNoeuds, requete):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    satifactionRequete = metaDonneesFiltreAux(EnsNoeuds, requete, curseur)
-    connexion.close()
-    return satifactionRequete
-
-
 def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
     if 'nbre_minimal_noeuds' in requete.keys() and requete['nbre_minimal_noeuds'] > len(EnsNoeuds):
         return False
@@ -565,203 +469,3 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
         if filtre and long_enough:
             return True
     return False
-
-
-def metaDonneesFiltreListeAux(EnsNoeuds, Lrequete, curseur):
-    for n in range(len(Lrequete)):
-        if not metaDonneesFiltreAux(EnsNoeuds, Lrequete[n], curseur):
-            return False
-    return True
-
-
-def amasFiltreListe(numGalaxie, Lrequete, curseur, project_path):
-    dirAmas = shelve.open(project_path + '/BDs/listeAmasGalaxie' + str(numGalaxie))
-    res = []
-    for numero in range(len(dirAmas)):
-        EnsNoeuds = dirAmas[str(numero)]
-        if metaDonneesFiltreListeAux(EnsNoeuds, Lrequete, curseur):
-            res.append(numero)
-    dirAmas.close()
-    return res
-
-
-# def presenceAuteurGalaxieListeNoeuds(auteur, listeNoeuds):
-#     connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-#     curseur = connexion.cursor()
-#     reutilisations = set()
-#     for Noeud in listeNoeuds:
-#         curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (Noeud,))
-#         L = curseur.fetchall()
-#         if L != []:
-#             reutilisations.add(L[0][0])
-#         curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (Noeud,))
-#         L = curseur.fetchall()
-#         # print("Noeud: " + str(Noeud[0]) + " - arcs: " + str(L))
-#         if L != []:
-#             reutilisations.add(L[0][0])
-#     # print("Ensemble des réutilisations: "+ str(reutilisations))
-#     for idReutilisation in reutilisations:
-#         curseur.execute('''SELECT idRefSource FROM grapheReutilisations WHERE rowid = (?)''',
-#                         (str(idReutilisation),))
-#         t1 = curseur.fetchall()[0]
-#         curseur.execute('''SELECT auteur FROM livres WHERE rowid = (?)''', (t1[0],))
-#         if auteur in str.lower(curseur.fetchall()[0][0]):
-#             return auteur
-#         curseur.execute('''SELECT idRefCible FROM grapheReutilisations WHERE rowid = (?)''',
-#                         (str(idReutilisation),))
-#         t1 = curseur.fetchall()[0]
-#         curseur.execute('''SELECT auteur FROM livres WHERE rowid = (?)''', (t1[0],))
-#         if auteur in str.lower(curseur.fetchall()[0][0]):
-#             return auteur
-#     connexion.close()
-#     return ()
-#
-# def presenceLNomAuteurGalaxieListeNoeuds(LAuteurs, listeNoeuds):
-#     connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-#     curseur = connexion.cursor()
-#     reutilisations = set()
-#     for Noeud in listeNoeuds:
-#         curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (Noeud,))
-#         L = curseur.fetchall()
-#         if L != []:
-#             reutilisations.add(L[0][0])
-#         curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (Noeud,))
-#         L = curseur.fetchall()
-#         # print("Noeud: " + str(Noeud[0]) + " - arcs: " + str(L))
-#         if L != []:
-#             reutilisations.add(L[0][0])
-#     # print("Ensemble des réutilisations: "+ str(reutilisations))
-#     for idReutilisation in reutilisations:
-#         curseur.execute('''SELECT idRefSource FROM grapheReutilisations WHERE rowid = (?)''',
-#                         (str(idReutilisation),))
-#         t1 = curseur.fetchall()[0]
-#         curseur.execute('''SELECT auteur FROM livres WHERE rowid = (?)''', (t1[0],))
-#         if toutDans(LAuteurs, str.lower(curseur.fetchall()[0][0])):
-#             return LAuteurs
-#         curseur.execute('''SELECT idRefCible FROM grapheReutilisations WHERE rowid = (?)''',
-#                         (str(idReutilisation),))
-#         t1 = curseur.fetchall()[0]
-#         curseur.execute('''SELECT auteur FROM livres WHERE rowid = (?)''', (t1[0],))
-#         if toutDans(LAuteurs, str.lower(curseur.fetchall()[0][0])):
-#             return LAuteurs
-#     connexion.close()
-#     return ()
-
-def toutDans(L, F):
-    for X in L:
-        if X not in F:
-            return ()
-    return L
-
-
-def textesEtReferencesGalaxie(numero):
-    dirGalaxies = shelve.open(parametres.DirBD + '/listeGalaxies')
-    # print('Clefs des galaxies: ')
-    # print(list(dirGalaxies.keys()))
-
-    ListeNoeuds = dirGalaxies[str(numero)]
-    dirGalaxies.close()
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    reutilisations = set()
-    for Noeud in ListeNoeuds:
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: "+str(Noeud[0])+" - arcs: "+str(L))
-        if L != []:
-            reutilisations.add(L[0][0])
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: " + str(Noeud[0]) + " - arcs: " + str(L))
-        if L != []:
-            reutilisations.add(L[0][0])
-    textes = set()
-    # print("Ensemble des réutilisations: "+ str(reutilisations))
-    for idReutilisation in reutilisations:
-        curseur.execute('''SELECT texteSource, idRefSource FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0]))
-        curseur.execute('''SELECT texteCible, idRefCible FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0]))
-    connexion.close()
-    return textes
-
-
-def textesListeNoeuds(ListeNoeuds):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    textes = set()
-    for Noeud in ListeNoeuds:
-        curseur.execute('''SELECT texte FROM texteNoeuds WHERE idNoeud = (?)''', (Noeud,))
-        textes.add(curseur.fetchall()[0][0])
-    connexion.close()
-    return textes
-
-
-def textesEtReferencesListeNoeuds(ListeNoeuds):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    reutilisations = set()
-    for Noeud in ListeNoeuds:
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: "+str(Noeud[0])+" - arcs: "+str(L))
-        if L != []:
-            reutilisations.add(L[0][0])
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: " + str(Noeud[0]) + " - arcs: " + str(L))
-        if L != []:
-            reutilisations.add(L[0][0])
-    textes = set()
-    # print("Ensemble des réutilisations: "+ str(reutilisations))
-    for idReutilisation in reutilisations:
-        curseur.execute('''SELECT texteSource, idRefSource FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0]))
-        curseur.execute('''SELECT texteCible, idRefCible FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0]))
-    connexion.close()
-    return textes
-
-
-def textesEtReferencesListeNoeuds_avecNoeuds(ListeNoeuds):
-    connexion = sqlite3.connect(parametres.DirBD + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur = connexion.cursor()
-    reutilisations = set()
-    for Noeud in ListeNoeuds:
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: "+str(Noeud[0])+" - arcs: "+str(L))
-        if L != []:
-            reutilisations.add((L[0][0], Noeud))
-        curseur.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (Noeud,))
-        L = curseur.fetchall()
-        # print("Noeud: " + str(Noeud[0]) + " - arcs: " + str(L))
-        if L != []:
-            reutilisations.add((L[0][0], Noeud))
-    textes = set()
-    # print("Ensemble des réutilisations: "+ str(reutilisations))
-    for idReutilisation in reutilisations:
-        curseur.execute('''SELECT texteSource, idRefSource FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation[0]),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0], idReutilisation[1]))
-        curseur.execute('''SELECT texteCible, idRefCible FROM grapheReutilisations WHERE rowid = (?)''',
-                        (str(idReutilisation[0]),))
-        t1 = curseur.fetchall()[0]
-        curseur.execute('''SELECT auteur, titre, date FROM livres WHERE rowid = (?)''', (t1[1],))
-        textes.add((t1[0], curseur.fetchall()[0], idReutilisation[1]))
-    connexion.close()
-    return textes
