@@ -7,7 +7,6 @@ __author__ = 'Jean-Gabriel Ganascia'
 import amas
 import baseDonnees
 import filtres
-import parametres
 import re
 import shelve
 import sqlite3
@@ -55,7 +54,6 @@ class galaxie:  # permet d'énumérer composantes connexes
             list_galaxies[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
             x += 1
             if len(self.compositionGalaxie[str(id_galaxie)]) > self.max_length_galaxie:
-                del list_galaxies[str(id_galaxie)]
                 print('id_galaxie =', id_galaxie, ' ; self.compositionGalaxie[str(id_galaxie)] =',
                       self.compositionGalaxie[str(id_galaxie)])
                 list_amas = amas.create_partition(self.compositionGalaxie[str(id_galaxie)], self.project_path)
@@ -65,11 +63,7 @@ class galaxie:  # permet d'énumérer composantes connexes
                     i = len(list_amas)
                     for ama in list_amas:
                         if len(list_amas[ama]) > self.max_length_galaxie:
-                            print("ama we want to resplit =", ama)
-                            print("list_amas[ama] =", list_amas[ama])
-                            print('len(list_amas[ama]) =', len(list_amas[ama]))
                             list_amas_split = amas.create_partition(list_amas[ama], self.project_path)
-                            print("list_amas_split =", list_amas_split)
                             for sub_ama in list_amas_split:
                                 list_amas_temp[ama + i] = list_amas_split[sub_ama]
                                 i += 1
@@ -91,33 +85,34 @@ class galaxie:  # permet d'énumérer composantes connexes
         tr = time.clock()
         print("         Extraction des galaxies terminées; opérations de rangement...")
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-        curseur2 = connexion.cursor()
-        curseur2.execute('''INSERT INTO nombreGalaxies values (?)''', (str(self.val),))
+        cursor = connexion.cursor()
+        cursor.execute('''INSERT INTO nombreGalaxies values (?)''', (str(self.val),))
         print("Nombre de galaxies: " + str(self.val))
-        self.ajoutTexteNoeuds(connexion, curseur2)
+        self.ajoutTexteNoeuds(connexion, cursor)
         t0 = tr
         i = 0
         for galaxie in self.compositionGalaxie:
-
-            if divmod(i, self.pasGalaxies)[1] == 0 and i != 0:
+            if divmod(i, 1000)[1] == 0 and i != 0:
+                connexion.commit()
                 t1 = time.clock()
                 print('Nombre galaxies rangées: ' + str(i) + ' sur ' + str(self.val) + " (" + str(
                     int((float(i) / float(self.val)) * 100)) + '%) en ' + format(t1 - t0, 'f') + 'sec.')
                 t0 = t1
-            lnoeuds = self.compositionGalaxie[galaxie]
-            n = len(lnoeuds)
+            list_nodes = self.compositionGalaxie[galaxie]
+            add_nodes_database(cursor, list_nodes, galaxie)
+            n = len(list_nodes)
             longueur = 0
             longueurMax = 0
-            for texte in texteGalaxie(galaxie, curseur2, self.data_base_path):
+            for texte in texteGalaxie(galaxie, cursor, self.data_base_path):
                 longueur += len(texte)
                 longueurMax = max(len(texte), longueurMax)
-            curseur2.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(galaxie),))
-            curseur2.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
+            cursor.execute('''DELETE from degreGalaxies WHERE idGalaxie = ?''', (str(galaxie),))
+            cursor.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
                              (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
             if int(longueur / n) > longueurMax:
                 print("ERROR : average length > max length, galaxie =", galaxie)
             i += 1
-        connexion.commit()
+
         connexion.commit()
         connexion.close()
         trf = time.clock()
@@ -128,31 +123,35 @@ class galaxie:  # permet d'énumérer composantes connexes
         idRefCible, texteCible, ordonneeCible, empanCible from GrapheReutilisations''')
         curseurSource = connexion.cursor()
         curseurCible = connexion.cursor()
-        X = curseur.fetchone()
-        while X:
+        node = curseur.fetchone()
+        while node:
             curseurSource.execute('''SELECT idNoeud FROM grapheGalaxiesSource WHERE idReutilisation = ?''',
-                                  (str(X[0]),))
-            curseurCible.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = ?''', (str(X[0]),))
-            self.miseAJourNoeud(curseurSource.fetchall()[0][0], X[1], X[2], X[3], X[4], curseurSource)
-            self.miseAJourNoeud(curseurCible.fetchall()[0][0], X[5], X[6], X[7], X[8], curseurCible)
-            X = curseur.fetchone()
-        curseur.execute('''SELECT idNoeud from ListeNoeuds''')
-        EnsembleNoeuds = set(curseur.fetchall())
+                                  (str(node[0]),))
+            curseurCible.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = ?''',
+                                 (str(node[0]),))
+            update_node(curseurSource.fetchall()[0][0], node[1], node[2], node[3], node[4], curseurSource)
+            update_node(curseurCible.fetchall()[0][0], node[5], node[6], node[7], node[8], curseurCible)
+            node = curseur.fetchone()
+        # curseur.execute('''SELECT idNoeud from ListeNoeuds''')
+        # EnsembleNoeuds = set(curseur.fetchall())
 
-        for noeud in EnsembleNoeuds:
-            curseur.execute('''SELECT texte, idRowLivre, ordonnee, empan FROM ListeNoeuds WHERE idNoeud = ?''', noeud)
-            S = []
-            for X in curseur.fetchall():
-                new_node = [X[0], X[1], X[2], X[3]]
-                if new_node not in S:
-                    S.append(new_node)
-            if len(S) > 1:
-                new_node = merge_nodes(S)
-            curseur.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?)''', (str(noeud[0]), new_node[0], new_node[1], new_node[2], new_node[3],))
 
-    def miseAJourNoeud(self, Noeud, idRef, texte, ordonnee, empan, curseur):
-        curseur.execute('''INSERT INTO listeNoeuds values (?,?,?,?,?)''',
-                        (str(Noeud), texte, idRef, ordonnee, len(texte),))
+def add_nodes_database(cursor, list_nodes, galaxie_id):
+    for node in list_nodes:
+        cursor.execute('''SELECT texte, idRowLivre, ordonnee, empan FROM ListeNoeuds WHERE idNoeud = ?''', (node,))
+        merge_node = []
+        for n in cursor.fetchall():
+            new_node = [n[0], n[1], n[2], n[3]]
+            if new_node not in merge_node:
+                merge_node.append(new_node)
+        if len(merge_node) > 1:
+            new_node = merge_nodes(merge_node)
+        cursor.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?,?)''', (str(node), new_node[0], new_node[1],
+                                                                            new_node[2], new_node[3], galaxie_id))
+
+
+def update_node(node, idRef, text, ordonnee, empan, cursor):
+    cursor.execute('''INSERT INTO listeNoeuds values (?,?,?,?,?)''', (str(node), text, idRef, ordonnee, len(text),))
 
 
 def merge_nodes(list_node):
@@ -361,36 +360,76 @@ def galaxies_filter(query, project_path):
 
 
 def nodes_filter(filter_, project_path):
+
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor_query = connexion.cursor()
+    cursor_node = connexion.cursor()
     cursor = connexion.cursor()
-    dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
-    list_galaxies = []
-    cursor.execute('''SELECT auteur, titre, date, empan, texte FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid 
-    = texteNoeuds.idRowLivre)''')
 
-    node = cursor.fetchone()
-    while node:
+    cursor_query.execute('''SELECT idGalaxie FROM Query''')
+    galaxies_query = cursor_query.fetchone()
 
+    while galaxies_query:
 
+        cursor_node.execute('''SELECT idNoeud, auteur, titre, date, empan, texte FROM texteNoeuds LEFT OUTER JOIN livres
+         ON (livres.rowid = texteNoeuds.idRowLivre) WHERE texteNoeuds.idGalaxie = (?)''', galaxies_query)
 
+        node = cursor_node.fetchone()
+        while node:
+            if filtres.filtreLivres(filter_, node[1:]):
+                cursor.execute('''INSERT INTO Filter values (?,?)''', (node[0], galaxies_query))
+            node = cursor_node.fetchone()
+        galaxies_query = cursor_query.fetchone()
 
-        node = cursor.fetchone()
-    for id_galaxie in dirGalaxies:
-        nodes_list = dirGalaxies[id_galaxie]
-        append = True
-        for num_query in query:
-            if not metaDonneesFiltreAux(nodes_list, query[num_query], cursor):
-                append = False
-                break
-        if append:
-            list_galaxies.append(id_galaxie)
-
-    update_query_table(cursor, list_galaxies)
-
-    dirGalaxies.close()
     connexion.commit()
     connexion.close()
-    return list_galaxies
+    return
+
+    # node = cursor.fetchone()
+    # while node:
+    #     node = cursor.fetchone()
+    # for id_galaxie in dirGalaxies:
+    #     nodes_list = dirGalaxies[id_galaxie]
+    #     append = True
+    #     for num_query in query:
+    #         if not metaDonneesFiltreAux(nodes_list, query[num_query], cursor):
+    #             append = False
+    #             break
+    #     if append:
+    #         list_galaxies.append(id_galaxie)
+    #
+    # update_query_table(cursor, list_galaxies)
+    #
+    # dirGalaxies.close()
+    # return list_galaxies
+
+
+def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
+    if 'nbre_minimal_noeuds' in requete.keys() and requete['nbre_minimal_noeuds'] > len(EnsNoeuds):
+        return False
+    if 'nbre_maximal_noeuds' in requete.keys() and requete['nbre_maximal_noeuds'] < len(EnsNoeuds):
+        return False
+
+    long_enough = True
+    long_comparator = -1
+    if 'longueur_texte_maximal' in requete.keys():
+        long_enough = False
+        long_comparator = requete['longueur_texte_maximal']
+
+    filtre = False
+
+    for Noeud in EnsNoeuds:
+        curseur.execute(
+            '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
+            (Noeud,))
+        LLivres = curseur.fetchall()[0]
+        if LLivres[3] >= long_comparator:
+            long_enough = True
+        if filtres.filtreLivres(requete, LLivres):
+            filtre = True
+        if filtre and long_enough:
+            return True
+    return False
 
 
 def get_list_galaxie(project_path):
@@ -441,31 +480,3 @@ def get_int(id_galaxie):
         number_ama = re.findall(r'\d+', id_galaxie)
         return int(number_ama[0]), int(number_ama[1])
     return int(id_galaxie), -1
-
-
-def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
-    if 'nbre_minimal_noeuds' in requete.keys() and requete['nbre_minimal_noeuds'] > len(EnsNoeuds):
-        return False
-    if 'nbre_maximal_noeuds' in requete.keys() and requete['nbre_maximal_noeuds'] < len(EnsNoeuds):
-        return False
-
-    long_enough = True
-    long_comparator = -1
-    if 'longueur_texte_maximal' in requete.keys():
-        long_enough = False
-        long_comparator = requete['longueur_texte_maximal']
-
-    filtre = False
-
-    for Noeud in EnsNoeuds:
-        curseur.execute(
-            '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
-            (Noeud,))
-        LLivres = curseur.fetchall()[0]
-        if LLivres[3] >= long_comparator:
-            long_enough = True
-        if filtres.filtreLivres(requete, LLivres):
-            filtre = True
-        if filtre and long_enough:
-            return True
-    return False

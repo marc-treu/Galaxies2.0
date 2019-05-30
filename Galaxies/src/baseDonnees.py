@@ -19,12 +19,13 @@ def create_bd(project_path):
     cursor.execute('''CREATE TABLE grapheGalaxiesCible (idReutilisation INTEGER UNIQUE, idNoeud INTEGER)''')
     cursor.execute('''CREATE TABLE grapheGalaxies (idNoeudPere INTEGER, idNoeudFils INTEGER)''')
     cursor.execute('''CREATE TABLE texteNoeuds (idNoeud INTEGER UNIQUE, texte TEXT, idRowLivre INTEGER, 
-        ordonnee INTEGER, empan INTEGER)''')
+        ordonnee INTEGER, empan INTEGER, idGalaxie TEXT)''')
     cursor.execute('''CREATE TABLE maxNoeud (idNoeud INTEGER)''')
     cursor.execute('''CREATE TABLE nombreGalaxies (nbre INTEGER)''')
     cursor.execute('''CREATE TABLE degreGalaxies (idGalaxie TEXT UNIQUE, degreGalaxie INTEGER, 
         longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
     cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
+    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT)''')
     cursor.execute('''CREATE TABLE ListeNoeuds (idNoeud INTEGER, texte TEXT, idRowLivre INTEGER, 
         ordonnee INTEGER, empan INTEGER)''')
 
@@ -50,6 +51,17 @@ def reload_query_table(cursor):
     """
     cursor.execute('''DROP TABLE Query''')
     cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
+
+
+def reload_filter_table(cursor):
+    """
+        Function that erase the Filter table for create a new empty one.
+    This fonction is call after a new filter query had been made by the user
+
+    :param cursor: cursor on the DB
+    """
+    cursor.execute('''DROP TABLE Filter''')
+    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT)''')
 
 
 def dateToInt(date):
