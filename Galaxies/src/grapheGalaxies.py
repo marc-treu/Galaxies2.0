@@ -6,7 +6,6 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import sqlite3
 import time
-import shelve
 
 
 class noeud:  # permet d'énumérer les noeuds du graphe
@@ -56,23 +55,20 @@ def fusion_sources_cibles(idRef, c, n):
     c : un pipe qui est connecté a notre BD
     n : la class Noeud qui permet de compter les noeuds de notre graphe
     """
-    # print("idReference =", idRef)
 
     curseurSource = c.cursor()  # On creer deux curseur
     curseurCible = c.cursor()
-    curseurSource.execute(
-        '''SELECT ordonneeSource, empanSource, rowid FROM grapheReutilisations WHERE idRefSource = ?''', idRef)
+    curseurSource.execute('''SELECT ordonneeSource, empanSource, rowid FROM grapheReutilisations WHERE idRefSource = 
+                        ?''', idRef)
     curseurCible.execute('''SELECT ordonneeCible, empanCible, rowid FROM grapheReutilisations WHERE idRefCible = ?''',
                          idRef)
+
     listeReutilisationSource = curseurSource.fetchall()
-    # print('listeReutilisationSource=',listeReutilisationSource)
     listeReutilisationCible = curseurCible.fetchall()
-    # print('listeReutilisationCible =',listeReutilisationCible )
     listeReutilisationMarquee = marquage(listeReutilisationCible, 'cible') + listeReutilisationSource
     listeReutilisationMarquee.sort()
-    # print("listeReutilisationMarquee =",listeReutilisationMarquee)
     R = fusion(listeReutilisationMarquee, n)
-    # print("R =",R)
+
     if R:
         n.nouvelleValeur()
     for X in R:
@@ -139,7 +135,6 @@ def fusion_aux(Tete, Suivant, Entree, Noeud, Resultat):
 
 
 def ajoutSource(L, Curseur):
-    # print("L =",L)
     Curseur.execute('''INSERT INTO grapheGalaxiesSource values (?,?)''', (L[2], L[3],))
 
 
@@ -147,127 +142,36 @@ def ajoutCible(L, Curseur):
     Curseur.execute('''INSERT INTO grapheGalaxiesCible values (?,?)''', (abs(L[2]), L[3],))
 
 
-def sauvegarde_graphe(data_base_path):
-    connexion = sqlite3.connect(data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-    curseur_arc = connexion.cursor()
-    curseur_noeud = connexion.cursor()
-    curseur_graphe = connexion.cursor()
-    curseur_arc.execute('''SELECT * FROM maxNoeud''')
-    maxNoeud = curseur_arc.fetchone()[0]
-    graphe = shelve.open(data_base_path + '/liste_ajacence_graphe')
-    n = noeud()
-    while n.val < maxNoeud:
-        curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (n.val,))
-        reutilisation = curseur_arc.fetchone()
-        # print("Noeud: "+str(n.val)+"; reutilisation: "+str(reutilisation))
-        liste_adjacence = []
-        while reutilisation != None:
-            # print("     - Noeud fils: "+str(reutilisation))
-            curseur_noeud.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = (?)''',
-                                  (reutilisation[0],))
-            nouveau_noeud = curseur_noeud.fetchone()
-            liste_adjacence.append(nouveau_noeud[0])
-            curseur_graphe.execute('''INSERT INTO grapheGalaxies values (?,?)''', (n.val, nouveau_noeud[0],))
-            reutilisation = curseur_arc.fetchone()
-        # print("Ensemble des fils de "+str(n.val)+": "+str(liste_adjacence))
-        graphe[str(n.val)] = liste_adjacence
-        n.nouvelleValeur()
-    graphe.close()
-    print("graphe sauvé")
-    graphe_t = shelve.open(data_base_path + '/liste_ajacence_graphe_transpose')
-    n = noeud()
-    while n.val < maxNoeud:
-        curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (n.val,))
-        reutilisation = curseur_arc.fetchone()
-        # print("Noeud: "+str(n.val)+"; reutilisation: "+str(reutilisation))
-        liste_adjacence = []
-        while reutilisation != None:
-            # print("     - Noeud fils: "+str(reutilisation))
-            curseur_noeud.execute('''SELECT idNoeud FROM grapheGalaxiesSource WHERE idReutilisation = (?)''',
-                                  (reutilisation[0],))
-            nouveau_noeud = curseur_noeud.fetchone()
-            liste_adjacence.append(nouveau_noeud[0])
-            curseur_graphe.execute('''INSERT INTO grapheGalaxies values (?,?)''', (n.val, nouveau_noeud[0],))
-            reutilisation = curseur_arc.fetchone()
-        # print("Ensemble des fils de "+str(n.val)+": "+str(liste_adjacence))
-        graphe_t[str(n.val)] = liste_adjacence
-        n.nouvelleValeur()
-    graphe_t.close()
-    connexion.commit()
-    connexion.close()
-    print("graphe transposé sauvé")
-
-
-def sauvegarde_graphe_(project_path):
-    # print("\nsauvegarde_graphe_\n")
+def sauvegarde_graphe(project_path):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur_arc = connexion.cursor()
     curseur_noeud = connexion.cursor()
     curseur_graphe = connexion.cursor()
     curseur_arc.execute('''SELECT * FROM maxNoeud''')
     maxNoeud = curseur_arc.fetchone()[0]
-    # graphe = shelve.open(project_path + '/BDs/liste_ajacence_graphe')
     n = noeud()
     while n.val < maxNoeud:
         curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesSource WHERE idNoeud = (?)''', (n.val,))
         reutilisation = curseur_arc.fetchone()
-        # print("Noeud: "+str(n.val)+"; reutilisation: "+str(reutilisation))
-        # liste_adjacence = []
         while reutilisation != None:
-            # print("     - Noeud fils: "+str(reutilisation))
             curseur_noeud.execute('''SELECT idNoeud FROM grapheGalaxiesCible WHERE idReutilisation = (?)''',
                                   (reutilisation[0],))
             nouveau_noeud = curseur_noeud.fetchone()
-            # print("nouveau_noeud =", nouveau_noeud )
-            # liste_adjacence.append(nouveau_noeud[0])
             curseur_graphe.execute('''INSERT INTO grapheGalaxies values (?,?)''', (n.val, nouveau_noeud[0],))
             reutilisation = curseur_arc.fetchone()
-        # print("Ensemble des fils de "+str(n.val)+": "+str(liste_adjacence))
-        # graphe[str(n.val)]=liste_adjacence
         n.nouvelleValeur()
-    # graphe.close()
     print("graphe sauvé")
-    # graphe_t = shelve.open(project_path + '/BDs/liste_ajacence_graphe_transpose')
     n = noeud()
     while n.val < maxNoeud:
         curseur_arc.execute('''SELECT idReutilisation FROM grapheGalaxiesCible WHERE idNoeud = (?)''', (n.val,))
         reutilisation = curseur_arc.fetchone()
-        # print("Noeud: "+str(n.val)+"; reutilisation: "+str(reutilisation))
-        # liste_adjacence = []
         while reutilisation != None:
-            # print("     - Noeud fils: "+str(reutilisation))
             curseur_noeud.execute('''SELECT idNoeud FROM grapheGalaxiesSource WHERE idReutilisation = (?)''',
                                   (reutilisation[0],))
             nouveau_noeud = curseur_noeud.fetchone()
-            # liste_adjacence.append(nouveau_noeud[0])
             curseur_graphe.execute('''INSERT INTO grapheGalaxies values (?,?)''', (n.val, nouveau_noeud[0],))
             reutilisation = curseur_arc.fetchone()
-        # print("Ensemble des fils de "+str(n.val)+": "+str(liste_adjacence))
-        # graphe_t[str(n.val)]=liste_adjacence
         n.nouvelleValeur()
-    # graphe_t.close()
     connexion.commit()
     connexion.close()
     print("graphe transposé sauvé")
-
-
-def grapheConstruit(project_path):
-    """
-    Se connecte a la base de donnée et retourne la permier ligne de la TABLE grapheGalaxiesSource
-    Permet de tester si la base est bien remplie
-    """
-    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
-    cursor = connexion.cursor()
-    cursor.execute('''SELECT * FROM grapheGalaxiesSource''')
-    result = cursor.fetchone()
-    connexion.close()
-    return result
-
-
-def egal(L1, L2):
-    if len(L1) != len(L2):
-        return None
-    for x in L1:
-        if not x in L2:
-            return None
-    return L1
