@@ -57,8 +57,8 @@ def lecture(tab_file, project_path, number_of_line=0):
                                        int(L['target_end_byte'])-int(L['target_start_byte']),
                                        L['target_passage'],
                                        metaData(parametres.metaDataCible, L),
-                                       curseur, nbre_ligne)
-        if divmod(nbre_ligne, parametres.pasTracage)[1]==0: # permet de tenir au courant l'utilisateur
+                                       curseur)
+        if divmod(nbre_ligne, parametres.pasTracage)[1] == 0:  # permet de tenir au courant l'utilisateur
             t2 = time.clock()                               # du temps de construction du graphe
             print(" - " + str(nbre_ligne) + " réutilisations déjà traitées en un temps de "+format(t2-t1,'f')+" secondes")
             t1 = time.clock()
