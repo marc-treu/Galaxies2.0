@@ -56,7 +56,7 @@ $.getJSON("jsons/exemple.json", function (data) {
 	}
 	
 	function showNodeInfo(node){
-		Object.assign(node.data(), {'degre': JSON.parse(node.data().reutilisation).length});
+		Object.assign(node.data(), {'degre': node.degree()});
 		console.log(node.data());
 		var infoTemplate = Handlebars.compile([
 			'<p>You have selecte the node number : {{id}}</p>',
