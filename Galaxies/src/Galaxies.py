@@ -79,7 +79,7 @@ class Galaxie:
             Function we call when we don't have any current query or filter. It apply a empty Query over the data base
         so we could see the entire Galaxies list.
         """
-        amas.execute_query({0: {}}, self.project_path)  # Apply the empty Query
+        extractionGalaxies.galaxies_filter({0: {}}, self.project_path)  # Apply the empty Query
         self.interface.display_graph_list()  # Then Display
         self.interface.enabled_window()  # And finally enable the window
 
@@ -129,12 +129,12 @@ class Galaxie:
 
     def _execute_query(self):
         self.interface.set_progress_bar_values(10, 100, "Executing query")
-        amas.execute_query(self.query, self.project_path)
+        extractionGalaxies.galaxies_filter(self.query, self.project_path)
         self._execute_query_aux(self.query)
 
     def _execute_filter(self):
         self.interface.set_progress_bar_values(10, 100, "Executing query")
-        amas.execute_filter(self.filter_, self.project_path)
+        extractionGalaxies.nodes_filter(self.filter_, self.project_path)
         self._execute_query_aux(self.filter_)
 
     def _disable_window(self):
@@ -167,6 +167,9 @@ class Galaxie:
             return
 
         self._add_query(query)
+        if len(self.query) == 0:
+            self.interface.enabled_window()
+            return
         self._execute_query()
 
     def get_requete_postprocessing(self):
@@ -185,6 +188,9 @@ class Galaxie:
             return
 
         self._add_filter(filter_)
+        if len(self.filter_) == 0:
+            self.interface.enabled_window()
+            return
         self._execute_filter()
 
     def new_query(self):

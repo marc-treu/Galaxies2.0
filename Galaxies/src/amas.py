@@ -5,7 +5,7 @@
 __author__ = 'Jean-Gabriel Ganascia'
 
 import sqlite3
-import community as louvain
+import community
 import networkx as nx
 
 import extractionGalaxies
@@ -22,7 +22,7 @@ def create_partition(nodes_list, project_path):
         for value in graph[key]:
             nx_graph.add_edge(key, value)
 
-    amas = louvain.best_partition(nx_graph)
+    amas = community.best_partition(nx_graph)
 
     amas_list = dict()
     for ama in amas:
@@ -32,17 +32,3 @@ def create_partition(nodes_list, project_path):
             amas_list[amas[ama]] = [ama]
 
     return amas_list
-
-
-def execute_query(query, project_path):
-
-    if len(query) == 0:
-        return
-    extractionGalaxies.galaxies_filter(query, project_path)
-
-
-def execute_filter(filter_, project_path):
-
-    if len(filter_) == 0:
-        return
-    extractionGalaxies.nodes_filter(filter_, project_path)
