@@ -191,13 +191,13 @@ class InterfaceGalaxies(tk.Tk):
 
         def recupere():
             if auteur.get():
-                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get())]
+                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get()) if words is not '']
             if notauteur.get():
-                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get())]
+                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get()) if words is not '']
             if mcles.get():
-                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get())]
+                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get()) if words is not '']
             if notmcles.get():
-                requete['-mots_titre'] = [words.strip() for words in re.split('[;,/]', notmcles.get())]
+                requete['-mots_titre'] = [words.strip() for words in re.split('[;,/]', notmcles.get()) if words is not '']
             if date.get():
                 requete['date'] = [int(s) for s in date.get().split() if s.isdigit()]
                 if len(requete['date']) == 0:
@@ -298,17 +298,17 @@ class InterfaceGalaxies(tk.Tk):
 
         def recupere():
             if auteur.get():
-                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get())]
+                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get()) if words is not '']
             if notauteur.get():
-                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get())]
+                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get()) if words is not '']
             if mcles.get():
-                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get())]
+                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get()) if words is not '']
             if notmcles.get():
-                requete['-mots_titre'] = [words.strip() for words in re.split('[;,/]', notmcles.get())]
+                requete['-mots_titre'] = [words.strip()for words in re.split('[;,/]', notmcles.get())if words is not '']
             if text.get():
-                requete['text'] = [words.strip() for words in re.split('[;,/]', text.get())]
+                requete['text'] = [words.strip() for words in re.split('[;,/]', text.get()) if words is not '']
             if nottext.get():
-                requete['-text'] = [words.strip() for words in re.split('[;,/]', nottext.get())]
+                requete['-text'] = [words.strip() for words in re.split('[;,/]', nottext.get()) if words is not '']
             if date.get():
                 requete['date'] = [int(s) for s in date.get().split() if s.isdigit()]
                 if len(requete['date']) == 0:
