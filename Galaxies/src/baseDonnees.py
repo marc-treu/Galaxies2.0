@@ -75,7 +75,7 @@ def normalisation_date(date):
 
 
 def ajoutLivre(auteur, titre, date, curseur, nbre_lignes):
-    id = idRef(auteur, titre, date, curseur, nbre_lignes)
+    id = idRef(auteur, titre, date)
     curseur.execute('''SELECT * FROM livres WHERE idLivre = ?''', (id,))
     L = curseur.fetchone()
     if not L:
@@ -89,7 +89,7 @@ def idRef(auteur, titre, date):
 
 def idLivre(auteur, titre, date, curseur, nbre_lignes):
     curseur.execute('''SELECT rowid FROM livres WHERE idLivre = (?)''',
-                    (idRef(auteur, titre, date, curseur, nbre_lignes),))
+                    (idRef(auteur, titre, date),))
     first_line = curseur.fetchone()
     return first_line[0]
 
