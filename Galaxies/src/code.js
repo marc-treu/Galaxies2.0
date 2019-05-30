@@ -6,10 +6,11 @@ $.getJSON("jsons/exemple.json", function (data) {
             {
                 selector: 'node',
                 style: {
-                    'label': function(node){ return GetLabel(node);},
+                    'label': 'data(id)',
+                    //'content': 'data(texte)',
                     'width': 'data(longueurTexte)',
-		   			'height' : 'data(longueurTexte)',
-                    'background-color': function(node){ return 'rgb(5,'+GetColor(node)+',5)';},
+		    'height' : 'data(longueurTexte)',
+                    'background-color': function(node){ return 'rgb(0,'+(255-(node.degree()-1)*10)+',255)';},
                     'color': 'blue',
                     'background-fit': 'contain',
                     'background-clip': 'none'
@@ -17,14 +18,22 @@ $.getJSON("jsons/exemple.json", function (data) {
             },{
               selector: "node:selected",
               style: {
-                'label': function(node){showNodeInfo(node);},
+                'label': 'data(texte)',
                 "border-width": "6px",
                 "border-color": "#AAD8FF",
                 "border-opacity": "0.5",
                 "background-color": "#77828C",
-                "text-outline-color": "#77828C",
+                  "text-outline-color": "#77828C",
+		  'text-background-color':'#ADFF2F',
+		  'text-background-opacity':'0.8',
+		  'text-background-shape': 'roundrectangle',
+		  'text-background-padding': '3px',
+		  'text-border-opacity': 1,
+		  'text-border-width':'3px',
+		  'text-border-style':'dashed',
+		  'text-border-color':'#FF0000'
               }
-            },{
+            }, {
                 selector: 'edge',
                 style: {
                     'line-color': '#91b0ad',
@@ -42,33 +51,5 @@ $.getJSON("jsons/exemple.json", function (data) {
 	    animate : false
 	}
     });
-
-    function GetColor(node) { // Upgrade by using count as a global variable 
-		var n, count = 0;
-		for(n in Object.keys(data['elements']['edges'])) {
-			count++;
-		  }
-    	return (count / node.degree()) * 255 / count;
-    }
-	
-	function GetLabel(node){
-		return node.data().texte.substring(0,15);
-	}
-	
-	function showNodeInfo(node){
-		Object.assign(node.data(), {'degre': JSON.parse(node.data().reutilisation).length});
-		console.log(node.data());
-		var infoTemplate = Handlebars.compile([
-			'<p>You have selecte the node number : {{id}}</p>',
-			'<p>Which is connect to {{degre}} others nodes</p>',
-			'<p>Came from : {{titre}}</p>',
-			'<p>Written by : {{auteur}}</p>',
-			'<p>In : {{date}}</p>',
-			'<p>{{texte}}</p>',
-		].join(''));
-		console.log(infoTemplate);
-		$('#info').html(infoTemplate(node.data())).show();
-	}	
-});
-
+  });
 

@@ -10,12 +10,6 @@ FILTRE = ['empan', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date']
 
 
 def filtreLivres(requete, LLivre):
-    """
-
-    :param requete:
-    :param LLivre: auteur, titre, date, empan, texte FROM texteNoeuds
-    :return:
-    """
 
     clefs = requete.keys()
 
@@ -39,12 +33,6 @@ def filtreLivres(requete, LLivre):
             return False
     if 'date' in clefs:
         if not testNum(LLivre[2], requete['date']):
-            return False
-    if 'text' in clefs:
-        if not any(word.lower() in LLivre[4].lower() for word in requete['text']):
-            return False
-    if '-text' in clefs:
-        if any(word.lower() in LLivre[4].lower() for word in requete['-text']):
             return False
     return True
 
