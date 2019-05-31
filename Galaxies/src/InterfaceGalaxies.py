@@ -79,6 +79,7 @@ class InterfaceGalaxies(tk.Tk):
         self.graph_info = tk.Label(self.frame_right, relief=tk.RIDGE)
         self.graph_info.pack(side=tk.TOP, fill="both", expand=True, padx=2,
                              pady=2)
+        self.graph_info.bind('<Button-1>', lambda x: self._try_fonction(self.galaxie.display_query))
 
         self.frame_right_button = tk.Frame(self.frame_right)
         self.frame_right_button.pack(side=tk.BOTTOM, fill="both", expand=False, padx=2,
@@ -132,7 +133,7 @@ class InterfaceGalaxies(tk.Tk):
         self.config(menu=menubar)
 
     def create_button_menu(self):
-        processing = tk.Frame(self.frame_right_button)#, height=20, width=20)
+        processing = tk.Frame(self.frame_right_button)
         processing.pack(side=tk.TOP, fill="both", expand=True)
 
         processing.grid_columnconfigure(0, weight=1)

@@ -4,17 +4,17 @@
 
 __author__ = 'Jean-Gabriel Ganascia'
 
-import amas
 import baseDonnees
 import extractionGalaxies
 import grapheGalaxies
 import visualisationGraphe
 import javaVisualisation
-import lecture_fic  
+import lecture_fic
 
 import time
 import os
 import webbrowser
+import sys
 
 
 class Galaxie:
@@ -134,8 +134,11 @@ class Galaxie:
 
     def _execute_filter(self):
         self.interface.set_progress_bar_values(10, 100, "Executing query")
-        extractionGalaxies.nodes_filter(self.filter_, self.project_path)
-        self._execute_query_aux(self.filter_)
+        if extractionGalaxies.nodes_filter(self.filter_, self.project_path):
+            self._execute_query_aux(self.filter_)
+        else:
+            self.interface.enabled_window()
+            self.interface.display_info("Your filter has match 0 node", self.filter_)
 
     def _disable_window(self):
         """
@@ -281,11 +284,17 @@ class Galaxie:
         javaVisualisation.change_html_graph_display(id_galaxie, self.project_path)
 
         try:
-            webbrowser.get('firefox').open(self.project_path + '/index.html')
+            if sys.platform == "darwin":
+                print('files location =', 'file:///' + self.project_path + '/index.html')
+                webbrowser.get('firefox').open('file:///' + self.project_path + '/index.html')
+            else:
+                webbrowser.get('firefox').open(self.project_path + '/index.html')
             self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with firefox')
         except:
             webbrowser.open(self.project_path + '/index.html')
-            self.print_verbose('file id_galaxie =', id_galaxie, ', open in web browser with default')
+
+    def display_query(self):
+        self.interface.display_info("", self.query)
 
     def mark_galaxie(self, id_galaxie):
         extractionGalaxies.mark_galaxie_query_table(self.project_path, id_galaxie)

@@ -52,8 +52,7 @@ class galaxie:  # permet d'énumérer composantes connexes
 
     def sauvegarde(self):
         list_galaxies = shelve.open(self.data_base_path + '/listeGalaxies')
-        connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
-        cursor = connexion.cursor()
+
         x = 0
 
         for id_galaxie in range(self.val):
@@ -161,10 +160,8 @@ def add_nodes_database(cursor, list_nodes, galaxie_id):
         c = cursor.fetchone()
         if c:
             print("c", c)
-            print("list_nodes",list_nodes)
-            print("node",node)
-            print("galaxie_id",galaxie_id)
-            print("new_node",new_node)
+            print("node", node)
+            print("galaxie_id", galaxie_id)
             cursor.execute('''DELETE FROM texteNoeuds WHERE idNoeud = (?)''', (node,))
 
         cursor.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?,?)''', (str(node), new_node[0], new_node[1],
@@ -411,7 +408,7 @@ def nodes_filter(filter_, project_path):
     :param filter_:
     :param project_path: The path of the current project
     :type project_path: A String
-    :return:
+    :return: True if we add at least one node in the database, False otherwise
     """
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
@@ -422,6 +419,7 @@ def nodes_filter(filter_, project_path):
 
     cursor_query.execute('''SELECT idGalaxie FROM Query''')
     galaxies_query = cursor_query.fetchone()
+    is_result = False
 
     while galaxies_query:
 
@@ -436,13 +434,14 @@ def nodes_filter(filter_, project_path):
                     append = False
                     break
             if append:
+                is_result = True
                 cursor.execute('''INSERT INTO Filter values (?,?,?,?)''', (node[0], galaxies_query[0], True, False,))
             node = cursor_node.fetchone()
         galaxies_query = cursor_query.fetchone()
 
     connexion.commit()
     connexion.close()
-    return
+    return is_result
 
 
 def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
