@@ -109,9 +109,11 @@ class Galaxie:
         self.project_path = directory
         self.interface.change_name(directory.split('/')[-1])
         self.interface.display_graph_list()
-        self.query = lecture_fic.load_query(self.project_path)
-        text = "The "+self.project_path.split('/')[-1]+" Project has been loaded successfully"
-        self.interface.display_info(text, self.query)
+        query = lecture_fic.load_query(self.project_path)
+        self.query = query.get('query', None)
+        self.filter_ = query.get('filter', None)
+        text = "The "+self.project_path.split('/')[-1]+" Project has been loaded successfully\n\nYour last query was:\n"
+        self.interface.display_info(text, {'query': self.query, 'filter': self.filter_})
         self.interface.enabled_window()
 
     def _execute_query_aux(self, query):
@@ -294,7 +296,7 @@ class Galaxie:
             webbrowser.open(self.project_path + '/index.html')
 
     def display_query(self):
-        self.interface.display_info("", self.query)
+        self.interface.display_info("", {'query': self.query, 'filter': self.filter_})
 
     def mark_galaxie(self, id_galaxie):
         extractionGalaxies.mark_galaxie_query_table(self.project_path, id_galaxie)
