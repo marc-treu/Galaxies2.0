@@ -16,6 +16,12 @@ import time
 class galaxie:  # permet d'énumérer composantes connexes
 
     def __init__(self, project_path, max_length_galaxie):
+        """
+
+        :param project_path: The path of the current project
+        :type project_path: A String
+        :param max_length_galaxie:
+        """
         self.val = 0
         self.compositionGalaxie = dict()
         self.tempsIni = time.clock()
@@ -220,6 +226,15 @@ class noeudMarques():
 
 
 def extractionComposantesConnexes(maxNoeud, project_path, max_length_galaxie, step=10000):
+    """
+
+    :param maxNoeud:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :param max_length_galaxie:
+    :param step:
+    :return:
+    """
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
@@ -279,7 +294,8 @@ def get_meta_data_from_idGalaxie(project_path, idGalaxie):
     """
         Function that connects to the data base, and extracts and returns meta information about a specific Galaxie
 
-    :param project_path: The path of the project
+    :param project_path: The path of the current project
+    :type project_path: A String
     :param idGalaxie: The id of the Galaxie we want meta-data
     :return: The line in table degreGalaxies that corresponding to the Galaxie Id
     """
@@ -331,6 +347,13 @@ def update_query_table(cursor, galaxies_list):
 
 
 def mark_galaxie_query_table(project_path, id_galaxie):
+    """
+
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :param id_galaxie:
+    :return:
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     cursor.execute('''SELECT mark from Query WHERE idGalaxie = ?''', (id_galaxie,))
@@ -341,6 +364,13 @@ def mark_galaxie_query_table(project_path, id_galaxie):
 
 
 def galaxies_filter(query, project_path):
+    """
+
+    :param query:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return:
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
@@ -365,6 +395,13 @@ def galaxies_filter(query, project_path):
 
 
 def nodes_filter(filter_, project_path):
+    """
+
+    :param filter_:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return:
+    """
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor_query = connexion.cursor()
@@ -438,6 +475,12 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
 
 
 def get_list_galaxie(project_path):
+    """
+
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return: A list of tuple compose of (galaxy id, galaxy number of node, galaxy Mark) (e.g. [('2', 5, 1), ...])
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     cursor.execute(
@@ -445,6 +488,7 @@ def get_list_galaxie(project_path):
             ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
     connexion.close()
+    print("result =",result)
     return result
 
 
