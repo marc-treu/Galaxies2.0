@@ -126,7 +126,7 @@ class Galaxie:
         self.interface.set_progress_bar_values(90, 100, "Display result")
         self.interface.display_graph_list()
         self.print_verbose("Galaxies list display")
-
+        self.interface.display_info("", {'query': self.query, 'filter': self.filter_})
         self.interface.enabled_window()
 
     def _execute_query(self):
@@ -140,7 +140,8 @@ class Galaxie:
             self._execute_query_aux(self.filter_)
         else:
             self.interface.enabled_window()
-            self.interface.display_info("Your filter has match 0 node", self.filter_)
+            self.interface.display_info("Your filter has match 0 node", {'query': None,
+                                                                         'filter': self.filter_[len(self.filter_)-1]})
 
     def _disable_window(self):
         """
