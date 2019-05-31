@@ -198,6 +198,8 @@ class Galaxie:
             self.get_requete_preprocessing()
         elif self.interface.ask_for_yes_no_txt("Are you sure you want to erase your Query", "Erase current Query"):
             self.query = None
+            baseDonnees.reload_query_table(project_path=self.project_path)
+            baseDonnees.reload_filter_table(project_path=self.project_path)
             self.get_requete_preprocessing()
 
     def undo_query(self):
@@ -224,6 +226,26 @@ class Galaxie:
             self.query = {0: query}
         else:
             self.query[len(self.query)] = query
+
+    def new_filter(self):
+        if self.filter_ is None:
+            self.get_requete_postprocessing()
+        elif self.interface.ask_for_yes_no_txt("Are you sure you want to erase your Filter", "Erase current filter"):
+            self.filter_ = None
+            baseDonnees.reload_filter_table(project_path=self.project_path)
+            self.get_requete_postprocessing()
+
+    def undo_filter(self):
+        if self.filter_ is not None:
+            self.interface.disabled_window()
+            self.interface.set_progress_bar_values(5, 100, "Suppress last query")
+            baseDonnees.reload_filter_table(project_path=self.project_path)
+            if len(self.filter_) == 1:
+                self.filter_ = None
+                self._execute_query()
+            else:
+                del self.filter_[len(self.filter_)-1]
+                self._execute_filter()
 
     def _add_filter(self, filter_):
 
@@ -254,7 +276,7 @@ class Galaxie:
         if self.project_path is None:
             return  # if no project are selected or stared
 
-        filename = visualisationGraphe.sauveGrapheGalaxie(id_galaxie, self.project_path)
+        filename = visualisationGraphe.sauveGrapheGalaxie_(id_galaxie, self.project_path)
         javaVisualisation.visualisation(filename, self.project_path)
         javaVisualisation.change_html_graph_display(id_galaxie, self.project_path)
 

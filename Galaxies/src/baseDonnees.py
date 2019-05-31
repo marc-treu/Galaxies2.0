@@ -8,6 +8,12 @@ import sqlite3
 
 
 def create_bd(project_path):
+    """
+
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return:
+    """
     print("Création de la base de données 'galaxie.db'")
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
@@ -25,7 +31,7 @@ def create_bd(project_path):
     cursor.execute('''CREATE TABLE degreGalaxies (idGalaxie TEXT UNIQUE, degreGalaxie INTEGER, 
         longueurTexteTotale INTEGER, longueurTexteMoyenne INTEGER, longueurTexteMax INTEGER)''')
     cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
-    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT)''')
+    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT, isKeep BOOLEAN, mark BOOLEAN)''')
     cursor.execute('''CREATE TABLE ListeNoeuds (idNoeud INTEGER, texte TEXT, idRowLivre INTEGER, 
         ordonnee INTEGER, empan INTEGER)''')
 
@@ -42,26 +48,67 @@ def create_bd(project_path):
     connexion.close()
 
 
-def reload_query_table(cursor):
+def reload_query_table(cursor=None, project_path=None):
     """
         Function that erase the Query table for create a new empty one.
     This fonction is call after a new query had been made by the user
 
     :param cursor: cursor on the DB
+    :param project_path: The path of the current project
+    :type project_path: A String
     """
+    is_open = False
+    if cursor is None:
+        connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+        cursor = connexion.cursor()
+        is_open = True
+
     cursor.execute('''DROP TABLE Query''')
     cursor.execute('''CREATE TABLE Query (idGalaxie TEXT, mark BOOLEAN)''')
 
+    if is_open is True:
+        connexion.commit()
+        connexion.close()
 
-def reload_filter_table(cursor):
+
+def reload_filter_table(cursor=None, project_path=None):
     """
         Function that erase the Filter table for create a new empty one.
     This fonction is call after a new filter query had been made by the user
 
     :param cursor: cursor on the DB
+    :param project_path: The path of the current project
+    :type project_path: A String
     """
+    is_open = False
+    if cursor is None:
+        connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+        cursor = connexion.cursor()
+        is_open = True
+
     cursor.execute('''DROP TABLE Filter''')
-    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT)''')
+    cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT, isKeep BOOLEAN, mark BOOLEAN)''')
+
+    if is_open is True:
+        connexion.commit()
+        connexion.close()
+
+
+def get_filter_exist(project_path):
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    cursor.execute('''SELECT 1 FROM Filter LIMIT 1''')
+    if cursor.fetchone():  # If we do have a Filter in our database
+        connexion.close()
+        return True
+    else:
+        connexion.close()
+        return False
+
+
+def get_filter_exist_cursor(cursor):
+    cursor.execute('''SELECT 1 FROM Filter LIMIT 1''')
+    return True if cursor.fetchone() else False
 
 
 def dateToInt(date):

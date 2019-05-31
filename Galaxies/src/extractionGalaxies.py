@@ -16,6 +16,12 @@ import time
 class galaxie:  # permet d'énumérer composantes connexes
 
     def __init__(self, project_path, max_length_galaxie):
+        """
+
+        :param project_path: The path of the current project
+        :type project_path: A String
+        :param max_length_galaxie:
+        """
         self.val = 0
         self.compositionGalaxie = dict()
         self.tempsIni = time.clock()
@@ -49,6 +55,7 @@ class galaxie:  # permet d'énumérer composantes connexes
         connexion = sqlite3.connect(self.data_base_path + '/galaxie.db', 1, 0, 'EXCLUSIVE')
         cursor = connexion.cursor()
         x = 0
+
         for id_galaxie in range(self.val):
 
             list_galaxies[str(id_galaxie)] = self.compositionGalaxie[str(id_galaxie)]
@@ -63,6 +70,7 @@ class galaxie:  # permet d'énumérer composantes connexes
                     i = len(list_amas)
                     for ama in list_amas:
                         if len(list_amas[ama]) > self.max_length_galaxie:
+                            print('id_galaxie =', ama, ' ;list_amas[ama] =', list_amas[ama])
                             list_amas_split = amas.create_partition(list_amas[ama], self.project_path)
                             for sub_ama in list_amas_split:
                                 list_amas_temp[ama + i] = list_amas_split[sub_ama]
@@ -137,8 +145,6 @@ class galaxie:  # permet d'énumérer composantes connexes
             update_node(curseurSource.fetchall()[0][0], node[1], node[2], node[3], node[4], curseurSource)
             update_node(curseurCible.fetchall()[0][0], node[5], node[6], node[7], node[8], curseurCible)
             node = curseur.fetchone()
-        # curseur.execute('''SELECT idNoeud from ListeNoeuds''')
-        # EnsembleNoeuds = set(curseur.fetchall())
 
 
 def add_nodes_database(cursor, list_nodes, galaxie_id):
@@ -151,6 +157,16 @@ def add_nodes_database(cursor, list_nodes, galaxie_id):
                 merge_node.append(new_node)
         if len(merge_node) > 1:
             new_node = merge_nodes(merge_node)
+        cursor.execute('''SELECT * FROM texteNoeuds WHERE idNoeud = (?)''', (node,))
+        c = cursor.fetchone()
+        if c:
+            print("c", c)
+            print("list_nodes",list_nodes)
+            print("node",node)
+            print("galaxie_id",galaxie_id)
+            print("new_node",new_node)
+            cursor.execute('''DELETE FROM texteNoeuds WHERE idNoeud = (?)''', (node,))
+
         cursor.execute('''INSERT INTO texteNoeuds values (?,?,?,?,?,?)''', (str(node), new_node[0], new_node[1],
                                                                             new_node[2], new_node[3], galaxie_id))
 
@@ -220,6 +236,15 @@ class noeudMarques():
 
 
 def extractionComposantesConnexes(maxNoeud, project_path, max_length_galaxie, step=10000):
+    """
+
+    :param maxNoeud:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :param max_length_galaxie:
+    :param step:
+    :return:
+    """
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     curseur = connexion.cursor()
@@ -279,7 +304,8 @@ def get_meta_data_from_idGalaxie(project_path, idGalaxie):
     """
         Function that connects to the data base, and extracts and returns meta information about a specific Galaxie
 
-    :param project_path: The path of the project
+    :param project_path: The path of the current project
+    :type project_path: A String
     :param idGalaxie: The id of the Galaxie we want meta-data
     :return: The line in table degreGalaxies that corresponding to the Galaxie Id
     """
@@ -326,11 +352,19 @@ def texteGalaxie(numero, curseur, data_base_path):
 
 def update_query_table(cursor, galaxies_list):
     baseDonnees.reload_query_table(cursor)
+    baseDonnees.reload_filter_table(cursor)
     for galaxie in galaxies_list:
         cursor.execute('''INSERT INTO Query values (?,?)''', (galaxie, False,))
 
 
 def mark_galaxie_query_table(project_path, id_galaxie):
+    """
+
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :param id_galaxie:
+    :return:
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     cursor.execute('''SELECT mark from Query WHERE idGalaxie = ?''', (id_galaxie,))
@@ -341,6 +375,13 @@ def mark_galaxie_query_table(project_path, id_galaxie):
 
 
 def galaxies_filter(query, project_path):
+    """
+
+    :param query:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return:
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     dirGalaxies = shelve.open(project_path + '/BDs/listeGalaxies')
@@ -365,11 +406,19 @@ def galaxies_filter(query, project_path):
 
 
 def nodes_filter(filter_, project_path):
+    """
+
+    :param filter_:
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return:
+    """
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor_query = connexion.cursor()
     cursor_node = connexion.cursor()
     cursor = connexion.cursor()
+    baseDonnees.reload_filter_table(cursor)
 
     cursor_query.execute('''SELECT idGalaxie FROM Query''')
     galaxies_query = cursor_query.fetchone()
@@ -381,32 +430,19 @@ def nodes_filter(filter_, project_path):
 
         node = cursor_node.fetchone()
         while node:
-            if filtres.filtreLivres(filter_, node[1:]):
-                cursor.execute('''INSERT INTO Filter values (?,?)''', (node[0], galaxies_query))
+            append = True
+            for num_filter in filter_:
+                if not filtres.filtreLivres(filter_[num_filter], node[1:]):
+                    append = False
+                    break
+            if append:
+                cursor.execute('''INSERT INTO Filter values (?,?,?,?)''', (node[0], galaxies_query[0], True, False,))
             node = cursor_node.fetchone()
         galaxies_query = cursor_query.fetchone()
 
     connexion.commit()
     connexion.close()
     return
-
-    # node = cursor.fetchone()
-    # while node:
-    #     node = cursor.fetchone()
-    # for id_galaxie in dirGalaxies:
-    #     nodes_list = dirGalaxies[id_galaxie]
-    #     append = True
-    #     for num_query in query:
-    #         if not metaDonneesFiltreAux(nodes_list, query[num_query], cursor):
-    #             append = False
-    #             break
-    #     if append:
-    #         list_galaxies.append(id_galaxie)
-    #
-    # update_query_table(cursor, list_galaxies)
-    #
-    # dirGalaxies.close()
-    # return list_galaxies
 
 
 def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
@@ -424,9 +460,8 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
     filtre = False
 
     for Noeud in EnsNoeuds:
-        curseur.execute(
-            '''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''',
-            (Noeud,))
+        curseur.execute('''SELECT auteur, titre, date, empan FROM texteNoeuds LEFT OUTER JOIN livres 
+                        ON (livres.rowid = texteNoeuds.idRowLivre) WHERE idNoeud = (?)''', (Noeud,))
         LLivres = curseur.fetchall()[0]
         if LLivres[3] >= long_comparator:
             long_enough = True
@@ -438,11 +473,20 @@ def metaDonneesFiltreAux(EnsNoeuds, requete, curseur):
 
 
 def get_list_galaxie(project_path):
+    """
+
+    :param project_path: The path of the current project
+    :type project_path: A String
+    :return: A list of tuple compose of (galaxy id, galaxy number of node, galaxy Mark) (e.g. [('2', 5, 1), ...])
+    """
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
-    cursor.execute(
-        '''SELECT Query.idGalaxie, degreGalaxie, mark FROM Query LEFT OUTER JOIN degreGalaxies 
-            ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
+    cursor.execute('''SELECT 1 FROM Filter LIMIT 1''')
+    if cursor.fetchone():  # If we do have a Filter in our database
+        cursor.execute('''SELECT idGalaxie, count(idNoeud), mark FROM Filter WHERE isKeep GROUP BY idGalaxie''')
+    else:  # If not
+        cursor.execute('''SELECT Query.idGalaxie, degreGalaxie, mark FROM Query LEFT OUTER JOIN degreGalaxies 
+                        ON (Query.idGalaxie = degreGalaxies.idGalaxie)''')
     result = [id_galaxie for id_galaxie in cursor.fetchall()]
     connexion.close()
     return result
