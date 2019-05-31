@@ -89,7 +89,9 @@ class InterfaceGalaxies(tk.Tk):
         self.button_new_query = None
         self.button_add_query = None
         self.button_undo_query = None
-        self.button_apply_filter = None
+        self.button_new_filter = None
+        self.button_add_filter = None
+        self.button_undo_filter = None
         self.button_display_graph = None
 
         # Creation of the button on right bottom
@@ -141,20 +143,23 @@ class InterfaceGalaxies(tk.Tk):
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=12, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_new_query = tk.Button(processing, text="New Query on Galaxies", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_new_query.grid(row=1, rowspan=3, column=0)
 
-        self.button_add_query = tk.Button(processing, text="Add Query", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
-        self.button_add_query.grid(row=4, rowspan=3, column=0)
+        self.button_add_query = tk.Button(processing, text="Add Query on Galaxies", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_add_query.grid(row=5, rowspan=3, column=0)
 
-        self.button_undo_query = tk.Button(processing, text="Undo Query", command=self.galaxie.undo_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
-        self.button_undo_query.grid(row=8, rowspan=3, column=0)
+        self.button_undo_query = tk.Button(processing, text="Undo last Query on Galaxies", command=self.galaxie.undo_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_undo_query.grid(row=10, rowspan=3, column=0)
 
-        self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
-        self.button_apply_filter.grid(row=1, rowspan=3, column=2)
+        self.button_new_filter = tk.Button(processing, text="New filter on node", command=self.galaxie.get_requete_postprocessing)
+        self.button_new_filter.grid(row=1, rowspan=3, column=2)
 
-        self.button_apply_filter = tk.Button(processing, text="Apply filter\n on node")
-        self.button_apply_filter.grid(row=1, rowspan=3, column=2)
+        self.button_add_filter = tk.Button(processing, text="Add filter on node")
+        self.button_add_filter.grid(row=5, rowspan=3, column=2)
+
+        self.button_undo_filter = tk.Button(processing, text="Undo last filter on node")
+        self.button_undo_filter.grid(row=10, rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
         button.pack(side=tk.BOTTOM, fill="both", expand=True)
@@ -182,17 +187,17 @@ class InterfaceGalaxies(tk.Tk):
         except:
             self.enabled_window()
 
-    def get_requete_from_user(self):
+    def get_requete_pre_from_user(self):
 
         def recupere():
             if auteur.get():
-                requete['auteur'] = auteur.get().split(',')
+                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get()) if words is not '']
             if notauteur.get():
-                requete['-auteur'] = notauteur.get().split(',')
+                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get()) if words is not '']
             if mcles.get():
-                requete['mots_titre'] = mcles.get().split()
+                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get()) if words is not '']
             if notmcles.get():
-                requete['-mots_titre'] = notmcles.get().split()
+                requete['-mots_titre'] = [words.strip() for words in re.split('[;,/]', notmcles.get()) if words is not '']
             if date.get():
                 requete['date'] = [int(s) for s in date.get().split() if s.isdigit()]
                 if len(requete['date']) == 0:
@@ -227,7 +232,7 @@ class InterfaceGalaxies(tk.Tk):
 
         fenetre = tk.Toplevel()
         fenetre.title("Recherche dans les galaxies")
-        fenetre.geometry("800x400")
+        fenetre.geometry("800x370")
 
         tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0, column=1)
 
@@ -276,6 +281,109 @@ class InterfaceGalaxies(tk.Tk):
                                                                                                    , column=1)
         nbnoeuds_max = tk.Entry(fenetre, width=30)
         nbnoeuds_max.grid(sticky="w", row=9, column=2)
+
+        requete = dict()
+        is_close = [False]
+
+        tk.Label(fenetre, text="\n").grid(row=11)
+        tk.Button(fenetre, text="Valider", command=recupere).grid(row=12, column=2)
+        tk.Button(fenetre, text="Fermer", command=close_window).grid(sticky="w", row=12, column=1)
+        fenetre.bind("<Return>", lambda e: recupere())
+        fenetre.bind("<Escape>", lambda e: close_window())
+
+        self.wait_window(fenetre)
+        return requete if is_close[0] is False else None
+
+    def get_requete_post_from_user(self):
+
+        def recupere():
+            if auteur.get():
+                requete['auteur'] = [words.strip() for words in re.split('[;,/]', auteur.get()) if words is not '']
+            if notauteur.get():
+                requete['-auteur'] = [words.strip() for words in re.split('[;,/]', notauteur.get()) if words is not '']
+            if mcles.get():
+                requete['mots_titre'] = [words.strip() for words in re.split('[;,/]', mcles.get()) if words is not '']
+            if notmcles.get():
+                requete['-mots_titre'] = [words.strip()for words in re.split('[;,/]', notmcles.get())if words is not '']
+            if text.get():
+                requete['text'] = [words.strip() for words in re.split('[;,/]', text.get()) if words is not '']
+            if nottext.get():
+                requete['-text'] = [words.strip() for words in re.split('[;,/]', nottext.get()) if words is not '']
+            if date.get():
+                requete['date'] = [int(s) for s in date.get().split() if s.isdigit()]
+                if len(requete['date']) == 0:
+                    del requete['date']
+                elif len(requete['date']) == 1:
+                    i = 1
+                    while date.get()[i] == ' ':
+                        i = i + 1
+                    if date.get()[i] == '-':
+                        requete['date'].insert(0, "-")
+                    else:
+                        requete['date'].append("-")
+                elif len(requete['date']) == 0:
+                    print("Erreur à la déclaration de l'intervalle")
+                elif requete['date'][0] > requete['date'][1]:
+                    print(
+                        "Erreur dans la déclaration de l'intervalle\nDonner en premier argument une date antérieure à la seconde")
+            if empan_min.get():
+                requete['empan_min'] = [int(s) for s in empan_min.get().split() if s.isdigit()].pop()
+            if empan_max.get():
+                requete['empan_max'] = [int(s) for s in empan_max.get().split() if s.isdigit()].pop()
+
+            fenetre.destroy()
+
+        def close_window():
+            is_close[0] = True
+            fenetre.destroy()
+
+        fenetre = tk.Toplevel()
+        fenetre.title("Recherche dans les noeuds")
+        fenetre.geometry("800x370")
+
+        tk.Label(fenetre, text="\nEntrer les critères de recherche\n", font="FreeSerif 14 bold").grid(row=0, column=1)
+
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs présents du noeud :", font="Arial 11").grid(sticky="w"
+                                                                                                             , row=1
+                                                                                                             , column=1)
+        auteur = tk.Entry(fenetre, width=100)
+        auteur.grid(row=1, column=2)
+
+        tk.Label(fenetre, text="Noms et prénoms d'auteurs absents du noeud :", font="Arial 11").grid(sticky="w"
+                                                                                                          , row=2
+                                                                                                          , column=1)
+        notauteur = tk.Entry(fenetre, width=100)
+        notauteur.grid(row=2, column=2)
+
+        tk.Label(fenetre, text="Date de publication :\n(Donner un intervalle)", font="Arial 11").grid(sticky="w", row=3
+                                                                                                      , column=1)
+        date = tk.Entry(fenetre, width=80)
+        date.insert(0, '[ AAAA - AAAA ]')
+        date.grid(sticky="w", row=3, column=2)
+
+        tk.Label(fenetre, text="Mots présents dans le titre du noeud :", font="Arial 11").grid(sticky="w", row=4, column=1)
+        mcles = tk.Entry(fenetre, width=100)
+        mcles.grid(row=4, column=2)
+
+        tk.Label(fenetre, text="Mots absents du titres du noeud :", font="Arial 11").grid(sticky="w", row=5, column=1)
+        notmcles = tk.Entry(fenetre, width=100)
+        notmcles.grid(row=5, column=2)
+
+        tk.Label(fenetre, text="Longueur minimale du texte dans le noeud :", font="Arial 11").grid(sticky="w", row=6, column=1)
+        empan_min = tk.Entry(fenetre, width=30)
+        empan_min.grid(sticky="w", row=6, column=2)
+
+        tk.Label(fenetre, text="Longueur maximal du texte dans le noeud :", font="Arial 11").grid(sticky="w", row=7, column=1)
+        empan_max = tk.Entry(fenetre, width=30)
+        empan_max.grid(sticky="w", row=7, column=2)
+
+        tk.Label(fenetre, text="Text present dans le noeud :", font="Arial 11").grid(sticky="w", row=8, column=1)
+        text = tk.Entry(fenetre, width=30)
+        text.grid(sticky="w", row=8, column=2)
+
+        tk.Label(fenetre, text="Text absent dans le noeud :", font="Arial 11").grid(sticky="w", row=9, column=1)
+        nottext = tk.Entry(fenetre, width=30)
+        nottext.grid(sticky="w", row=9, column=2)
 
         requete = dict()
         is_close = [False]
@@ -383,7 +491,9 @@ class InterfaceGalaxies(tk.Tk):
             Disable the window, by disable all buttons on the page
         """
         self.liste_Graphe.configure(state='disable')
-        self.button_apply_filter.configure(state='disable')
+        self.button_new_filter.configure(state='disable')
+        self.button_add_filter.configure(state='disable')
+        self.button_undo_filter.configure(state='disable')
         self.button_display_graph.configure(state='disable')
         self.button_new_query.configure(state='disable')
         self.button_add_query.configure(state='disable')
@@ -397,7 +507,9 @@ class InterfaceGalaxies(tk.Tk):
             enable the window, by enable all buttons on the page
         """
         self.liste_Graphe.configure(state='normal')
-        self.button_apply_filter.configure(state='normal')
+        self.button_new_filter.configure(state='normal')
+        self.button_add_filter.configure(state='normal')
+        self.button_undo_filter.configure(state='normal')
         self.button_display_graph.configure(state='normal')
         self.button_new_query.configure(state='normal')
         self.button_add_query.configure(state='normal')
