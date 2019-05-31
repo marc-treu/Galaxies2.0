@@ -453,10 +453,7 @@ class InterfaceGalaxies(tk.Tk):
         :param text: the text we want to display
         :param query: if has one, the last time use query
         """
-        print('query  =', query)
-
         if query is not None:
-            print('query[query]  =', query['query'])
             if query.get('query', False):
                 text += 'Query on Galaxies :\n'
                 for item in query['query']:
