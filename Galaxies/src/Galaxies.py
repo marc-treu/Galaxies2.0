@@ -209,6 +209,8 @@ class Galaxie:
 
     def undo_query(self):
         if self.query is not None:
+            baseDonnees.reload_filter_table(project_path=self.project_path)
+            self.filter_ = None
             self.interface.disabled_window()
             self.interface.set_progress_bar_values(5, 100, "Suppress last query")
             if len(self.query) == 1:
