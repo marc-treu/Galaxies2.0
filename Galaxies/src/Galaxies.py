@@ -209,6 +209,10 @@ class Galaxie:
 
     def undo_query(self):
         if self.query is not None:
+            if self.filter_:
+                if not self.interface.ask_for_yes_no_txt("Are you sure you want to undo your last Query, it will erase "
+                                                         "your filte too", "Erase current Query"):
+                    return
             baseDonnees.reload_filter_table(project_path=self.project_path)
             self.filter_ = None
             self.interface.disabled_window()
