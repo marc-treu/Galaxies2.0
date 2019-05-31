@@ -99,6 +99,27 @@ class TSNE(object):
         return np.sum(produit)
 
 
+    """
+    def descente_gradient(self,p):
+        colonne = self.matrice_reduite.shape[1]
+        ligne = self.matrice_reduite.shape[0]
+        histo_y = np.zeros((ligne,2,colonne))
+        for epoque in range(self.iteration):
+            q = self.matrice_q()
+            pq= p-q
+            for i in range(ligne):
+                gradient = 0
+                temp = self.matrice_reduite[i] - self.matrice_reduite
+                for j in range(ligne):
+                    gradient += (self.matrice_reduite[i]-self.matrice_reduite[j]) * (pq[i][j]) * (1+np.linalg.norm(self.matrice_reduite[i]-self.matrice_reduite[j])**2)**(-1)
+                self.matrice_reduite[i] = histo_y[i][1] - self.learn_rate * 4 * gradient + self.momuntum * (histo_y[i][1]-histo_y[i][0])
+                histo_y[i][0] = histo_y[i][1]
+                histo_y[i][1] = self.matrice_reduite[i]
+            #if epoque%100==0:
+            print(self.kl_divergence(p,q))"""
+
+       
+
     
     def descente_gradient(self,p):
         colonne = self.matrice_reduite.shape[1]
@@ -106,22 +127,18 @@ class TSNE(object):
         histo_y = np.zeros((ligne,2,colonne))
         for epoque in range(self.iteration):
             q = self.matrice_q()
+            pq= p-q
             for i in range(ligne):
-                gradient = 0
-                for j in range(ligne):
-                    gradient += (self.matrice_reduite[i]-self.matrice_reduite[j])*(p[i][j]-q[i][j])*(1+np.linalg.norm(self.matrice_reduite[i]-self.matrice_reduite[j])**2)**(-1)
-                    self.matrice_reduite[i] = histo_y[1][1] - self.learn_rate * 4 * gradient + self.momuntum * (histo_y[i][1]-histo_y[i][0])
-                    histo_y[i][0] = histo_y[i][1]
-                    histo_y[i][1] = self.matrice_reduite[i]
+                temp = self.matrice_reduite[i] - self.matrice_reduite
+                gradient = np.sum(temp * pq[i].reshape(-1,1) * ((1+np.linalg.norm(temp,axis=1)**2)**(-1)).reshape(-1,1),axis=0)
+                self.matrice_reduite[i] = histo_y[i][1] - self.learn_rate * 4 * gradient + self.momuntum * (histo_y[i][1]-histo_y[i][0])
+                histo_y[i][0] = histo_y[i][1]
+                histo_y[i][1] = self.matrice_reduite[i]
             #if epoque%100==0:
-            print(self.kl_divergence(p,q)) 
+            #print(self.kl_divergence(p,q))
 
-        """
-        y-=np.mean(y)
-        y/=np.std(y)
-        return y
-        """
-
+        self.matrice_reduite -= np.mean(self.matrice_reduite)
+        self.matrice_reduite /= np.std(self.matrice_reduite)
 
     def fit_transform(self, x):
         self.matrice = x
@@ -135,7 +152,17 @@ class TSNE(object):
     
 if __name__ == '__main__':
 
-    tsne = TSNE(perplexite=5,iteration=1000)
-    x = np.random.rand(100,30)
-    tsne.fit_transform(x)
-    
+    tsne = TSNE(perplexite=3,iteration=50)
+    #x = np.random.rand(100,30)
+    x = np.array([[1,1,0,0,0,0],
+                  [0.9,0.9,0,0,0,0],
+                  [0.6,0.7,0,0,0,0],
+                  [0.5,0.5,0,0,0,0],
+                  [0.5,0.5,0.5,0,0,0],
+                  [0,0,0,0,0.5,0.5],
+                  [0,0,0,0,0,1],
+                  [0,0,0,0,1,1],
+                  [0,0,0,0,0.5,1],
+                  [0,0,0,0,0.2,1]])
+    y = tsne.fit_transform(x)
+    print(y)
