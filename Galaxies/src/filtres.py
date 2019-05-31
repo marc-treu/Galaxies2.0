@@ -6,7 +6,7 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import parametres
 
-FILTRE = ['empan', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date']
+FILTRE = ['empan', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date', 'text', '-text']
 
 
 def filtreLivres(requete, LLivre):

@@ -1,35 +1,9 @@
 # -*- coding:utf-8 -*-
 
-import parametres
-import webbrowser
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
-import visualisationGraphe
-import os
-import shutil
 import re
-
-
-def preparationVisualisation(project_path):
-    if 'jsons' in os.listdir(project_path):
-        shutil.rmtree(project_path + "/jsons")
-        os.mkdir(project_path + "/jsons")
-    count = 0
-
-    galaxies = os.listdir(project_path + "/graphs")
-    for i in galaxies:
-        visualisation(project_path + "/graphs/" + i, project_path)
-        count += 1
-    amas = os.listdir(project_path + "/amas")
-    for i in amas:
-        visualisation(project_path + '/amas/' + i, project_path)
-        count += 1
-
-
-def visualisaton_galaxie(num_galaxie):
-    Nom = visualisationGraphe.sauveGrapheGalaxie(num_galaxie)
-    visualisation(parametres.DirGraphes + Nom)
 
 
 def visualisation(fichier, project_path):
@@ -74,37 +48,6 @@ def visualisation(fichier, project_path):
     if filename is not None:
         with open(filename, 'w') as f:
             json.dump(data1, f)
-
-
-def selectionGrapheAffichage(nomFichier):
-    #os.mknod(parametres.DirPgm + 'code2.js')
-    #os.mknod(parametres.DirPgm + 'code1.js')
-    #print("Appel selection Graphe sur ")
-    shutil.copyfile(parametres.DirPgm + 'code1.js', parametres.DirPgm + 'code2.js')
-    #print("Copie code1 vers code2")
-    destination = open(parametres.DirPgm + 'code1.js', "w")
-    source = open(parametres.DirPgm + 'code2.js', "r")
-    for line in source:
-        # print(line)
-        # print(line=="  fetch({mode: 'no-cors'})\n")
-        if (line == "fetch()\n"):
-            destination.write('fetch(\'' + nomFichier + '\')\n')
-        elif (line == "  fetch({mode: 'no-cors'})\n"):
-            destination.write('fetch(\'' + nomFichier + '\', {mode :\'no-cors\'})\n')
-        else:
-            destination.write(line)
-
-    source.close()
-    destination.close()
-    #print("Fin")
-
-
-def affichage(nomFichier):
-    # print(nomFichier)
-    selectionGrapheAffichage(nomFichier)
-    webbrowser.open('file:///'+parametres.DirPgm + 'pop-up1.html')
-    shutil.copyfile(parametres.DirPgm + 'code2.js', parametres.DirPgm + 'code1.js')
-    os.remove(parametres.DirPgm + 'code2.js')
 
 
 def change_html_graph_display(id_galaxie, project_path):

@@ -143,22 +143,22 @@ class InterfaceGalaxies(tk.Tk):
         ttk.Separator(processing, orient=tk.VERTICAL).grid(row=0, rowspan=12, column=1, sticky=tk.N + tk.S)
         tk.Label(processing, text="Postprocessing").grid(row=0, column=2, sticky=tk.N + tk.S + tk.W + tk.E)
 
-        self.button_new_query = tk.Button(processing, text="New Query on Galaxies", command=self.galaxie.new_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_new_query = tk.Button(processing, text="New Query on Galaxies", command=self.galaxie.new_query)  # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_new_query.grid(row=1, rowspan=3, column=0)
 
-        self.button_add_query = tk.Button(processing, text="Add Query on Galaxies", command=self.galaxie.get_requete_preprocessing) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_add_query = tk.Button(processing, text="Add Query on Galaxies", command=self.galaxie.get_requete_preprocessing)  # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_add_query.grid(row=5, rowspan=3, column=0)
 
-        self.button_undo_query = tk.Button(processing, text="Undo last Query on Galaxies", command=self.galaxie.undo_query) # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
+        self.button_undo_query = tk.Button(processing, text="Undo last Query on Galaxies", command=self.galaxie.undo_query)  # command=lambda: self._try_fonction(self.galaxie.get_requete_preprocessing))
         self.button_undo_query.grid(row=10, rowspan=3, column=0)
 
-        self.button_new_filter = tk.Button(processing, text="New filter on node", command=self.galaxie.get_requete_postprocessing)
+        self.button_new_filter = tk.Button(processing, text="New filter on node", command=self.galaxie.new_filter)
         self.button_new_filter.grid(row=1, rowspan=3, column=2)
 
-        self.button_add_filter = tk.Button(processing, text="Add filter on node")
+        self.button_add_filter = tk.Button(processing, text="Add filter on node", command=self.galaxie.get_requete_postprocessing)
         self.button_add_filter.grid(row=5, rowspan=3, column=2)
 
-        self.button_undo_filter = tk.Button(processing, text="Undo last filter on node")
+        self.button_undo_filter = tk.Button(processing, text="Undo last filter on node", command=self.galaxie.undo_filter)
         self.button_undo_filter.grid(row=10, rowspan=3, column=2)
 
         button = tk.Frame(self.frame_right_button)
@@ -590,7 +590,7 @@ class InterfaceGalaxies(tk.Tk):
     def ask_for_max_length_galaxie(self, current_max):
         text = "Do you want to change the maximal size of galaxie ?\nThe actual size is " + str(current_max)\
                + "\n\nCancel for keep the previous size "
-        return simpledialog.askinteger("Set max length for galaxie", text, parent=self, minvalue=10)
+        return simpledialog.askinteger("Set max length for galaxie", text, parent=self, minvalue=0)
 
 
 if __name__ == '__main__':
