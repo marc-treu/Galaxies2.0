@@ -58,7 +58,7 @@ def inverse_bd(project_path, list_galaxie):
 
 
 if __name__ == '__main__':
-    path = "../projects/Balzac"
+    path = "../projects/projet2"
 
     # liste_galaxie = get_list_galaxie(path)
     # print([liste_galaxie])
@@ -77,24 +77,26 @@ if __name__ == '__main__':
     liste_galaxies = get_list_galaxie(path)
 
     matrix = np.zeros([len(t), len(liste_galaxies)])
-
+    """
     print("index =", index)
     print("matrix =", matrix)
     print("result =", result)
-    print("liste_galaxies =", liste_galaxies)
+    print("liste_galaxies =", liste_galaxies)"""
 
     dirGalaxies = shelve.open(path + '/BDs/listeGalaxies')
 
     for galaxie in range(len(liste_galaxies)):
         for node in dirGalaxies[str(liste_galaxies[galaxie])]:
-            matrix[index[node]][galaxie] = 1
+            matrix[index[node]][galaxie] += 1
+        
+        matrix[:,galaxie] = matrix[:,galaxie] / len(dirGalaxies[str(liste_galaxies[galaxie])])
 
     dirGalaxies.close()
-    print("matrix =", matrix)
+    print("matrix =", matrix[:10])
 
     label = np.array([i for i in range(len(t))])
 
-    tsne = TSNEVisualizer(decompose_by=20)
+    tsne = TSNEVisualizer(decompose='svd',decompose_by=15)
     tsne.fit(matrix, label)
     tsne.poof()
 
