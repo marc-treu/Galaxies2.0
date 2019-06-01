@@ -7,9 +7,10 @@ __author__ = 'Jean-Gabriel Ganascia'
 import baseDonnees
 import extractionGalaxies
 import grapheGalaxies
-import visualisationGraphe
 import javaVisualisation
 import lecture_fic
+import Score
+import visualisationGraphe
 
 import time
 import os
@@ -26,6 +27,8 @@ class Galaxie:
         self.query = None  # Query on galaxies (i.e. preprocessing)
         self.filter_ = None  # Query on node (i.e. postprocessing)
         self.max_length_galaxie = 100_000
+        self.score = None
+        self.lang = 'FR'
 
     def start_from_textalign_file(self):
         """
@@ -52,8 +55,12 @@ class Galaxie:
         self.interface.set_progress_bar_values(5, 100, "creation of project files")
         lecture_fic.init_directory(self.project_path)  # Creation of the project folder
         tt1 = time.clock()
+
         self.interface.set_progress_bar_values(10, 100, "creation of the Data Base")
         baseDonnees.create_bd(self.project_path)  # Creation of the database
+
+        self.score = self.initialize_score()
+
         t1 = time.clock()
         self.interface.set_progress_bar_values(20, 100, "filling the Data Base")
         lecture_fic.lecture(file, self.project_path)  # On remplie notre BD avec notre fichiers .tab
@@ -82,6 +89,9 @@ class Galaxie:
         extractionGalaxies.galaxies_filter({0: {}}, self.project_path)  # Apply the empty Query
         self.interface.display_graph_list()  # Then Display
         self.interface.enabled_window()  # And finally enable the window
+
+    def initialize_score(self):
+        return Score.Score(self.lang)
 
     def open_existing_project(self):
 
