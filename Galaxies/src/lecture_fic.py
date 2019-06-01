@@ -121,15 +121,33 @@ def load_query(project_path):
         return None
 
 
-def parse_lemmas(file_path):
+def parse_lemma(file_path):
 
     result = dict()
     with open(file_path, "r+") as file:
         line = file.readline()
         while line:
-            print("line =", line)
+
             line = line.split()
             result[line[0]] = line[1]
             line = file.readline()
 
     return result
+
+
+def parse_lexicon(file_path):
+
+    result = dict()
+    sum_frequence = 0
+
+    with open(file_path, "r+") as file:
+        line = file.readline()
+        while line:
+
+            line = line.split(";")
+            score = int(float(line[1][:-1]) + 1)
+            sum_frequence += score
+            result[line[0]] = score
+            line = file.readline()
+
+    return result, sum_frequence

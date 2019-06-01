@@ -91,7 +91,7 @@ class Galaxie:
         self.interface.enabled_window()  # And finally enable the window
 
     def initialize_score(self):
-        return Score.Score(self.lang)
+        return Score.Score(self.project_path ,self.lang)
 
     def open_existing_project(self):
 

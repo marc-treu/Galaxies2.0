@@ -34,6 +34,7 @@ def create_bd(project_path):
     cursor.execute('''CREATE TABLE Filter (idNoeud INTEGER UNIQUE, idGalaxie TEXT, isKeep BOOLEAN, mark BOOLEAN)''')
     cursor.execute('''CREATE TABLE ListeNoeuds (idNoeud INTEGER, texte TEXT, idRowLivre INTEGER, 
         ordonnee INTEGER, empan INTEGER)''')
+    cursor.execute('''CREATE TABLE Score (lem TEXT, probability FLOAT)''')
 
     cursor.execute('''CREATE INDEX idLivreSource ON grapheGalaxiesSource (idNoeud)''')
     cursor.execute('''CREATE INDEX idLivreCible ON grapheGalaxiesCible (idNoeud)''')
@@ -46,6 +47,8 @@ def create_bd(project_path):
 
     connexion.commit()
     connexion.close()
+    print("base de données 'galaxie.db' créé")
+
 
 
 def reload_query_table(cursor=None, project_path=None):
@@ -109,6 +112,18 @@ def get_filter_exist(project_path):
 def get_filter_exist_cursor(cursor):
     cursor.execute('''SELECT 1 FROM Filter LIMIT 1''')
     return True if cursor.fetchone() else False
+
+
+def fill_score(project_path, lexicon, sum_occurence):
+    
+    connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
+    cursor = connexion.cursor()
+    for word in lexicon:
+        score = (lexicon[word] / sum_occurence)
+        cursor.execute('''INSERT INTO Score values (?,?)''', (word, score,))
+
+    connexion.commit()
+    connexion.close()
 
 
 def dateToInt(date):
