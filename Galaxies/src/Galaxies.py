@@ -294,7 +294,8 @@ class Galaxie:
         """
         meta_data = extractionGalaxies.get_meta_data_from_idGalaxie(self.project_path, idGalaxie)
         return 'Galaxie selected : {}\n\nNumber of nodes : {}\nTotal lengh of text : {}\nMean of text : {}\nlongest ' \
-               'text : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4])
+               'Text : {}\nScore : {}\n'.format(meta_data[0], meta_data[1], meta_data[2], meta_data[3], meta_data[4]
+                                                , meta_data[5])
 
     def display_webbrowser(self, id_galaxie):
         """
