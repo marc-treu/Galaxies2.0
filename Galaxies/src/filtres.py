@@ -6,7 +6,7 @@ __author__ = 'Jean-Gabriel Ganascia'
 
 import parametres
 
-FILTRE = ['empan', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date', 'text', '-text']
+FILTRE = ['empan', 'empan_min', 'empan_max', 'auteur', '-auteur', 'mots_titre', '-mots_titre', 'date', 'text', '-text']
 
 
 def filtreLivres(requete, LLivre):
@@ -24,6 +24,12 @@ def filtreLivres(requete, LLivre):
 
     if 'empan' in clefs:
         if not LLivre[3] > requete['empan']:
+            return False
+    if 'empan_min' in clefs:
+        if not LLivre[3] > requete['empan_min']:
+            return False
+    if 'empan_max' in clefs:
+        if not LLivre[3] < requete['empan_max']:
             return False
     if 'auteur' in clefs:
         if not any(name.lower() in LLivre[0].lower() for name in requete['auteur']):
