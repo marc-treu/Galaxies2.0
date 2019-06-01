@@ -119,3 +119,17 @@ def load_query(project_path):
         return pickle.load(open(project_path + '/query', 'rb'))
     except:
         return None
+
+
+def parse_lemmas(file_path):
+
+    result = dict()
+    with open(file_path, "r+") as file:
+        line = file.readline()
+        while line:
+            print("line =", line)
+            line = line.split()
+            result[line[0]] = line[1]
+            line = file.readline()
+
+    return result
