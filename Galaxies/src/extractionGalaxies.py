@@ -112,8 +112,8 @@ class galaxie:  # permet d'énumérer composantes connexes
                 for texte in texteGalaxie(galaxie, cursor, self.data_base_path):
                     longueur += len(texte)
                     longueurMax = max(len(texte), longueurMax)
-                cursor.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?)''',
-                                 (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, )))
+                cursor.execute('''INSERT INTO degreGalaxies values (?, ?, ?, ?, ?, ?)''',
+                                 (str(galaxie), str(n), str(longueur), str(int(longueur / n)), str(longueurMax, ), 0))
                 if int(longueur / n) > longueurMax:
                     print("ERROR : average length > max length, galaxie =", galaxie)
                 i += 1
@@ -499,6 +499,7 @@ def sort_list_galaxie(project_path, table_index=0):
             2 longueurTexteTotale
             3 longueurTexteMoyenne
             4 longueurTexteMax
+            5 score
         that is base on the degreGalaxies table
 
     :param project_path:
@@ -509,7 +510,7 @@ def sort_list_galaxie(project_path, table_index=0):
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     select_item = {0: 'idGalaxie', 1: 'degreGalaxie', 2: 'longueurTexteTotale', 3: 'longueurTexteMoyenne',
-                   4: 'longueurTexteMax'}
+                   4: 'longueurTexteMax', 5: 'score'}
     result = sorted(galaxies_list, key=lambda Galaxie: degreGalaxie(Galaxie[0], cursor, select_item[table_index]))
     connexion.close()
     return result

@@ -59,25 +59,33 @@ class Galaxie:
         self.interface.set_progress_bar_values(10, 100, "creation of the Data Base")
         baseDonnees.create_bd(self.project_path)  # Creation of the database
 
+        self.interface.set_progress_bar_values(20, 100, "creation of the lemmatizer")
         self.score = self.initialize_score()
 
         t1 = time.clock()
-        self.interface.set_progress_bar_values(20, 100, "filling the Data Base")
+        self.interface.set_progress_bar_values(30, 100, "filling the Data Base")
         lecture_fic.lecture(file, self.project_path)  # On remplie notre BD avec notre fichiers .tab
         t2 = time.clock()
         self.print_verbose("Temps de lecture du fichier source: " + format(t2 - t1, 'f') + " sec.")
+
         self.interface.set_progress_bar_values(50, 100, "creation of the galaxies")
         number_of_node = grapheGalaxies.construction_graphe(self.project_path)
         grapheGalaxies.sauvegarde_graphe(self.project_path)  # Et on le sauvegarde
         self.interface.set_progress_bar_values(70, 100, "saving + split the huge galaxies")
+
         if number_of_node == 0:
             number_of_node = baseDonnees.maxNoeuds(self.project_path + '/BDs')
+
         t1 = time.clock()
         extractionGalaxies.extractionComposantesConnexes(number_of_node, self.project_path, self.max_length_galaxie)
         tt2 = time.clock()
         self.print_verbose("Temps total: " + format(tt2 - tt1, 'f') + " sec.")
         t2 = time.clock()
         self.print_verbose("Temps total d'extraction des composantes connexes: " + format(t2 - t1, 'f') + " sec.")
+
+        self.interface.set_progress_bar_values(70, 100, "Compute the score for each galaxies")
+        self.score.compute_score()
+
         self.print_verbose("Operation terminée start_from_textAlign_file")
         self._get_all_graph()
 
@@ -91,7 +99,7 @@ class Galaxie:
         self.interface.enabled_window()  # And finally enable the window
 
     def initialize_score(self):
-        return Score.Score(self.project_path ,self.lang)
+        return Score.Score(self.project_path, self.lang)
 
     def open_existing_project(self):
 

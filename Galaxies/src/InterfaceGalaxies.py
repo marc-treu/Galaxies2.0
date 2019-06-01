@@ -43,10 +43,11 @@ class InterfaceGalaxies(tk.Tk):
         self.frame_left_top = tk.Frame(self.frame_left)
         self.frame_left_top.pack(side=tk.TOP, fill="both", expand=True, padx='2', pady='2')
 
-        self.combo_box = ttk.Combobox(self.frame_left_top, values=['', 'name', 'number of node ascending',
-                                                                   'number of node descending', 'longest text',
-                                                                   'shortest text', 'text average length ascending',
-                                                                   'text average length descending'])
+        self.combo_box = ttk.Combobox(self.frame_left_top, values=['', 'name', 'number of node asc',
+                                                                   'number of node des', 'min score', 'max score',
+                                                                   'longest text', 'shortest text',
+                                                                   'text average length asc',
+                                                                   'text average length des'])
         self.combo_box.pack(side=tk.RIGHT, pady='2')
         self.combo_box.bind('<<ComboboxSelected>>', lambda event: self.display_graph_list())
         self.combo_box.current(0)
@@ -414,10 +415,10 @@ class InterfaceGalaxies(tk.Tk):
 
         if self.sort_method == '':
             list_graph = extractionGalaxies.get_list_galaxie(project_path)
-        elif self.sort_method == 'number of node ascending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
-        elif self.sort_method == 'number of node descending':
+        elif self.sort_method == 'number of node asc':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)
+        elif self.sort_method == 'number of node des':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 1)[::-1]
         elif self.sort_method == 'shortest text':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 4)
         elif self.sort_method == 'longest text':
@@ -425,11 +426,14 @@ class InterfaceGalaxies(tk.Tk):
         elif self.sort_method == 'name':
             list_graph = sorted(extractionGalaxies.get_list_galaxie(project_path),
                                 key=lambda x: extractionGalaxies.get_int(x[0]))
-        elif self.sort_method == 'text average length ascending':
-            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
-        elif self.sort_method == 'text average length descending':
+        elif self.sort_method == 'text average length asc':
             list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)
-        print("list_graph =", list_graph)
+        elif self.sort_method == 'text average length des':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 3)[::-1]
+        elif self.sort_method == 'max score':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 5)[::-1]
+        elif self.sort_method == 'min score':
+            list_graph = extractionGalaxies.sort_list_galaxie(project_path, 5)
 
         for graph in list_graph:
             space = " " * (14 - 2 * len(str(graph[0]))) + " with "
