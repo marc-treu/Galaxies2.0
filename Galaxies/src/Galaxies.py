@@ -128,8 +128,9 @@ class Galaxie:
         self.interface.change_name(directory.split('/')[-1])
         self.interface.display_graph_list()
         query = lecture_fic.load_query(self.project_path)
-        self.query = query.get('query', None)
-        self.filter_ = query.get('filter', None)
+        if query:
+            self.query = query.get('query', None)
+            self.filter_ = query.get('filter', None)
         text = "The "+self.project_path.split('/')[-1]+" Project has been loaded successfully\n\nYour last query was:\n"
         self.interface.display_info(text, {'query': self.query, 'filter': self.filter_})
         self.interface.enabled_window()

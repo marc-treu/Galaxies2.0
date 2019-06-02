@@ -7,8 +7,8 @@ $.getJSON("jsons/exemple.json", function (data) {
                 selector: 'node',
                 style: {
                     'label': function(node){ return GetLabel(node);},
-                    'width': 'data(longueurTexte)',
-		   			'height' : 'data(longueurTexte)',
+                    'width': function(node){ return Math.min(node.data().longueurTexte,500);},
+		   			'height' : function(node){ return Math.min(node.data().longueurTexte,500);},
                     'background-color': function(node){ return 'rgb(5,'+GetColor(node)+',5)';},
                     'color': 'blue',
                     'background-fit': 'contain',

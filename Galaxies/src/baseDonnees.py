@@ -112,16 +112,22 @@ def get_filter_exist_cursor(cursor):
     return True if cursor.fetchone() else False
 
 
-def fill_score(project_path, lexicon, sum_occurence):
+def fill_score(project_path, lexicon):
 
     connexion = sqlite3.connect(project_path + '/BDs/galaxie.db', 1, 0, 'EXCLUSIVE')
     cursor = connexion.cursor()
     for word in lexicon:
-        score = (lexicon[word] / sum_occurence)
+        score = lexicon[word]
         cursor.execute('''INSERT INTO Score values (?,?)''', (word, score,))
 
     connexion.commit()
     connexion.close()
+
+
+def get_probability(lem, cursor):
+    cursor.execute('''SELECT probability FROM Score WHERE lem = (?)''', (lem,))
+    score = cursor.fetchone()
+    return score[0] if score else 1
 
 
 def dateToInt(date):

@@ -58,7 +58,7 @@ def inverse_bd(project_path, list_galaxie):
 
 
 if __name__ == '__main__':
-    path = "../projects/projet2"
+    path = "../projects/Balzac"
 
     # liste_galaxie = get_list_galaxie(path)
     # print([liste_galaxie])
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     label = np.array([i for i in range(len(t))])
 
-    tsne = TSNEVisualizer(decompose='svd',decompose_by=15)
+    tsne = TSNEVisualizer(decompose='svd',decompose_by=20)
     tsne.fit(matrix, label)
     tsne.poof()
 

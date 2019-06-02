@@ -147,7 +147,8 @@ def parse_lexicon(file_path):
             line = line.split(";")
             score = int(float(line[1][:-1]) + 1)
             sum_frequence += score
-            result[line[0]] = score
+            if score > 1:
+               result[line[0]] = score
             line = file.readline()
 
     return result, sum_frequence
